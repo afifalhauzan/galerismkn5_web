@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -44,5 +46,37 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Check if user is a guru (teacher)
+     */
+    public function isGuru(): bool
+    {
+        return $this->role === 'guru';
+    }
+
+    /**
+     * Check if user is a siswa (student)
+     */
+    public function isSiswa(): bool
+    {
+        return $this->role === 'siswa';
+    }
+
+    /**
+     * Scope to get only guru users
+     */
+    public function scopeGuru($query)
+    {
+        return $query->where('role', 'guru');
+    }
+
+    /**
+     * Scope to get only siswa users
+     */
+    public function scopeSiswa($query)
+    {
+        return $query->where('role', 'siswa');
     }
 }
