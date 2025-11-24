@@ -53,8 +53,14 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Copy application files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Install PHP dependencies with dev dependencies for seeding
+RUN composer install --optimize-autoloader --no-interaction
+
+# Run database migrations and seeders (if needed)
+# Note: This requires database connection, so it's better to run these commands after container starts
+
+# Remove dev dependencies for production
+# RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
