@@ -12,6 +12,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
+RUN npm install --os=linux --cpu=x64 sharp
+
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
