@@ -49,6 +49,8 @@ COPY default.conf /etc/nginx/http.d/default.conf
 
 # Copy supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Copy PHP configuration
+COPY php.ini /usr/local/etc/php/conf.d/99-custom.ini
 
 COPY composer.json composer.lock ./
 
@@ -69,8 +71,8 @@ COPY . .
 #     && chmod -R 755 /var/www/html/storage \
 #     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Copy PHP configuration
-COPY php.ini /usr/local/etc/php/conf.d/99-custom.ini
+# Run the dump-autoload again to ensure the copied files are mapped
+RUN composer dump-autoload --optimize
 
 # Create necessary directories
 RUN mkdir -p /var/log/supervisor /var/run/nginx
