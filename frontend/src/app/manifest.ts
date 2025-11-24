@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'MyWebSite',
     short_name: 'MySite',
     description: 'My awesome Next.js PWA',
-    start_url: '/', // <--- FIXED: Added this
+    start_url: '/login', // <--- FIXED: Added this
     display: 'standalone',
     background_color: '#ffffff',
     theme_color: '#ffffff',
