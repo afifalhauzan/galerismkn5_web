@@ -52,13 +52,11 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Copy PHP configuration
 COPY php.ini /usr/local/etc/php/conf.d/99-custom.ini
 
-COPY composer.json composer.lock ./
+# Copy application files
+COPY . .
 
 # Install PHP dependencies with dev dependencies for seeding
 RUN composer install --optimize-autoloader --no-interaction
-
-# Copy application files
-COPY . .
 
 # Run database migrations and seeders (if needed)
 # Note: This requires database connection, so it's better to run these commands after container starts
