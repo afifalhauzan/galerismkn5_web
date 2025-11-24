@@ -50,11 +50,13 @@ COPY default.conf /etc/nginx/http.d/default.conf
 # Copy supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Copy application files
-COPY . .
+COPY composer.json composer.lock ./
 
 # Install PHP dependencies with dev dependencies for seeding
 RUN composer install --optimize-autoloader --no-interaction
+
+# Copy application files
+COPY . .
 
 # Run database migrations and seeders (if needed)
 # Note: This requires database connection, so it's better to run these commands after container starts
@@ -63,9 +65,9 @@ RUN composer install --optimize-autoloader --no-interaction
 # RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# RUN chown -R www-data:www-data /var/www/html \
+#     && chmod -R 755 /var/www/html/storage \
+#     && chmod -R 755 /var/www/html/bootstrap/cache
 
 # Copy PHP configuration
 COPY php.ini /usr/local/etc/php/conf.d/99-custom.ini
