@@ -27,7 +27,22 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Define gate for API docs access
-        Gate::define('viewApiDocs', function (User $user) {
+        Gate::define('viewApiDocs', function (?User $user = null) {
+            // Allow access in local environment
+            if (app()->environment('local')) {
+                return true;
+            }
+            
+            // Check if user is authenticated via any guard
+            if (!$user) {
+                // Try to get user from different guards
+                $user = auth()->guard('web')->user() ?? auth()->guard('sanctum')->user();
+            }
+            
+            if (!$user) {
+                return false;
+            }
+            
             // Allow access for admin users or specific emails
             return $user->role === 'admin' || in_array($user->email, [
                 'admin@smkn5.com',
