@@ -30,7 +30,7 @@ return [
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => '',
+        'description' => 'API Documentation for Galeri Digital SMKN 5 - A digital gallery system for managing student artworks and educational content.',
     ],
 
     /*
@@ -40,7 +40,7 @@ return [
         /*
          * Define the title of the documentation's website. App name is used when this config is `null`.
          */
-        'title' => null,
+        'title' => 'Galeri SMKN5 API Documentation',
 
         /*
          * Define the theme of the documentation. Available options are `light`, `dark`, and `system`.
@@ -80,17 +80,11 @@ return [
      * The list of servers of the API. By default, when `null`, server URL will be created from
      * `scramble.api_path` and `scramble.api_domain` config variables. When providing an array, you
      * will need to specify the local server URL manually (if needed).
-     *
-     * Example of non-default config (final URLs are generated using Laravel `url` helper):
-     *
-     * ```php
-     * 'servers' => [
-     *     'Live' => 'api',
-     *     'Prod' => 'https://scramble.dedoc.co/api',
-     * ],
-     * ```
      */
-    'servers' => null,
+    'servers' => [
+        'Production' => 'https://galerismkn5.duckdns.org/api',
+        'Local' => 'http://localhost:8000/api',
+    ],
 
     /**
      * Determines how Scramble stores the descriptions of enum cases.
