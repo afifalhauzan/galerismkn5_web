@@ -16,33 +16,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create default admin user
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'role' => 'admin',
-            'password' => Hash::make('admin12345'),
+        // Run seeders in correct order due to foreign key constraints
+        $this->call([
+            JurusanSeeder::class,
+            UserSeeder::class,
+            ProyekSeeder::class,
+            PenilaianSeeder::class,
         ]);
-
-        // Create test siswa user
-        User::factory()->create([
-            'name' => 'Siswa User',
-            'email' => 'siswa@example.com',
-            'role' => 'siswa',
-            'password' => Hash::make('siswa12345'),
-        ]);
-
-        // Create test guru user
-        User::factory()->create([
-            'name' => 'Guru User',
-            'email' => 'guru@example.com',
-            'role' => 'guru',
-            'password' => Hash::make('guru12345'),
-        ]);
-
-        // Create additional random users for testing (only in development)
-        if (app()->environment('local', 'development')) {
-            User::factory(10)->create();
-        }
     }
 }

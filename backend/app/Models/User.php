@@ -22,7 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'nis_nip',
         'role',
+        'jurusan_id',
     ];
 
     /**
@@ -62,6 +64,38 @@ class User extends Authenticatable
     public function isSiswa(): bool
     {
         return $this->role === 'siswa';
+    }
+
+    /**
+     * Check if user is an admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Get the jurusan that the student belongs to
+     */
+    public function jurusan()
+    {
+        return $this->belongsTo(Jurusan::class);
+    }
+
+    /**
+     * Get the proyeks created by this user (siswa)
+     */
+    public function proyeks()
+    {
+        return $this->hasMany(Proyek::class);
+    }
+
+    /**
+     * Get the penilaians given by this user (guru)
+     */
+    public function penilaians()
+    {
+        return $this->hasMany(Penilaian::class, 'guru_id');
     }
 
     /**
