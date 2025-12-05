@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import SWRProvider from "@/providers/SWRProvider";
+import ProgressProviders from '@/app/bprogress';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,11 +30,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SWRProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </SWRProvider>
+        <ProgressProviders>
+          <SWRProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </SWRProvider>
+        </ProgressProviders>
       </body>
     </html>
   );
