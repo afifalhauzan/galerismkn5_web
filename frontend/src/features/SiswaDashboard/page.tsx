@@ -8,44 +8,9 @@ export default function SiswaDashboard({ user, logout }: { user: any, logout: ()
     const { stats, isLoading: statsLoading, isError } = useUserStats();
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 md:pt-15">
             {/* Siswa Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center py-6">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <div className="h-10 w-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                                    <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div className="ml-4">
-                                <h1 className="text-2xl font-bold text-white">Portal Siswa</h1>
-                                <p className="text-blue-200">Galeri Digital SMKN 5</p>
-                            </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4">
-                            <div className="text-right">
-                                <p className="text-sm font-medium text-white">{user.name}</p>
-                                <p className="text-xs text-blue-200">
-                                    Siswa SMKN 5
-                                </p>
-                            </div>
-                            <button
-                                onClick={logout}
-                                className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors text-sm"
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 <div className="px-4 py-6 sm:px-0">
                     {/* Welcome Section */}

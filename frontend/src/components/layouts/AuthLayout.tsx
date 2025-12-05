@@ -4,6 +4,8 @@ import { ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Navbar from "@/components/ui/Navbar";
+import Footer from "@/components/ui/Footer";
 
 interface AuthLayoutProps {
     children: ReactNode;
@@ -41,8 +43,12 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {children}
-        </div>
+        <>
+            <Navbar />
+            <main className="min-h-screen bg-zinc-50 font-sans pb-16 md:pb-0">
+                {children}
+            </main>
+            <Footer />
+        </>
     );
 }

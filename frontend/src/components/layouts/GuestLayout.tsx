@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import Navbar from "@/components/ui/Navbar";
+import Footer from "@/components/ui/Footer";
 
 interface GuestLayoutProps {
     children: ReactNode;
@@ -14,6 +15,7 @@ export default function GuestLayout({ children }: GuestLayoutProps) {
             <main className="min-h-screen bg-white">
                 {children}
             </main>
+            <Footer />
         </div>
     );
 }

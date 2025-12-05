@@ -2,7 +2,7 @@
 
 export default function Galeri() {
     return (
-        <div className="flex min-h-screen w-full flex-col items-center justify-center py-20 px-8">
+        <div className="flex min-h-screen w-full flex-col items-center justify-center py-20 px-4">
             <div className="max-w-6xl w-full text-center">
                 <h1 className="text-5xl font-bold text-gray-800 mb-6">
                     Galeri
