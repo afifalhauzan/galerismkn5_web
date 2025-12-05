@@ -15,6 +15,7 @@ class Proyek extends Model
         'judul',
         'deskripsi',
         'tautan_proyek',
+        'image_url',
         'status',
     ];
 

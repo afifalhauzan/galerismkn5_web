@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import Hero from "@/components/ui/Hero";
 import KaryaCarousel from "@/components/ui/KaryaCarousel";
+import KaryaCarouselServer from "@/components/ui/KaryaCarouselServer";
 
 interface LandingPageProps {
     user?: any;

@@ -3,8 +3,7 @@
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import KaryaCard from "@/components/ui/KaryaCard";
-import { useKaryaItems } from "@/hooks/ProjekHooks";
-import { Spinner } from "@/components/ui/spinner";
+import { KaryaItem } from "@/types/proyek";
 
 // Carousel configuration
 const responsive = {
@@ -59,52 +58,12 @@ const customStyles = `
     }
 `;
 
-interface KaryaCarouselProps {
+interface KaryaCarouselClientProps {
+    karyaItems: KaryaItem[];
     className?: string;
 }
 
-export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
-    const { karyaItems, isLoading, isError } = useKaryaItems({
-        status: 'dinilai', // Only show graded/approved projects
-        limit: 6, // Limit to 6 items for carousel
-        page: 1
-    });
-
-    if (isLoading) {
-        return (
-            <div className={`py-8 ${className}`}>
-                <div className="mb-6">
-                    <h2 className="inline-block w-full text-center bg-sky-700 text-white px-6 py-3 rounded-full text-lg font-semibold">
-                        Karya Unggulan
-                    </h2>
-                </div>
-                <div className="flex justify-center items-center py-16">
-                    <div className="text-center">
-                        <Spinner className="mx-auto mb-4" />
-                        <p className="text-gray-600">Loading karya unggulan...</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (isError) {
-        return (
-            <div className={`py-8 ${className}`}>
-                <div className="mb-6">
-                    <h2 className="inline-block w-full text-center bg-sky-700 text-white px-6 py-3 rounded-full text-lg font-semibold">
-                        Karya Unggulan
-                    </h2>
-                </div>
-                <div className="flex justify-center items-center py-16">
-                    <div className="text-center">
-                        <p className="text-gray-500">Failed to load featured projects</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
+export default function KaryaCarouselClient({ karyaItems, className = "" }: KaryaCarouselClientProps) {
     if (karyaItems.length === 0) {
         return (
             <div className={`py-8 ${className}`}>
@@ -122,6 +81,7 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
             </div>
         );
     }
+
     return (
         <div className={`py-8 ${className}`}>
             <style>{customStyles}</style>
@@ -135,16 +95,16 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
             <div className="relative">
                 <Carousel
                     responsive={responsive}
-                    infinite={true}
+                    infinite={karyaItems.length > 3}
                     autoPlay={false}
                     keyBoardControl={true}
                     customTransition="transform 300ms ease-in-out"
                     transitionDuration={300}
                     containerClass="carousel-container"
-                    removeArrowOnDeviceType={[]}
+                    removeArrowOnDeviceType={karyaItems.length <= 3 ? ["desktop", "tablet", "mobile"] : []}
                     itemClass="px-2"
                     showDots={false}
-                    arrows={true}
+                    arrows={karyaItems.length > 3}
                 >
                     {karyaItems.map((karya) => (
                         <KaryaCard key={karya.id} karya={karya} />

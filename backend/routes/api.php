@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProjekController;
 
 /**
  * Authentication Routes
@@ -12,6 +13,13 @@ use App\Http\Controllers\AuthController;
 // Public authentication routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+/**
+ * Public Proyek Routes
+ * These routes can be accessed without authentication for public viewing
+ */
+Route::get('/proyeks', [ProjekController::class, 'index'])->name('proyeks.index');
+Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyeks.show');
 
 /**
  * Protected Routes
@@ -40,4 +48,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'updated_at' => $user->updated_at,
         ]);
     })->name('user.profile');
+
+    /**
+     * Protected Proyek (Projects) Routes
+     * CRUD operations that require authentication
+     */
+    Route::post('/proyeks', [ProjekController::class, 'store'])->name('proyeks.store');
+    Route::put('/proyeks/{proyek}', [ProjekController::class, 'update'])->name('proyeks.update');
+    Route::patch('/proyeks/{proyek}', [ProjekController::class, 'update'])->name('proyeks.update.patch');
+    Route::delete('/proyeks/{proyek}', [ProjekController::class, 'destroy'])->name('proyeks.destroy');
+    Route::get('/my-proyeks', [ProjekController::class, 'myProjects'])->name('proyeks.my');
 });

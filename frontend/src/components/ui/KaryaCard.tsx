@@ -1,18 +1,10 @@
 "use client";
 
 import Image from "next/image";
-
-interface Karya {
-    id: number;
-    title: string;
-    description: string;
-    imageUrl: string;
-    author: string;
-    jurusan: string;
-}
+import type { KaryaItem } from '@/types/proyek';
 
 interface KaryaCardProps {
-    karya: Karya;
+    karya: KaryaItem;
 }
 
 export default function KaryaCard({ karya }: KaryaCardProps) {
@@ -21,7 +13,7 @@ export default function KaryaCard({ karya }: KaryaCardProps) {
             {/* Image Section */}
             <div className="relative w-full h-48 bg-gray-200">
                 <Image
-                    src={karya.imageUrl}
+                    src={karya.imageUrl ?? '/logosmkn5.png'}
                     alt={karya.title}
                     fill
                     className="object-cover"
