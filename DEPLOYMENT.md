@@ -79,11 +79,11 @@ docker-compose -f docker-compose.prod.yaml build --no-cache
 docker-compose -f docker-compose.prod.yaml up -d
 
 # Laravel commands
-docker-compose -f docker-compose.prod.yaml exec backend php artisan migrate
-docker-compose -f docker-compose.prod.yaml exec backend php artisan cache:clear
+docker compose -f docker-compose.prod.yaml exec backend php artisan migrate
+docker compose -f docker-compose.prod.yaml exec backend php artisan cache:clear
 
 # Database backup
-docker-compose -f docker-compose.prod.yaml exec mysql mysqldump -u root -p galerismkn5 > backup.sql
+docker compose -f docker-compose.prod.yaml exec mysql mysqldump -u root -p galerismkn5 > backup.sql
 ```
 
 ## Security Checklist
