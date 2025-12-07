@@ -15,7 +15,7 @@ export default function SearchCard({
     selectedCategory, 
     setSelectedCategory 
 }: SearchCardProps) {
-    const categories = ["Semua", "Kategori 1", "Kategori 2", "Kategori 3"];
+    const categories = ["Semua", "Umum", "Karya"];
 
     return (
         <div className="mb-6 space-y-4">
@@ -43,7 +43,7 @@ export default function SearchCard({
                     </svg>
                 </div>
                 
-                <div className="flex-1 bg-slate-600 rounded-lg px-4 py-2">
+                <div className="flex-1 bg-slate-500 rounded-lg px-4 py-2">
                     <input
                         type="text"
                         placeholder="Cari"

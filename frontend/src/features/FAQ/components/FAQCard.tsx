@@ -28,7 +28,7 @@ export default function FAQCard({ question, answer }: FAQCardProps) {
             </button>
             
             {isOpen && (
-                <div className="bg-slate-600 text-white px-6 py-4">
+                <div className="bg-sky-900 text-white px-6 py-4">
                     <p className="leading-relaxed">{answer}</p>
                 </div>
             )}

@@ -15,7 +15,7 @@ interface LandingPageProps {
 export default function LandingPage({ user, logout, isLoading }: LandingPageProps) {
     return (
         <div className="flex min-h-screen w-full flex-col items-center">
-            <div className="w-full max-w-6xl px-0 md:px-8 py-8 md:py-20">
+            <div className="w-full max-w-6xl px-0 md:px-8 md:py-8 md:py-20">
                 {/* Hero Section */}
                 <Hero />
 

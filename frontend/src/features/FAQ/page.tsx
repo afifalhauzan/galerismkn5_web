@@ -8,28 +8,33 @@ import KaryaCarousel from "@/components/ui/KaryaCarousel";
 const faqData = [
     {
         id: 1,
-        question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        answer: "Lorem ipsum dolor sit amet consectetur adipiscing elit fames, porttitor posuere nec ridiculus nisl pretium sollicitudin, nostra iaculis pulvinar ut ultrices vestibulum nascetur. Parturient viverra tristique nunc accumsan nibh vivamus malesuada elementum venenatis mi, blandit rutrum litora montes turpis imperdiet platea at fringilla eu facilisis, orci purus nisl vehicula nam phasellus penatibus facilisi ultrices."
+        question: "Apa itu website Galeri Project Akhir SMKN 5 Malang?",
+        answer: "Website ini adalah platform resmi sekolah untuk mengumpulkan, menampilkan, dan menilai project akhir siswa dari berbagai jurusan di SMKN 5 Malang. Siswa dapat mengunggah project melalui tautan eksternal, dan guru dapat melakukan review serta memberikan penilaian.",
+        category: "umum"
     },
     {
         id: 2,
-        question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        answer: "Lorem ipsum dolor sit amet consectetur adipiscing elit fames, porttitor posuere nec ridiculus nisl pretium sollicitudin, nostra iaculis pulvinar ut ultrices vestibulum nascetur. Parturient viverra tristique nunc accumsan nibh vivamus malesuada elementum venenatis mi, blandit rutrum litora montes turpis imperdiet platea at fringilla eu facilisis, orci purus nisl vehicula nam phasellus penatibus facilisi ultrices."
+        question: "Bagaimana cara siswa mengunggah project?",
+        answer: "Siswa harus login terlebih dahulu, kemudian masuk ke dashboard siswa dan klik “Unggah Project Baru”. Isi judul, deskripsi, jurusan, dan tautan eksternal (Google Drive, YouTube, GitHub, Figma), lalu simpan.",
+        category: "karya"
     },
     {
         id: 3,
-        question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        answer: "Lorem ipsum dolor sit amet consectetur adipiscing elit fames, porttitor posuere nec ridiculus nisl pretium sollicitudin, nostra iaculis pulvinar ut ultrices vestibulum nascetur. Parturient viverra tristique nunc accumsan nibh vivamus malesuada elementum venenatis mi, blandit rutrum litora montes turpis imperdiet platea at fringilla eu facilisis, orci purus nisl vehicula nam phasellus penatibus facilisi ultrices."
+        question: "Apakah saya bisa upload file langsung ke website?",
+        answer: "Tidak. Sistem hanya menerima tautan eksternal untuk menghemat kapasitas server. Pastikan tautan diset ke “public” atau “anyone with the link can view”.",
+        category: "karya"
     },
     {
         id: 4,
-        question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        answer: "Lorem ipsum dolor sit amet consectetur adipiscing elit fames, porttitor posuere nec ridiculus nisl pretium sollicitudin, nostra iaculis pulvinar ut ultrices vestibulum nascetur. Parturient viverra tristique nunc accumsan nibh vivamus malesuada elementum venenatis mi, blandit rutrum litora montes turpis imperdiet platea at fringilla eu facilisis, orci purus nisl vehicula nam phasellus penatibus facilisi ultrices."
+        question: "Bagaimana sistem penilaian project bekerja?",
+        answer: "Guru dapat melihat project siswa dengan login dan masuk pada dashboard guru, lalu memberikan nilai menggunakan rentang bintang 1–5. Nilai ini akan langsung muncul di dashboard siswa.",
+        category: "karya"
     },
     {
         id: 5,
-        question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        answer: "Lorem ipsum dolor sit amet consectetur adipiscing elit fames, porttitor posuere nec ridiculus nisl pretium sollicitudin, nostra iaculis pulvinar ut ultrices vestibulum nascetur. Parturient viverra tristique nunc accumsan nibh vivamus malesuada elementum venenatis mi, blandit rutrum litora montes turpis imperdiet platea at fringilla eu facilisis, orci purus nisl vehicula nam phasellus penatibus facilisi ultrices."
+        question: "Apakah pengguna umum harus login untuk melihat project?",
+        answer: "Tidak. Pengguna umum bebas melihat daftar project melalui halaman galeri tanpa harus login tetapi memiliki keterbatasan akses hanya melihat project saja.",
+        category: "umum"
     }
 ];
 
@@ -37,10 +42,15 @@ export default function FAQPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("Semua");
 
-    const filteredFAQ = faqData.filter(item =>
-        item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.answer.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredFAQ = faqData.filter(item => {
+        const matchesSearch = item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            item.answer.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesCategory = selectedCategory === "Semua" || 
+                              item.category === selectedCategory.toLowerCase();
+        
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-6xl md:pt-30">
@@ -53,13 +63,19 @@ export default function FAQPage() {
             />
             
             <div className="space-y-4">
-                {filteredFAQ.map((faq) => (
-                    <FAQCard 
-                        key={faq.id}
-                        question={faq.question}
-                        answer={faq.answer}
-                    />
-                ))}
+                {filteredFAQ.length > 0 ? (
+                    filteredFAQ.map((faq) => (
+                        <FAQCard 
+                            key={faq.id}
+                            question={faq.question}
+                            answer={faq.answer}
+                        />
+                    ))
+                ) : (
+                    <div className="text-center py-8">
+                        <p className="text-gray-600">Hasil pencarian tidak tersedia</p>
+                    </div>
+                )}
             </div>
         </div>
     );
