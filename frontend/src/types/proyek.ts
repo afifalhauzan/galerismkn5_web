@@ -72,6 +72,7 @@ export interface CreateProjekData {
     deskripsi: string;
     tautan_proyek?: string;
     image_url?: string;
+    image?: File;
     jurusan_id: number;
     status?: 'terkirim' | 'dinilai';
 }

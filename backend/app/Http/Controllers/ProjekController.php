@@ -35,16 +35,16 @@ class ProjekController extends Controller
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('judul', 'like', "%{$search}%")
-                      ->orWhere('deskripsi', 'like', "%{$search}%");
+                        ->orWhere('deskripsi', 'like', "%{$search}%");
                 });
             }
 
             // Pagination
             $page = $request->get('page', 1);
             $limit = $request->get('limit', 10);
-            
+
             $proyeks = $query->latest()
-                           ->paginate($limit, ['*'], 'page', $page);
+                ->paginate($limit, ['*'], 'page', $page);
 
             return response()->json([
                 'success' => true,
@@ -78,6 +78,7 @@ class ProjekController extends Controller
                 'deskripsi' => 'required|string',
                 'tautan_proyek' => 'nullable|url|max:500',
                 'image_url' => 'nullable|url|max:500',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'jurusan_id' => 'required|exists:jurusans,id',
                 'status' => 'in:terkirim,dinilai',
             ]);
@@ -90,31 +91,130 @@ class ProjekController extends Controller
                 ], 422);
             }
 
+            $data = $request->except('image');
+            $uploadInfo = null;
+
+            // Handle image upload with detailed feedback
+            if ($request->hasFile('image')) {
+                $imageFile = $request->file('image');
+                
+                // Get original file info
+                $originalName = $imageFile->getClientOriginalName();
+                $originalSize = $imageFile->getSize();
+                $mimeType = $imageFile->getMimeType();
+                $extension = $imageFile->getClientOriginalExtension();
+                
+                // Validate file integrity
+                if (!$imageFile->isValid()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid file upload',
+                        'error' => 'The uploaded file is corrupted or incomplete'
+                    ], 400);
+                }
+
+                try {
+                    // Store file with original name preservation
+                    $fileName = time() . '_' . str_replace(' ', '_', $originalName);
+                    $path = $imageFile->storeAs('projects', $fileName, 'public');
+                    
+                    if (!$path) {
+                        throw new \Exception('Failed to store file');
+                    }
+
+                    // Verify file was actually stored
+                    $fullPath = storage_path('app/public/' . $path);
+                    if (!file_exists($fullPath)) {
+                        throw new \Exception('File verification failed after upload');
+                    }
+
+                    $data['image_url'] = '/storage/' . $path;
+                    
+                    // Prepare upload info for response
+                    $uploadInfo = [
+                        'original_name' => $originalName,
+                        'stored_name' => $fileName,
+                        'size' => $originalSize,
+                        'size_formatted' => $this->formatBytes($originalSize),
+                        'mime_type' => $mimeType,
+                        'extension' => $extension,
+                        'url' => '/storage/' . $path,
+                        'path' => $path,
+                        'uploaded_at' => now()->toISOString()
+                    ];
+                    
+                } catch (\Exception $uploadException) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Image upload failed',
+                        'error' => $uploadException->getMessage(),
+                        'upload_details' => [
+                            'original_name' => $originalName,
+                            'size' => $this->formatBytes($originalSize),
+                            'type' => $mimeType
+                        ]
+                    ], 500);
+                }
+            }
+
+            // Create the project
             $proyek = Proyek::create([
                 'user_id' => Auth::id(),
                 'jurusan_id' => $request->jurusan_id,
                 'judul' => $request->judul,
                 'deskripsi' => $request->deskripsi,
                 'tautan_proyek' => $request->tautan_proyek,
-                'image_url' => $request->image_url,
+                'image_url' => $data['image_url'] ?? $request->image_url,
                 'status' => $request->status ?? 'terkirim',
             ]);
 
             $proyek->load(['user', 'jurusan', 'penilaian']);
 
-            return response()->json([
+            // Prepare comprehensive success response
+            $response = [
                 'success' => true,
                 'message' => 'Project created successfully',
                 'data' => $proyek
-            ], 201);
+            ];
+
+            // Add upload info if image was uploaded
+            if ($uploadInfo) {
+                $response['upload_info'] = $uploadInfo;
+                $response['message'] = 'Project created successfully with image upload';
+            }
+
+            return response()->json($response, 201);
 
         } catch (\Exception $e) {
+            // Clean up uploaded file if project creation fails
+            if (isset($path) && $path) {
+                $fullPath = storage_path('app/public/' . $path);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create project',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
             ], 500);
         }
+    }
+
+    /**
+     * Format bytes to human readable format
+     */
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        for ($i = 0; $bytes > 1024; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, $precision) . ' ' . $units[$i];
     }
 
     /**
@@ -178,7 +278,12 @@ class ProjekController extends Controller
             }
 
             $proyek->update($request->only([
-                'judul', 'deskripsi', 'tautan_proyek', 'image_url', 'jurusan_id', 'status'
+                'judul',
+                'deskripsi',
+                'tautan_proyek',
+                'image_url',
+                'jurusan_id',
+                'status'
             ]));
 
             $proyek->load(['user', 'jurusan', 'penilaian']);
@@ -247,7 +352,7 @@ class ProjekController extends Controller
     {
         try {
             $query = Proyek::with(['jurusan', 'penilaian'])
-                          ->where('user_id', Auth::id());
+                ->where('user_id', Auth::id());
 
             // Filter by status if provided
             if ($request->has('status')) {
@@ -257,9 +362,9 @@ class ProjekController extends Controller
             // Pagination
             $page = $request->get('page', 1);
             $limit = $request->get('limit', 10);
-            
+
             $proyeks = $query->latest()
-                           ->paginate($limit, ['*'], 'page', $page);
+                ->paginate($limit, ['*'], 'page', $page);
 
             return response()->json([
                 'success' => true,

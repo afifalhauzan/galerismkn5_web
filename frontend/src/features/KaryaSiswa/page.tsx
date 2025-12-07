@@ -44,15 +44,16 @@ export default function KaryaSiswa({ user, logout }: { user: any, logout: () => 
     return (
         <div className="min-h-screen bg-gray-50 pt-8 md:pt-20">
             <div className="w-full max-w-6xl px-4 md:px-8 md:py-8">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col justify-start items-start md:flex-row md:justify-between md:items-center mb-6">
                     <h1 className="text-3xl font-bold text-gray-800">Karya Anda ({user?.name})</h1>
-                    <div className="flex items-center space-x-4">
-                        <div className="text-sm text-gray-600">
+                    <div className="flex text-left items-start md:text-center md:items-center justify-around space-x-6 mt-2 md:mt-0">
+                        <div className="text-sm text-left text-gray-600 md:mb-0">
                             Total: {proyeks.length} proyek
                         </div>
+                        {/* Desktop Add Button */}
                         <Link
                             href="/karya/add"
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center"
+                            className="hidden md:flex bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium items-center"
                         >
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -86,6 +87,16 @@ export default function KaryaSiswa({ user, logout }: { user: any, logout: () => 
                     </div>
                 )}
             </div>
+            
+            {/* Mobile Floating Add Button */}
+            <Link
+                href="/karya/add"
+                className="md:hidden fixed bottom-25 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:shadow-xl z-50"
+            >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+            </Link>
         </div>
     );
 }

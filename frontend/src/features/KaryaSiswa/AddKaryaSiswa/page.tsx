@@ -1,15 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCreateProyek } from "@/hooks/ProjekHooks";
 import { useAuth } from "@/context/AuthContext";
+import Dropzone from "dropzone";
+import "dropzone/dist/dropzone.css";
+import "../../../styles/dropzone.css";
 
 interface FormData {
     judul: string;
     deskripsi: string;
     tautan_proyek: string;
+}
+
+interface UploadedFile {
+    file: File;
+    preview: string;
+    status: 'uploading' | 'success' | 'error';
 }
 
 interface FormErrors {
@@ -22,6 +31,8 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
     const router = useRouter();
     const { user: authUser } = useAuth();
     const { createProyek, isCreating, error } = useCreateProyek();
+    const dropzoneRef = useRef<HTMLDivElement>(null);
+    const dropzoneInstance = useRef<Dropzone | null>(null);
     
     const [formData, setFormData] = useState<FormData>({
         judul: "",
@@ -29,8 +40,79 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
         tautan_proyek: "",
     });
 
+    const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
     const [errors, setErrors] = useState<FormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string>("");
+
+    // Initialize Dropzone
+    useEffect(() => {
+        if (dropzoneRef.current && !dropzoneInstance.current) {
+            dropzoneInstance.current = new Dropzone(dropzoneRef.current, {
+                url: "/api/upload", // Placeholder URL
+                autoProcessQueue: false,
+                maxFiles: 1,
+                acceptedFiles: "image/*",
+                maxFilesize: 2, // 2MB
+                addRemoveLinks: true,
+                dictDefaultMessage: "Klik atau seret gambar proyek ke sini",
+                dictRemoveFile: "Hapus",
+                dictFileTooBig: "File terlalu besar. Maksimal 2MB.",
+                dictInvalidFileType: "Tipe file tidak valid. Hanya gambar yang diperbolehkan.",
+                dictMaxFilesExceeded: "Hanya boleh upload 1 gambar.",
+                previewTemplate: `
+                    <div class="dz-preview dz-file-preview">
+                        <div class="dz-image"><img data-dz-thumbnail /></div>
+                        <div class="dz-details">
+                            <div class="dz-size"><span data-dz-size></span></div>
+                            <div class="dz-filename"><span data-dz-name></span></div>
+                        </div>
+                        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                        <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                        <div class="dz-success-mark">✓</div>
+                        <div class="dz-error-mark">✗</div>
+                    </div>
+                `
+            });
+
+            dropzoneInstance.current.on('addedfile', (file) => {
+                setUploadedFile({
+                    file,
+                    preview: URL.createObjectURL(file),
+                    status: 'success'
+                });
+                // Clear any previous errors when new file is added
+                if (errors.judul && errors.judul.includes('gambar')) {
+                    setErrors(prev => ({
+                        ...prev,
+                        judul: undefined
+                    }));
+                }
+            });
+
+            dropzoneInstance.current.on('removedfile', () => {
+                setUploadedFile(null);
+            });
+
+            dropzoneInstance.current.on('error', (file, errorMessage) => {
+                setErrors(prev => ({
+                    ...prev,
+                    judul: `Error uploading ${file.name}: ${errorMessage}`
+                }));
+                setUploadedFile(prev => prev ? {
+                    ...prev,
+                    status: 'error'
+                } : null);
+            });
+        }
+
+        return () => {
+            if (dropzoneInstance.current) {
+                dropzoneInstance.current.destroy();
+                dropzoneInstance.current = null;
+            }
+        };
+    }, []);
 
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
@@ -89,27 +171,58 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
         setIsSubmitting(true);
 
         try {
-            await createProyek({
+            const proyekData = {
                 judul: formData.judul.trim(),
                 deskripsi: formData.deskripsi.trim(),
                 tautan_proyek: formData.tautan_proyek.trim() || undefined,
                 jurusan_id: authUser.jurusan_id,
-                status: 'terkirim'
-            });
+                status: 'terkirim' as const,
+                image: uploadedFile?.file
+            };
 
-            // Redirect to karya list on success
-            router.push('/karya');
+            const result = await createProyek(proyekData);
+            
+            // Handle success message with upload info
+            if (result?.upload_info) {
+                setSuccessMessage(
+                    `Karya berhasil diunggah! Gambar "${result.upload_info.original_name}" (${result.upload_info.size_formatted}) telah tersimpan.`
+                );
+            } else {
+                setSuccessMessage("Karya berhasil diunggah!");
+            }
+
+            // Show success message briefly before redirect
+            setTimeout(() => {
+                router.push('/karya');
+            }, 1500);
         } catch (err: any) {
             console.error('Error creating proyek:', err);
             
-            // Handle validation errors from backend
-            if (err.response?.data?.errors) {
-                setErrors(err.response.data.errors);
-            } else {
-                setErrors({ 
-                    judul: err.response?.data?.message || "Terjadi kesalahan saat menyimpan karya" 
-                });
+            let errorMessage = "Terjadi kesalahan saat menyimpan karya";
+            
+            // Handle different types of errors
+            if (err.response?.data) {
+                const errorData = err.response.data;
+                
+                // Handle validation errors
+                if (errorData.errors) {
+                    setErrors(errorData.errors);
+                    return; // Don't set general error if we have field-specific errors
+                }
+                
+                // Handle upload-specific errors
+                if (errorData.upload_details) {
+                    errorMessage = `Gagal mengunggah gambar "${errorData.upload_details.original_name}" (${errorData.upload_details.size}): ${errorData.error}`;
+                } else if (errorData.message) {
+                    errorMessage = errorData.message;
+                }
+            } else if (err.message) {
+                errorMessage = err.message;
             }
+            
+            setErrors({ 
+                judul: errorMessage
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -138,6 +251,18 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
 
                 {/* Form */}
                 <div className="bg-white rounded-lg shadow-sm border">
+                    {/* Success Message */}
+                    {successMessage && (
+                        <div className="p-4 border-b bg-green-50 border-green-200">
+                            <div className="flex items-center">
+                                <svg className="h-5 w-5 text-green-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-sm text-green-700">{successMessage}</p>
+                            </div>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
                         {/* Judul Field */}
                         <div>
@@ -151,7 +276,7 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
                                 value={formData.judul}
                                 onChange={handleInputChange}
                                 placeholder="Isi judul karya..."
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                                     errors.judul ? 'border-red-500' : 'border-gray-300'
                                 }`}
                                 disabled={isSubmitting}
@@ -173,7 +298,7 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
                                 value={formData.deskripsi}
                                 onChange={handleInputChange}
                                 placeholder="Isi deskripsi karya..."
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${
+                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${
                                     errors.deskripsi ? 'border-red-500' : 'border-gray-300'
                                 }`}
                                 disabled={isSubmitting}
@@ -198,7 +323,7 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
                                 value={formData.tautan_proyek}
                                 onChange={handleInputChange}
                                 placeholder="https://github.com/username/project atau link lainnya..."
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                                     errors.tautan_proyek ? 'border-red-500' : 'border-gray-300'
                                 }`}
                                 disabled={isSubmitting}
@@ -208,6 +333,67 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
                             )}
                             <p className="mt-1 text-sm text-gray-500">
                                 Opsional. Tambahkan link ke GitHub, portfolio online, atau platform lainnya.
+                            </p>
+                        </div>
+
+                        {/* Image Upload Field */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Gambar Proyek
+                            </label>
+                            <div 
+                                ref={dropzoneRef}
+                                className="dropzone border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+                            >
+                                {/* Dropzone will replace this content */}
+                            </div>
+                            {uploadedFile && (
+                                <div className={`mt-2 p-3 border rounded-lg ${
+                                    uploadedFile.status === 'success' ? 'bg-green-50 border-green-200' :
+                                    uploadedFile.status === 'error' ? 'bg-red-50 border-red-200' :
+                                    'bg-blue-50 border-blue-200'
+                                }`}>
+                                    <div className="flex items-center space-x-2">
+                                        {uploadedFile.status === 'success' && (
+                                            <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        )}
+                                        {uploadedFile.status === 'error' && (
+                                            <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5C2.962 18.333 3.924 20 5.464 20z" />
+                                            </svg>
+                                        )}
+                                        {uploadedFile.status === 'uploading' && (
+                                            <svg className="animate-spin h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                        )}
+                                        <div className="flex-1">
+                                            <p className={`text-sm font-medium ${
+                                                uploadedFile.status === 'success' ? 'text-green-700' :
+                                                uploadedFile.status === 'error' ? 'text-red-700' :
+                                                'text-blue-700'
+                                            }`}>
+                                                {uploadedFile.file.name}
+                                            </p>
+                                            <p className={`text-xs ${
+                                                uploadedFile.status === 'success' ? 'text-green-600' :
+                                                uploadedFile.status === 'error' ? 'text-red-600' :
+                                                'text-blue-600'
+                                            }`}>
+                                                {Math.round(uploadedFile.file.size / 1024)} KB • {uploadedFile.file.type}
+                                                {uploadedFile.status === 'success' && " • Siap diunggah"}
+                                                {uploadedFile.status === 'uploading' && " • Mengunggah..."}
+                                                {uploadedFile.status === 'error' && " • Upload gagal"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            <p className="mt-1 text-sm text-gray-500">
+                                Opsional. Upload gambar screenshot atau foto dari proyek Anda.
                             </p>
                         </div>
 

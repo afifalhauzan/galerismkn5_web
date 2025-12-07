@@ -9,9 +9,7 @@ export default function Karya() {
 
     return (
         <AuthLayout>
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <AddKaryaSiswa user={user} logout={logout} />
-            </div>
+            <AddKaryaSiswa user={user} logout={logout} />
         </AuthLayout>
     );
 }

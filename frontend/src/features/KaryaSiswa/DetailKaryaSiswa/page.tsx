@@ -10,6 +10,7 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
     const proyekId = params.id as string;
     const { proyek, isLoading, isError, mutate } = useProyek(proyekId);
     const [showReview, setShowReview] = useState(false);
+    const imageUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
     if (isLoading) {
         return (
@@ -119,7 +120,7 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                             {proyek.image_url ? (
                                 <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                                     <img
-                                        src={proyek.image_url}
+                                        src={`${imageUrl}${proyek.image_url}`}  
                                         alt={proyek.judul}
                                         className="w-full h-full object-cover"
                                     />

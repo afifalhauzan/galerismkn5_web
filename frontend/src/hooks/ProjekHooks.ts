@@ -15,13 +15,13 @@ import {
 // Helper function to build query string
 function buildQueryString(params: ProjekQueryParams): string {
     const queryParams = new URLSearchParams();
-    
+
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
     if (params.status) queryParams.append('status', params.status);
     if (params.jurusan_id) queryParams.append('jurusan_id', params.jurusan_id.toString());
     if (params.search) queryParams.append('search', params.search);
-    
+
     const queryString = queryParams.toString();
     return queryString ? `?${queryString}` : '';
 }
@@ -55,7 +55,7 @@ export function useProjeks(params: ProjekQueryParams = {}) {
  */
 export function useKaryaItems(params: ProjekQueryParams = {}) {
     const { proyeks, pagination, isLoading, isError, mutate } = useProjeks(params);
-    
+
     const karyaItems: KaryaItem[] = proyeks.map(proyek => proyekToKaryaItem(proyek));
 
     return {
@@ -106,6 +106,8 @@ export function useProyek(id: number | string) {
         }
     );
 
+    console.log(`Fetched proyek data for ID ${id}:`, data);
+
     return {
         proyek: (data as ApiResponse<Proyek>)?.data,
         isLoading,
@@ -121,13 +123,30 @@ export function useCreateProyek() {
     const { trigger, isMutating, error } = useSWRMutation(
         '/proyeks',
         (url: string, { arg }: { arg: CreateProjekData }) => {
-            return poster(url, arg);
+            // Check if we have a file to upload
+            if (arg.image) {
+                const formData = new FormData();
+                formData.append('judul', arg.judul);
+                formData.append('deskripsi', arg.deskripsi);
+                if (arg.tautan_proyek) formData.append('tautan_proyek', arg.tautan_proyek);
+                formData.append('jurusan_id', arg.jurusan_id.toString());
+                if (arg.status) formData.append('status', arg.status);
+                formData.append('image', arg.image);
+
+                console.log("Creating proyek with image upload:", formData);
+
+                return poster(url, formData);
+            } else {
+                console.log("Creating proyek without image upload:", arg);
+                return poster(url, arg);
+            }
         }
     );
 
     const createProyek = async (proyekData: CreateProjekData) => {
         try {
             const result = await trigger(proyekData);
+            console.log("Proyek created successfully:", result);
             // Revalidate projects lists after successful creation
             mutate((key) => typeof key === 'string' && (key.startsWith('/proyeks') || key.startsWith('/my-proyeks')));
             return result;
