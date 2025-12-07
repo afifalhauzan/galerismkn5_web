@@ -253,10 +253,17 @@ class ProjekController extends Controller
             $proyek = Proyek::findOrFail($id);
 
             // Check if user owns this project or is admin
-            if ($proyek->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
+            $currentUser = Auth::user();
+            if ($proyek->user_id !== $currentUser->id && $currentUser->role !== 'admin') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unauthorized to update this project'
+                    'message' => 'Unauthorized to update this project',
+                    'debug' => [
+                        'project_user_id' => $proyek->user_id,
+                        'current_user_id' => $currentUser->id,
+                        'user_role' => $currentUser->role,
+                        'auth_id' => Auth::id()
+                    ]
                 ], 403);
             }
 
@@ -265,6 +272,7 @@ class ProjekController extends Controller
                 'deskripsi' => 'sometimes|required|string',
                 'tautan_proyek' => 'nullable|url|max:500',
                 'image_url' => 'nullable|url|max:500',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'jurusan_id' => 'sometimes|required|exists:jurusans,id',
                 'status' => 'sometimes|in:terkirim,dinilai',
             ]);
@@ -277,22 +285,99 @@ class ProjekController extends Controller
                 ], 422);
             }
 
-            $proyek->update($request->only([
-                'judul',
-                'deskripsi',
-                'tautan_proyek',
-                'image_url',
-                'jurusan_id',
-                'status'
-            ]));
+            $data = $request->except('image');
+            $uploadInfo = null;
+
+            // Handle image upload if provided
+            if ($request->hasFile('image')) {
+                $imageFile = $request->file('image');
+                
+                // Get original file info
+                $originalName = $imageFile->getClientOriginalName();
+                $originalSize = $imageFile->getSize();
+                $mimeType = $imageFile->getMimeType();
+                $extension = $imageFile->getClientOriginalExtension();
+                
+                // Validate file integrity
+                if (!$imageFile->isValid()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid file upload',
+                        'error' => 'The uploaded file is corrupted or incomplete'
+                    ], 400);
+                }
+
+                try {
+                    // Delete old image if exists
+                    if ($proyek->image_url && str_starts_with($proyek->image_url, '/storage/')) {
+                        $oldPath = str_replace('/storage/', '', $proyek->image_url);
+                        $oldFullPath = storage_path('app/public/' . $oldPath);
+                        if (file_exists($oldFullPath)) {
+                            unlink($oldFullPath);
+                        }
+                    }
+
+                    // Store new file with original name preservation
+                    $fileName = time() . '_' . str_replace(' ', '_', $originalName);
+                    $path = $imageFile->storeAs('projects', $fileName, 'public');
+                    
+                    if (!$path) {
+                        throw new \Exception('Failed to store file');
+                    }
+
+                    // Verify file was actually stored
+                    $fullPath = storage_path('app/public/' . $path);
+                    if (!file_exists($fullPath)) {
+                        throw new \Exception('File verification failed after upload');
+                    }
+
+                    $data['image_url'] = '/storage/' . $path;
+                    
+                    // Prepare upload info for response
+                    $uploadInfo = [
+                        'original_name' => $originalName,
+                        'stored_name' => $fileName,
+                        'size' => $originalSize,
+                        'size_formatted' => $this->formatBytes($originalSize),
+                        'mime_type' => $mimeType,
+                        'extension' => $extension,
+                        'url' => '/storage/' . $path,
+                        'path' => $path,
+                        'uploaded_at' => now()->toISOString()
+                    ];
+                    
+                } catch (\Exception $uploadException) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Image upload failed',
+                        'error' => $uploadException->getMessage(),
+                        'upload_details' => [
+                            'original_name' => $originalName,
+                            'size' => $this->formatBytes($originalSize),
+                            'type' => $mimeType
+                        ]
+                    ], 500);
+                }
+            }
+
+            $proyek->update($data);
 
             $proyek->load(['user', 'jurusan', 'penilaian']);
 
-            return response()->json([
+            // Prepare comprehensive success response
+            $response = [
                 'success' => true,
                 'message' => 'Project updated successfully',
                 'data' => $proyek
-            ]);
+            ];
+
+            // Add upload info if image was uploaded
+            if ($uploadInfo) {
+                $response['upload_info'] = $uploadInfo;
+                $response['message'] = 'Project updated successfully with image upload';
+            }
+
+            return response()->json($response);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -303,7 +388,8 @@ class ProjekController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update project',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
             ], 500);
         }
     }

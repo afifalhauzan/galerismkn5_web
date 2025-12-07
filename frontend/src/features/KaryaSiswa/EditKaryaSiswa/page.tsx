@@ -197,8 +197,6 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                 judul: formData.judul.trim(),
                 deskripsi: formData.deskripsi.trim(),
                 tautan_proyek: formData.tautan_proyek.trim() || undefined,
-                jurusan_id: authUser.jurusan_id,
-                status: 'terkirim' as const,
                 image: uploadedFile?.file
             };
 
@@ -207,10 +205,10 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
             // Handle success message with upload info
             if (result?.upload_info) {
                 setSuccessMessage(
-                    `Karya berhasil diunggah! Gambar "${result.upload_info.original_name}" (${result.upload_info.size_formatted}) telah tersimpan.`
+                    `Karya berhasil diperbarui! Gambar "${result.upload_info.original_name}" (${result.upload_info.size_formatted}) telah tersimpan.`
                 );
             } else {
-                setSuccessMessage("Karya berhasil diunggah!");
+                setSuccessMessage("Karya berhasil diperbarui!");
             }
 
             // Show success message briefly before redirect

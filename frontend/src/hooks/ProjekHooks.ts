@@ -169,13 +169,30 @@ export function useUpdateProyek(id: number | string) {
     const { trigger, isMutating, error } = useSWRMutation(
         `/proyeks/${id}`,
         (url: string, { arg }: { arg: UpdateProjekData }) => {
-            return putter(url, arg);
+            // Check if we have a file to upload
+            if (arg.image) {
+                const formData = new FormData();
+                if (arg.judul) formData.append('judul', arg.judul);
+                if (arg.deskripsi) formData.append('deskripsi', arg.deskripsi);
+                if (arg.tautan_proyek) formData.append('tautan_proyek', arg.tautan_proyek);
+                if (arg.jurusan_id) formData.append('jurusan_id', arg.jurusan_id.toString());
+                if (arg.status) formData.append('status', arg.status);
+                formData.append('image', arg.image);
+
+                console.log("Updating proyek with image upload:", formData);
+
+                return putter(url, formData);
+            } else {
+                console.log("Updating proyek without image upload:", arg);
+                return putter(url, arg);
+            }
         }
     );
 
     const updateProyek = async (proyekData: UpdateProjekData) => {
         try {
             const result = await trigger(proyekData);
+            console.log("Proyek updated successfully:", result);
             // Revalidate specific project and lists
             mutate(`/proyeks/${id}`);
             mutate((key) => typeof key === 'string' && (key.startsWith('/proyeks') || key.startsWith('/my-proyeks')));

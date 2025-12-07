@@ -55,9 +55,9 @@ export default function KaryaCard({ proyek }: KaryaCardProps) {
                         Lihat Detail
                     </Link>
                     {proyek.status === 'terkirim' && (
-                        <button className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                        <Link href={`/karya/edit?id=${proyek.id}`} className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
                             Edit
-                        </button>
+                        </Link>
                     )}
                 </div>
             </div>
