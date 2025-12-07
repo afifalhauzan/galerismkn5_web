@@ -10,7 +10,7 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
     const proyekId = params.id as string;
     const { proyek, isLoading, isError, mutate } = useProyek(proyekId);
     const [showReview, setShowReview] = useState(false);
-    const imageUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    const imageUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
     if (isLoading) {
         return (
