@@ -73,6 +73,7 @@ export default function Navbar({ className = "" }: NavbarProps) {
                                 >
                                     Galeri
                                 </Link>
+
                                 {user?.role !== 'admin' && (
                                     <Link
                                         href="/faq"
@@ -95,6 +96,19 @@ export default function Navbar({ className = "" }: NavbarProps) {
                                         Kelola Akun
                                     </Link>
                                 )}
+
+                                {user?.role === 'siswa' && (
+                                    <Link
+                                        href="/karya"
+                                        className={`text-white px-3 py-2 rounded-full text-sm font-medium transition-colors ${pathname === "/karya"
+                                            ? "bg-sky-600 hover:bg-sky-700"
+                                            : "hover:bg-sky-700"
+                                            }`}
+                                    >
+                                        Karya
+                                    </Link>
+                                )}
+
                                 {user && (
                                     <Link
                                         href="/dashboard"
@@ -189,6 +203,19 @@ export default function Navbar({ className = "" }: NavbarProps) {
                         >
                             <HiQuestionMarkCircle size={24} />
                             <span className="text-xs mt-1">FAQ</span>
+                        </Link>
+                    )}
+
+                    {user?.role === 'siswa' && (
+                        <Link
+                            href="/karya"
+                            className={`flex flex-col items-center py-2 px-3 transition-colors ${pathname === "/karya"
+                                ? "text-sky-700"
+                                : "text-gray-600 hover:text-blue-600"
+                                }`}
+                        >
+                            <HiQuestionMarkCircle size={24} />
+                            <span className="text-xs mt-1">Karya</span>
                         </Link>
                     )}
 

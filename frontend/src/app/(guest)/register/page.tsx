@@ -8,9 +8,9 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    nis: "",
     password: "",
-    confirmPassword: "",
-    role: "siswa"
+    confirmPassword: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -40,6 +40,14 @@ export default function RegisterPage() {
       errors.email = "Format email tidak valid";
     }
 
+    if (!formData.nis.trim()) {
+      errors.nis = "NIS wajib diisi";
+    } else if (!/^\d+$/.test(formData.nis)) {
+      errors.nis = "NIS harus berupa angka";
+    } else if (formData.nis.length < 5 || formData.nis.length > 20) {
+      errors.nis = "NIS harus 5-20 digit";
+    }
+
     if (!formData.password) {
       errors.password = "Password wajib diisi";
     } else if (formData.password.length < 8) {
@@ -64,7 +72,7 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await register(formData.name, formData.email, formData.password, formData.role);
+      await register(formData.name, formData.email, formData.nis, formData.password, "siswa");
       // Redirect is handled by AuthContext
     } catch (err) {
       // Error is handled by AuthContext
@@ -141,21 +149,26 @@ export default function RegisterPage() {
                 <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
               )}
             </div>
-
+            
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Role
+              <label htmlFor="nis" className="block text-sm font-medium text-gray-700">
+                NIS (Nomor Induk Siswa)
               </label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
+              <input
+                id="nis"
+                name="nis"
+                type="text"
+                required
+                value={formData.nis}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-3 border border-gray-300 bg-white text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              >
-                <option value="siswa">Siswa</option>
-                <option value="guru">Guru</option>
-              </select>
+                className={`mt-1 appearance-none relative block w-full px-3 py-3 border ${
+                  validationErrors.nis ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:z-10`}
+                placeholder="Masukkan NIS"
+              />
+              {validationErrors.nis && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.nis}</p>
+              )}
             </div>
             
             <div>

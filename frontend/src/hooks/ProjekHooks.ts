@@ -82,9 +82,10 @@ export function useMyProjeks(params: Omit<ProjekQueryParams, 'jurusan_id'> = {})
         }
     );
 
+    console.log("Fetched my-proyeks data:", data);
+
     return {
-        proyeks: (data as PaginatedResponse<Proyek>)?.data || [],
-        pagination: (data as PaginatedResponse<Proyek>)?.pagination,
+        proyeks: (data as ApiResponse<Proyek[]>)?.data || [],
         isLoading,
         isError: error,
         mutate,

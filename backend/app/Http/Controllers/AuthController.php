@@ -19,6 +19,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'nis_nip' => ['required', 'string', 'max:20', 'unique:users,nis_nip'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', 'in:guru,siswa'],
         ]);
@@ -26,6 +27,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'nis_nip' => $request->nis_nip,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);

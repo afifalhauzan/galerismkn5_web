@@ -13,7 +13,7 @@ export interface User {
 export interface Jurusan {
     id: number;
     kode_jurusan: string;
-    nama_jurusan: string;
+    nama: string;
     deskripsi?: string;
     created_at: string;
     updated_at: string;
@@ -107,7 +107,7 @@ export function proyekToKaryaItem(proyek: Proyek): KaryaItem {
         title: proyek.judul,
         description: proyek.deskripsi,
         author: proyek.user?.name || 'Unknown',
-        jurusan: proyek.jurusan?.nama_jurusan || 'Unknown',
+        jurusan: proyek.jurusan?.nama || 'Unknown',
         createdAt: proyek.created_at,
         status: proyek.status,
     };

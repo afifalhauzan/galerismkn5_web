@@ -10,6 +10,7 @@ interface User {
     name: string;
     email: string;
     role: string;
+    jurusan_id?: number;
     isGuru: () => boolean;
     isSiswa: () => boolean;
 }
@@ -18,7 +19,7 @@ interface AuthContextType {
     user: User | null;
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string, role: string) => Promise<void>;
+    register: (name: string, email: string, nis: string, password: string, role: string) => Promise<void>;
     logout: () => Promise<void>;
     isLoading: boolean;
     error: string | null;
@@ -125,7 +126,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const register = async (name: string, email: string, password: string, role: string) => {
+    const register = async (name: string, email: string, nis: string, password: string, role: string) => {
         try {
             setIsLoading(true);
             setError(null);
@@ -133,6 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const response = await axios.post("/register", {
                 name,
                 email,
+                nis_nip: nis,
                 password,
                 password_confirmation: password,
                 role
