@@ -179,7 +179,10 @@ export function useUpdateProyek(id: number | string) {
                 if (arg.status) formData.append('status', arg.status);
                 formData.append('image', arg.image);
 
-                console.log("Updating proyek with image upload:", formData);
+                console.log("Updating proyek with image upload. FormData entries:");
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
 
                 return putter(url, formData);
             } else {

@@ -185,10 +185,8 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
             return;
         }
 
-        if (!authUser?.jurusan_id) {
-            setErrors({ judul: "User tidak memiliki jurusan yang valid" });
-            return;
-        }
+        // Remove the jurusan_id validation since we're updating, not creating
+        // The project already has a jurusan_id that we'll preserve
 
         setIsSubmitting(true);
 
@@ -197,9 +195,11 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                 judul: formData.judul.trim(),
                 deskripsi: formData.deskripsi.trim(),
                 tautan_proyek: formData.tautan_proyek.trim() || undefined,
+                jurusan_id: proyek?.jurusan_id || authUser?.jurusan_id,
                 image: uploadedFile?.file
             };
 
+            console.log('Updating project with data:', proyekData);
             const result = await updateProyek(proyekData);
 
             // Handle success message with upload info
@@ -216,16 +216,19 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                 router.push('/karya');
             }, 1500);
         } catch (err: any) {
-            console.error('Error creating proyek:', err);
+            console.error('Error updating proyek:', err);
 
-            let errorMessage = "Terjadi kesalahan saat menyimpan karya";
+            let errorMessage = "Terjadi kesalahan saat memperbarui karya";
 
             // Handle different types of errors
             if (err.response?.data) {
                 const errorData = err.response.data;
+                
+                console.error('Full error response:', errorData);
 
                 // Handle validation errors
                 if (errorData.errors) {
+                    console.error('Validation errors:', errorData.errors);
                     setErrors(errorData.errors);
                     return; // Don't set general error if we have field-specific errors
                 }
@@ -235,6 +238,11 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                     errorMessage = `Gagal mengunggah gambar "${errorData.upload_details.original_name}" (${errorData.upload_details.size}): ${errorData.error}`;
                 } else if (errorData.message) {
                     errorMessage = errorData.message;
+                }
+
+                // Add debug information if available
+                if (errorData.debug) {
+                    console.error('Debug info:', errorData.debug);
                 }
             } else if (err.message) {
                 errorMessage = err.message;
