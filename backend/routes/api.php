@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjekController;
+use App\Http\Controllers\JurusanController;
 
 /**
  * Authentication Routes
@@ -22,6 +23,13 @@ Route::get('/proyeks', [ProjekController::class, 'index'])->name('proyeks.index'
 Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyeks.show');
 
 /**
+ * Public Jurusan Routes
+ * These routes provide access to department/major information for forms
+ */
+Route::get('/jurusans', [JurusanController::class, 'index'])->name('jurusans.index');
+Route::get('/jurusans/{jurusan}', [JurusanController::class, 'show'])->name('jurusans.show');
+
+/**
  * Protected Routes
  * These routes require authentication via Sanctum token
  */
@@ -30,6 +38,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthController::class, 'me'])->name('user.me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
     Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('auth.logout.all');
+
+    Route::get('/user-stats', [AuthController::class, 'userStats'])->name('user.stats');
     
     /**
      * Get user profile information

@@ -11,6 +11,7 @@ interface User {
     email: string;
     role: string;
     jurusan_id?: number;
+    jurusan_name?: string;
     isGuru: () => boolean;
     isSiswa: () => boolean;
 }
@@ -19,7 +20,7 @@ interface AuthContextType {
     user: User | null;
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, nis: string, password: string, role: string) => Promise<void>;
+    register: (name: string, email: string, nis: string, password: string, role: string, jurusan_id: number) => Promise<void>;
     logout: () => Promise<void>;
     isLoading: boolean;
     error: string | null;
@@ -126,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const register = async (name: string, email: string, nis: string, password: string, role: string) => {
+    const register = async (name: string, email: string, nis: string, password: string, role: string, jurusan_id: number) => {
         try {
             setIsLoading(true);
             setError(null);
@@ -137,7 +138,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 nis_nip: nis,
                 password,
                 password_confirmation: password,
-                role
+                role,
+                jurusan_id
             });
 
             const { access_token, user: userData } = response.data;

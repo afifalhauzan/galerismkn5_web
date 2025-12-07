@@ -6,6 +6,7 @@ export interface User {
     role: 'admin' | 'guru' | 'siswa';
     nis_nip?: string;
     jurusan_id?: number;
+    jurusan_name?: string;
     created_at: string;
     updated_at: string;
 }

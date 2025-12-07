@@ -22,16 +22,28 @@ class JurusanSeeder extends Seeder
                 'singkatan' => 'TKJ',
             ],
             [
-                'nama' => 'Teknik Kendaraan Ringan',
-                'singkatan' => 'TKR',
+                'nama' => 'Desain Komunikasi Visual',
+                'singkatan' => 'DKV',
             ],
             [
-                'nama' => 'Teknik Elektronika Industri',
-                'singkatan' => 'TEI',
+                'nama' => 'Animasi',
+                'singkatan' => 'Animasi',
             ],
             [
-                'nama' => 'Akuntansi',
-                'singkatan' => 'AKL',
+                'nama' => 'Kriya Kayu',
+                'singkatan' => 'KK',
+            ],
+            [
+                'nama' => 'Kriya Tekstil',
+                'singkatan' => 'KT',
+            ],
+            [
+                'nama' => 'Kriya Keramik',
+                'singkatan' => 'KKR',
+            ],
+            [
+                'nama' => 'Tata Busana',
+                'singkatan' => 'TB',
             ],
         ];
 

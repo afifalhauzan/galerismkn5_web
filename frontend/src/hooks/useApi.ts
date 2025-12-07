@@ -41,13 +41,15 @@ export function usePhotos(page = 1, limit = 12) {
 
 // User Statistics Hook (for dashboards)
 export function useUserStats() {
-    const { data, error, isLoading } = useSWR('/user/stats', fetcher, {
+    const { data, error, isLoading } = useSWR('/user-stats', fetcher, {
         revalidateOnFocus: true,
         refreshInterval: 300000, // Refresh every 5 minutes
     });
 
+    console.log('User Stats Data:', data);
+
     return {
-        stats: data || {
+        stats: {
             totalUsers: 0,
             totalGuru: 0,
             totalSiswa: 0,
@@ -56,7 +58,8 @@ export function useUserStats() {
             userViews: 0,
             todayActivities: 0,
             monthlyVisits: 0,
-            favoritePhotos: 0
+            favoritePhotos: 0,
+            jumlahKarya: data?.stats?.jumlahKarya || 0
         },
         isLoading,
         isError: error,
@@ -187,34 +190,6 @@ export function useCreateUser() {
     return {
         createUser,
         isCreating: isMutating,
-        error,
-    };
-}
-
-// Toggle Favorite Photo Hook
-export function useFavoritePhoto() {
-    const { trigger, isMutating, error } = useSWRMutation(
-        '/photos/favorite',
-        (url: string, { arg }: { arg: { photoId: number; action: 'add' | 'remove' } }) => {
-            return poster(`${url}/${arg.photoId}`, { action: arg.action });
-        }
-    );
-
-    const toggleFavorite = async (photoId: number, action: 'add' | 'remove') => {
-        try {
-            const result = await trigger({ photoId, action });
-            // Optimistically update cache
-            mutate((key) => typeof key === 'string' && key.startsWith('/photos'));
-            mutate('/user/stats'); // Update stats if they include favorite count
-            return result;
-        } catch (error) {
-            throw error;
-        }
-    };
-
-    return {
-        toggleFavorite,
-        isToggling: isMutating,
         error,
     };
 }

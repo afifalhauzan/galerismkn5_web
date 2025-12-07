@@ -22,6 +22,7 @@ class AuthController extends Controller
             'nis_nip' => ['required', 'string', 'max:20', 'unique:users,nis_nip'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', 'in:guru,siswa'],
+            'jurusan_id' => ['required', 'exists:jurusans,id'],
         ]);
 
         $user = User::create([
@@ -30,13 +31,21 @@ class AuthController extends Controller
             'nis_nip' => $request->nis_nip,
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'jurusan_id' => $request->jurusan_id,
         ]);
+
+        // Load jurusan relationship
+        $user->load('jurusan');
+        
+        // Add jurusan_name to user data
+        $userData = $user->toArray();
+        $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'User registered successfully',
-            'user' => $user,
+            'user' => $userData,
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 201);
@@ -58,12 +67,17 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = User::where('email', $request->email)->with('jurusan')->firstOrFail();
+        
+        // Add jurusan_name to user data
+        $userData = $user->toArray();
+        $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
+        
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful',
-            'user' => $user,
+            'user' => $userData,
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 200);
@@ -74,8 +88,14 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
+        $user = $request->user()->load('jurusan');
+        
+        // Add jurusan_name to user data
+        $userData = $user->toArray();
+        $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
+        
         return response()->json([
-            'user' => $request->user()
+            'user' => $userData
         ], 200);
     }
 
@@ -102,6 +122,29 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged out from all devices successfully'
+        ], 200);
+    }
+
+    /**
+     * Get user statistics
+     */
+    public function userStats(Request $request)
+    {
+        $user = $request->user();
+
+        if (!in_array($user->role, ['siswa'])) {
+            return response()->json([
+                'message' => 'Statistics not available for this user role'
+            ], 403);
+        }
+        
+        $stats = [
+            'jumlahKarya' => $user->proyeks()->count(),
+            'userViews' => $user->proyeks()->sum('views'),
+        ];
+
+        return response()->json([
+            'stats' => $stats
         ], 200);
     }
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useJurusans } from "@/hooks/JurusanHooks";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -10,12 +11,14 @@ export default function RegisterPage() {
     email: "",
     nis: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    jurusan_id: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   const { register, isLoading, error, clearError } = useAuth();
+  const { jurusans, isLoading: isLoadingJurusans } = useJurusans();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -58,6 +61,10 @@ export default function RegisterPage() {
       errors.confirmPassword = "Konfirmasi password tidak cocok";
     }
 
+    if (!formData.jurusan_id) {
+      errors.jurusan_id = "Jurusan wajib dipilih";
+    }
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -72,7 +79,7 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await register(formData.name, formData.email, formData.nis, formData.password, "siswa");
+      await register(formData.name, formData.email, formData.nis, formData.password, "siswa", parseInt(formData.jurusan_id));
       // Redirect is handled by AuthContext
     } catch (err) {
       // Error is handled by AuthContext
@@ -168,6 +175,38 @@ export default function RegisterPage() {
               />
               {validationErrors.nis && (
                 <p className="mt-1 text-sm text-red-600">{validationErrors.nis}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="jurusan_id" className="block text-sm font-medium text-gray-700">
+                Jurusan
+              </label>
+              {isLoadingJurusans ? (
+                <div className="mt-1 appearance-none relative block w-full px-3 py-3 border border-gray-300 rounded-lg bg-gray-50">
+                  <span className="text-gray-500">Memuat jurusan...</span>
+                </div>
+              ) : (
+                <select
+                  id="jurusan_id"
+                  name="jurusan_id"
+                  required
+                  value={formData.jurusan_id}
+                  onChange={handleChange}
+                  className={`mt-1 appearance-none relative block w-full px-3 py-3 border ${
+                    validationErrors.jurusan_id ? 'border-red-300' : 'border-gray-300'
+                  } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:z-10`}
+                >
+                  <option value="">Pilih Jurusan</option>
+                  {jurusans?.map((jurusan) => (
+                    <option key={jurusan.id} value={jurusan.id}>
+                      {jurusan.nama}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {validationErrors.jurusan_id && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.jurusan_id}</p>
               )}
             </div>
             

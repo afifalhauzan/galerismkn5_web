@@ -65,44 +65,44 @@ class UserSeeder extends Seeder
                 'name' => 'Andi Pratama',
                 'email' => 'andi.pratama@student.smkn5.com',
                 'nis_nip' => 'NIS001',
-                'jurusan_name' => 'Rekayasa Perangkat Lunak',
+                'jurusan_id' => '1',
             ],
             [
                 'name' => 'Dewi Sari',
                 'email' => 'dewi.sari@student.smkn5.com',
                 'nis_nip' => 'NIS002',
-                'jurusan_name' => 'Rekayasa Perangkat Lunak',
+                'jurusan_id' => '1',
             ],
             // TKJ Students
             [
                 'name' => 'Rizky Ramadhan',
                 'email' => 'rizky.ramadhan@student.smkn5.com',
                 'nis_nip' => 'NIS003',
-                'jurusan_name' => 'Teknik Komputer Jaringan',
+                'jurusan_id' => '2',
             ],
             [
                 'name' => 'Maya Sari',
                 'email' => 'maya.sari@student.smkn5.com',
                 'nis_nip' => 'NIS004',
-                'jurusan_name' => 'Teknik Komputer Jaringan',
+                'jurusan_id' => '2',
             ],
             // TKR Students
             [
                 'name' => 'Joko Susilo',
                 'email' => 'joko.susilo@student.smkn5.com',
                 'nis_nip' => 'NIS005',
-                'jurusan_name' => 'Teknik Kendaraan Ringan',
+                'jurusan_id' => '3',
             ],
             [
                 'name' => 'Rina Wati',
                 'email' => 'rina.wati@student.smkn5.com',
                 'nis_nip' => 'NIS006',
-                'jurusan_name' => 'Teknik Kendaraan Ringan',
+                'jurusan_id' => '3',
             ],
         ];
 
         foreach ($siswaData as $siswa) {
-            $jurusan = $jurusans->where('nama', $siswa['jurusan_name'])->first();
+            // $jurusan = $jurusans->where('nama', $siswa['jurusan_name'])->first();
             
             User::create([
                 'name' => $siswa['name'],
@@ -110,7 +110,7 @@ class UserSeeder extends Seeder
                 'nis_nip' => $siswa['nis_nip'],
                 'password' => Hash::make('password'),
                 'role' => 'siswa',
-                'jurusan_id' => $jurusan ? $jurusan->id : null,
+                'jurusan_id' => $siswa['jurusan_id'],
             ]);
         }
     }
