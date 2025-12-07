@@ -9,22 +9,17 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# 2. Tarik kode terbaru dari git (Opsional, aktifkan jika mau auto-pull)
-# echo "📥 Pulling latest code..."
-# git config core.fileMode false
-# git pull origin main
-
-# 3. Build & Restart Container
+# 2. Build & Restart Container
 echo "📦 Building and starting containers..."
 docker compose -f docker-compose.prod.yaml up -d --build
 
 echo "⏳ Waiting for database to be ready..."
 sleep 10
 
-# 4. Setup Laravel
+# 3. Setup Laravel
 echo "🔧 Running Laravel setup commands..."
 
-# Bersihkan cache lama dulu (PENTING)
+# Bersihkan cache lama
 docker compose -f docker-compose.prod.yaml exec backend php artisan optimize:clear
 
 # Cache config baru
@@ -32,18 +27,26 @@ docker compose -f docker-compose.prod.yaml exec backend php artisan config:cache
 docker compose -f docker-compose.prod.yaml exec backend php artisan route:cache
 docker compose -f docker-compose.prod.yaml exec backend php artisan view:cache
 
-# Generate Storage Link (Agar gambar tidak 404)
+# Generate Storage Link
 docker compose -f docker-compose.prod.yaml exec backend php artisan storage:link
 
 # Migrasi Database
-docker compose -f docker-compose.prod.yaml exec backend php artisan migrate
+docker compose -f docker-compose.prod.yaml exec backend php artisan migrate --force
 
-# 5. FIX PERMISSION (JANGAN DI-COMMENT!)
-# Ini solusi untuk Error 500 saat upload
-echo "🔒 Setting proper permissions..."
+# 4. FIX PERMISSION STORAGE (Untuk Upload Laravel)
+echo "🔒 Setting proper permissions for Laravel Storage..."
 docker compose -f docker-compose.prod.yaml exec backend chown -R www-data:www-data /var/www/html/storage
 docker compose -f docker-compose.prod.yaml exec backend chmod -R 775 /var/www/html/storage
+
+# 5. FIX PERMISSION NGINX TEMP (Untuk Upload Nginx/Buffer) - NEW FIX!
+echo "🔒 Setting proper permissions for Nginx Temp..."
+# Buat foldernya dulu karena error 'No such file' sebelumnya
+docker compose -f docker-compose.prod.yaml exec backend mkdir -p /var/lib/nginx/tmp/client_body
+# Ubah pemiliknya ke www-data (user yang menjalankan nginx/php)
+docker compose -f docker-compose.prod.yaml exec backend chown -R www-data:www-data /var/lib/nginx
+docker compose -f docker-compose.prod.yaml exec backend chmod -R 775 /var/lib/nginx
 
 echo "✅ Deployment completed!"
 echo "   Frontend: 3001"
 echo "   Backend:  8001"
+```

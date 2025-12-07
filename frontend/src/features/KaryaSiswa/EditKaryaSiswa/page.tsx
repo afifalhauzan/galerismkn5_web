@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useUpdateProyek } from "@/hooks/ProjekHooks";
+import { useUpdateProyek, useProyek } from "@/hooks/ProjekHooks";
 import { useAuth } from "@/context/AuthContext";
 import Dropzone from "dropzone";
 import "dropzone/dist/dropzone.css";
@@ -29,16 +29,38 @@ interface FormErrors {
 
 export default function EditKaryaSiswa({ user, logout }: { user: any; logout: () => void }) {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const proyekId = searchParams.get('id');
     const { user: authUser } = useAuth();
-    const { updateProyek, isUpdating, error } = useUpdateProyek();
+    const { proyek, isLoading: isLoadingProyek } = useProyek(proyekId || '');
+    const { updateProyek, isUpdating, error } = useUpdateProyek(proyekId || '');
     const dropzoneRef = useRef<HTMLDivElement>(null);
     const dropzoneInstance = useRef<Dropzone | null>(null);
-    
+
     const [formData, setFormData] = useState<FormData>({
         judul: "",
         deskripsi: "",
         tautan_proyek: "",
     });
+
+    // Load existing project data when component mounts
+    useEffect(() => {
+        if (proyek) {
+            setFormData({
+                judul: proyek.judul || "",
+                deskripsi: proyek.deskripsi || "",
+                tautan_proyek: proyek.tautan_proyek || "",
+            });
+        }
+    }, [proyek]);
+
+    // Redirect if no project ID provided
+    useEffect(() => {
+        if (!proyekId) {
+            router.push('/karya');
+            return;
+        }
+    }, [proyekId, router]);
 
     const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
     const [errors, setErrors] = useState<FormErrors>({});
@@ -146,7 +168,7 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
             ...prev,
             [name]: value
         }));
-        
+
         // Clear error for this field when user starts typing
         if (errors[name as keyof FormErrors]) {
             setErrors(prev => ({
@@ -158,7 +180,7 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
@@ -181,7 +203,7 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
             };
 
             const result = await updateProyek(proyekData);
-            
+
             // Handle success message with upload info
             if (result?.upload_info) {
                 setSuccessMessage(
@@ -197,19 +219,19 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
             }, 1500);
         } catch (err: any) {
             console.error('Error creating proyek:', err);
-            
+
             let errorMessage = "Terjadi kesalahan saat menyimpan karya";
-            
+
             // Handle different types of errors
             if (err.response?.data) {
                 const errorData = err.response.data;
-                
+
                 // Handle validation errors
                 if (errorData.errors) {
                     setErrors(errorData.errors);
                     return; // Don't set general error if we have field-specific errors
                 }
-                
+
                 // Handle upload-specific errors
                 if (errorData.upload_details) {
                     errorMessage = `Gagal mengunggah gambar "${errorData.upload_details.original_name}" (${errorData.upload_details.size}): ${errorData.error}`;
@@ -219,8 +241,8 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
             } else if (err.message) {
                 errorMessage = err.message;
             }
-            
-            setErrors({ 
+
+            setErrors({
                 judul: errorMessage
             });
         } finally {
@@ -276,9 +298,8 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                                 value={formData.judul}
                                 onChange={handleInputChange}
                                 placeholder="Isi judul karya..."
-                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                                    errors.judul ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.judul ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 disabled={isSubmitting}
                             />
                             {errors.judul && (
@@ -298,9 +319,8 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                                 value={formData.deskripsi}
                                 onChange={handleInputChange}
                                 placeholder="Isi deskripsi karya..."
-                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${
-                                    errors.deskripsi ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${errors.deskripsi ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 disabled={isSubmitting}
                             />
                             {errors.deskripsi && (
@@ -323,9 +343,8 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                                 value={formData.tautan_proyek}
                                 onChange={handleInputChange}
                                 placeholder="https://github.com/username/project atau link lainnya..."
-                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                                    errors.tautan_proyek ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full text-slate-800 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.tautan_proyek ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 disabled={isSubmitting}
                             />
                             {errors.tautan_proyek && (
@@ -341,18 +360,17 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Gambar Proyek
                             </label>
-                            <div 
+                            <div
                                 ref={dropzoneRef}
                                 className="dropzone border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
                             >
                                 {/* Dropzone will replace this content */}
                             </div>
                             {uploadedFile && (
-                                <div className={`mt-2 p-3 border rounded-lg ${
-                                    uploadedFile.status === 'success' ? 'bg-green-50 border-green-200' :
-                                    uploadedFile.status === 'error' ? 'bg-red-50 border-red-200' :
-                                    'bg-blue-50 border-blue-200'
-                                }`}>
+                                <div className={`mt-2 p-3 border rounded-lg ${uploadedFile.status === 'success' ? 'bg-green-50 border-green-200' :
+                                        uploadedFile.status === 'error' ? 'bg-red-50 border-red-200' :
+                                            'bg-blue-50 border-blue-200'
+                                    }`}>
                                     <div className="flex items-center space-x-2">
                                         {uploadedFile.status === 'success' && (
                                             <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -371,18 +389,16 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                                             </svg>
                                         )}
                                         <div className="flex-1">
-                                            <p className={`text-sm font-medium ${
-                                                uploadedFile.status === 'success' ? 'text-green-700' :
-                                                uploadedFile.status === 'error' ? 'text-red-700' :
-                                                'text-blue-700'
-                                            }`}>
+                                            <p className={`text-sm font-medium ${uploadedFile.status === 'success' ? 'text-green-700' :
+                                                    uploadedFile.status === 'error' ? 'text-red-700' :
+                                                        'text-blue-700'
+                                                }`}>
                                                 {uploadedFile.file.name}
                                             </p>
-                                            <p className={`text-xs ${
-                                                uploadedFile.status === 'success' ? 'text-green-600' :
-                                                uploadedFile.status === 'error' ? 'text-red-600' :
-                                                'text-blue-600'
-                                            }`}>
+                                            <p className={`text-xs ${uploadedFile.status === 'success' ? 'text-green-600' :
+                                                    uploadedFile.status === 'error' ? 'text-red-600' :
+                                                        'text-blue-600'
+                                                }`}>
                                                 {Math.round(uploadedFile.file.size / 1024)} KB • {uploadedFile.file.type}
                                                 {uploadedFile.status === 'success' && " • Siap diunggah"}
                                                 {uploadedFile.status === 'uploading' && " • Mengunggah..."}
@@ -397,7 +413,6 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                             </p>
                         </div>
 
-                        {/* Info Section */}
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <div className="flex">
                                 <svg className="h-5 w-5 text-blue-400 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -406,8 +421,8 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                                 <div className="text-sm">
                                     <p className="text-blue-800 font-medium">Informasi Penting</p>
                                     <p className="text-blue-700 mt-1">
-                                        Karya Anda akan otomatis tersimpan dengan status "Terkirim" dan siap untuk dinilai oleh guru.
-                                        Pastikan semua informasi sudah benar sebelum mengunggah.
+                                        Perubahan akan otomatis tersimpan dan karya tetap dalam status saat ini.
+                                        Pastikan semua informasi sudah benar sebelum menyimpan.
                                     </p>
                                 </div>
                             </div>
@@ -432,10 +447,10 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Mengunggah...
+                                        Menyimpan...
                                     </>
                                 ) : (
-                                    'Unggah Karya'
+                                    'Simpan Perubahan'
                                 )}
                             </button>
                         </div>
