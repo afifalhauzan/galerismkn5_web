@@ -36,7 +36,7 @@ class AuthController extends Controller
 
         // Load jurusan relationship
         $user->load('jurusan');
-        
+
         // Add jurusan_name to user data
         $userData = $user->toArray();
         $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
@@ -68,11 +68,11 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->with('jurusan')->firstOrFail();
-        
+
         // Add jurusan_name to user data
         $userData = $user->toArray();
         $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
-        
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -89,11 +89,11 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         $user = $request->user()->load('jurusan');
-        
+
         // Add jurusan_name to user data
         $userData = $user->toArray();
         $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
-        
+
         return response()->json([
             'user' => $userData
         ], 200);
@@ -130,21 +130,31 @@ class AuthController extends Controller
      */
     public function userStats(Request $request)
     {
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        if (!in_array($user->role, ['siswa'])) {
+            if (!in_array($user->role, ['siswa'])) {
+                return response()->json([
+                    'message' => 'Statistics not available for this user role'
+                ], 403);
+            }
+
+            $stats = [
+                'jumlahKarya' => $user->proyeks()->count(),
+                'userViews' => $user->proyeks()->sum('views'),
+            ];
+
             return response()->json([
-                'message' => 'Statistics not available for this user role'
-            ], 403);
+                'stats' => $stats
+            ], 200);
+        } catch (\Exception $e) {
+            // INI HANYA UNTUK DEBUGGING, HAPUS SETELAH KETEMU MASALAHNYA
+            return response()->json([
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString() // Opsional
+            ], 500);
         }
-        
-        $stats = [
-            'jumlahKarya' => $user->proyeks()->count(),
-            'userViews' => $user->proyeks()->sum('views'),
-        ];
-
-        return response()->json([
-            'stats' => $stats
-        ], 200);
     }
 }
