@@ -51,11 +51,15 @@ export default function SiswaDashboard({ user, logout }: { user: any, logout: ()
                                 <p className="text-sm text-gray-900 mt-1">{user.jurusan?.nama || 'Jurusan tidak ditemukan'}</p>
                             </div>
                             <div>
+                                <label className="block text-sm font-medium text-gray-500">Kelas</label>
+                                <p className="text-sm text-gray-900 mt-1">{user.kelas || 'Kelas tidak ditemukan'}</p>
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-500">Email</label>
                                 <p className="text-sm text-gray-900 mt-1">{user?.email || '-'}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-500">NIS/NIP</label>
+                                <label className="block text-sm font-medium text-gray-500">NIS</label>
                                 <p className="text-sm text-gray-900 mt-1">{user?.nis_nip || '-'}</p>
                             </div>
                         </div>

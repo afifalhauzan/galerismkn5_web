@@ -27,7 +27,7 @@ const responsive = {
 
 const customStyles = `
     .react-multi-carousel-list {
-        padding: 0 40px;
+        padding: 0 0px;
     }
     
     .react-multi-carousel-dot-list {

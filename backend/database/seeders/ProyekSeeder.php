@@ -15,31 +15,46 @@ class ProyekSeeder extends Seeder
     public function run(): void
     {
         $siswaUsers = User::where('role', 'siswa')->get();
-        
-        $proyekData = [
+
+        $proyekDataFinal = [
+            // --- RPL (ID 1) ---
+            [
+                'judul' => 'Sistem Informasi Absensi Berbasis QR',
+                'deskripsi' => 'Aplikasi web menggunakan React dan Laravel untuk pencatatan kehadiran siswa dengan pemindaian QR Code.',
+                'tautan_proyek' => 'https://github.com/bambangsudiro/absensi-qr',
+                'image_url' => 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500&h=300&fit=crop',
+                'status' => 'dinilai',
+                'nis_nip' => 'NIS007',
+                'jurusan_id' => 1,
+            ],
             [
                 'judul' => 'Sistem Informasi Perpustakaan',
                 'deskripsi' => 'Aplikasi web untuk mengelola data buku, peminjaman, dan pengembalian buku di perpustakaan sekolah. Dibuat menggunakan Laravel dan MySQL.',
                 'tautan_proyek' => 'https://github.com/andipratama/sistem-perpustakaan',
                 'image_url' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
-                'nis_nip' => 'NIS001', // Andi Pratama
+                'nis_nip' => 'NIS001',
+                'jurusan_id' => 1,
             ],
             [
                 'judul' => 'E-Commerce Sederhana',
-                'deskripsi' => 'Aplikasi jual-beli online untuk produk lokal. Fitur include katalog produk, keranjang belanja, dan sistem pembayaran sederhana.',
+                'deskripsi' => 'Aplikasi jual-beli online untuk produk lokal. Fitur include katalog produk, keranjang belanja, dan sistem pembayaran sederhana. Dibuat dengan Next.js dan TailwindCSS.',
                 'tautan_proyek' => 'https://github.com/dewisari/ecommerce-app',
                 'image_url' => 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
-                'nis_nip' => 'NIS002', // Dewi Sari
+                'nis_nip' => 'NIS002',
+                'jurusan_id' => 1,
             ],
+
+            // --- TKJ (ID 2) ---
             [
                 'judul' => 'Monitoring Jaringan Komputer',
                 'deskripsi' => 'Sistem monitoring untuk memantau status perangkat jaringan di lab komputer. Menggunakan SNMP untuk monitoring real-time.',
                 'tautan_proyek' => 'https://github.com/rizkyramadhan/network-monitoring',
                 'image_url' => 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
-                'nis_nip' => 'NIS003', // Rizky Ramadhan
+                'nis_nip' => 'NIS003',
+                'jurusan_id' => 2,
             ],
             [
                 'judul' => 'Konfigurasi Server Web',
@@ -47,38 +62,211 @@ class ProyekSeeder extends Seeder
                 'tautan_proyek' => 'https://github.com/mayasari/web-server-config',
                 'image_url' => 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
-                'nis_nip' => 'NIS004', // Maya Sari
+                'nis_nip' => 'NIS004',
+                'jurusan_id' => 2,
             ],
             [
-                'judul' => 'Sistem Diagnostik Kendaraan',
-                'deskripsi' => 'Aplikasi mobile untuk diagnostik dasar kendaraan bermotor. Membantu teknisi dalam identifikasi masalah mesin.',
-                'tautan_proyek' => 'https://github.com/jokosusilo/vehicle-diagnostic',
-                'image_url' => 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500&h=300&fit=crop',
+                'judul' => 'Jaringan Wireless Skala Sekolah',
+                'deskripsi' => 'Perancangan topologi dan konfigurasi jaringan wireless di lingkungan sekolah menggunakan Mikrotik.',
+                'tautan_proyek' => 'https://github.com/cahyoutomo/wireless-skala-sekolah',
+                'image_url' => 'https://images.unsplash.com/photo-1599385552718-450f375c35f6?w=500&h=300&fit=crop',
+                'status' => 'terkirim', // **PERBAIKAN: Diubah dari 'draft' menjadi 'terkirim'**
+                'nis_nip' => 'NIS008',
+                'jurusan_id' => 2,
+            ],
+
+            // --- DKV (ID 3) ---
+            [
+                'judul' => 'Desain Identitas Brand Sekolah',
+                'deskripsi' => 'Pembuatan logo, palet warna, dan panduan penggunaan visual untuk rebranding sekolah. Dibuat menggunakan Adobe Illustrator.',
+                'tautan_proyek' => 'https://behance.net/jokosusilo/brand-design-smkn5',
+                'image_url' => 'https://images.unsplash.com/photo-1544256718-3c306d8601c0?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
-                'nis_nip' => 'NIS005', // Joko Susilo
+                'nis_nip' => 'NIS005',
+                'jurusan_id' => 3,
             ],
             [
-                'judul' => 'Panduan Perawatan Kendaraan',
-                'deskripsi' => 'Website informasi tentang tips perawatan kendaraan, jadwal service, dan panduan troubleshooting untuk pemilik kendaraan.',
-                'tautan_proyek' => 'https://github.com/rinawati/vehicle-maintenance',
-                'image_url' => 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=500&h=300&fit=crop',
+                'judul' => 'Infografis Pencegahan COVID-19',
+                'deskripsi' => 'Rangkaian desain infografis edukatif untuk media sosial dan cetak, dibuat dengan Canva dan Adobe Photoshop.',
+                'tautan_proyek' => 'https://dribbble.com/rinawati/covid-infographics',
+                'image_url' => 'https://images.unsplash.com/photo-1620288229410-d0d473b18c5e?w=500&h=300&fit=crop',
+                'status' => 'dinilai',
+                'nis_nip' => 'NIS006',
+                'jurusan_id' => 3,
+            ],
+            [
+                'judul' => 'Prototype Aplikasi Mobile Sekolah',
+                'deskripsi' => 'Desain UI/UX high-fidelity prototype aplikasi mobile informasi sekolah, dibuat menggunakan Figma.',
+                'tautan_proyek' => 'https://www.figma.com/file/diankusuma/app-prototype',
+                'image_url' => 'https://images.unsplash.com/photo-1626019554316-24e037c688c3?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
-                'nis_nip' => 'NIS006', // Rina Wati
+                'nis_nip' => 'NIS009',
+                'jurusan_id' => 3,
+            ],
+
+            // --- Animasi (ID 4) ---
+            [
+                'judul' => 'Animasi Edukasi Bahaya Sampah',
+                'deskripsi' => 'Video animasi 2D berdurasi 60 detik untuk kampanye kebersihan lingkungan. Dibuat dengan Adobe After Effects.',
+                'tautan_proyek' => 'https://youtube.com/tomi-animasi-sampah',
+                'image_url' => 'https://images.unsplash.com/photo-1588692795893-6c7c0f16e3b5?w=500&h=300&fit=crop',
+                'status' => 'dinilai',
+                'nis_nip' => 'NIS010',
+                'jurusan_id' => 4,
+            ],
+            [
+                'judul' => 'Motion Graphics Profil Sekolah',
+                'deskripsi' => 'Video profil sekolah berdurasi 2 menit dengan gaya motion graphics yang dinamis. Diedit menggunakan Adobe Premiere Pro.',
+                'tautan_proyek' => 'https://vimeo.com/lina-profil-sekolah',
+                'image_url' => 'https://images.unsplash.com/photo-1558981408-db0ecd4a317e?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS011',
+                'jurusan_id' => 4,
+            ],
+            [
+                'judul' => 'Model 3D Karakter Maskot Sekolah',
+                'deskripsi' => 'Pembuatan model 3D karakter maskot sekolah siap animasi. Dibuat menggunakan Blender.',
+                'tautan_proyek' => 'https://artstation.com/tomi-maskot',
+                'image_url' => 'https://images.unsplash.com/photo-1616782358984-2579b291583a?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS010',
+                'jurusan_id' => 4,
+            ],
+
+            // --- Kriya Kayu (ID 5) ---
+            [
+                'judul' => 'Desain Kursi Ergonomis Lipat',
+                'deskripsi' => 'Perancangan dan pembuatan prototipe kursi belajar lipat yang ergonomis dari kayu jati Belanda.',
+                'tautan_proyek' => 'https://instagram.com/slamet/kursi-lipat-kayu',
+                'image_url' => 'https://images.unsplash.com/photo-1517436329497-2e1c3a6d9b9c?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS012',
+                'jurusan_id' => 5,
+            ],
+            [
+                'judul' => 'Maket Rumah Adat Jawa',
+                'deskripsi' => 'Pembuatan maket miniatur rumah Joglo menggunakan teknik pahatan dan sambungan kayu tradisional.',
+                'tautan_proyek' => 'https://drive.google.com/slamet/maket-rumah-adat',
+                'image_url' => 'https://images.unsplash.com/photo-1582046808794-d4b65a5e305e?w=500&h=300&fit=crop',
+                'status' => 'dinilai',
+                'nis_nip' => 'NIS012',
+                'jurusan_id' => 5,
+            ],
+            [
+                'judul' => 'Hiasan Dinding Geometris Kayu',
+                'deskripsi' => 'Produk kriya kayu berupa hiasan dinding dengan pola geometris modern menggunakan teknik laser-cut dan finishing natural.',
+                'tautan_proyek' => 'https://tokopedia.com/kriya-slamet/hiasan-geometris',
+                'image_url' => 'https://images.unsplash.com/photo-1596706788874-5e5d3c8c72b2?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS012',
+                'jurusan_id' => 5,
+            ],
+
+            // --- Kriya Tekstil (ID 6) ---
+            [
+                'judul' => 'Kain Batik Motif Flora Sekolah',
+                'deskripsi' => 'Perancangan dan pembuatan kain batik tulis dengan motif flora khas lingkungan sekolah.',
+                'tautan_proyek' => 'https://instagram.com/nisa-tekstil/batik-sekolah',
+                'image_url' => 'https://images.unsplash.com/photo-1581005891393-2c1b1c1d1a1b?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS013',
+                'jurusan_id' => 6,
+            ],
+            [
+                'judul' => 'Taplak Meja Tenun Ikat Modern',
+                'deskripsi' => 'Pembuatan taplak meja dengan teknik tenun ikat menggunakan pewarna alami dan desain modern minimalis.',
+                'tautan_proyek' => 'https://shopee.co.id/nisa-tekstil/tenun-ikat',
+                'image_url' => 'https://images.unsplash.com/photo-1587522533031-158c5f590b1e?w=500&h=300&fit=crop',
+                'status' => 'dinilai',
+                'nis_nip' => 'NIS013',
+                'jurusan_id' => 6,
+            ],
+            [
+                'judul' => 'Aplikasi Sulam Benang di Jaket Denim',
+                'deskripsi' => 'Proyek kreatif aplikasi sulaman tangan dengan teknik cross-stitch pada jaket denim.',
+                'tautan_proyek' => 'https://drive.google.com/nisa-tekstil/sulam-denim',
+                'image_url' => 'https://images.unsplash.com/photo-1511993215234-a690e54b68f5?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS013',
+                'jurusan_id' => 6,
+            ],
+
+            // --- Kriya Keramik (ID 7) ---
+            [
+                'judul' => 'Set Peralatan Makan Keramik Glaze',
+                'deskripsi' => 'Pembuatan 4 set peralatan makan (piring, mangkuk, cangkir) dari keramik dengan teknik glazing warna-warni.',
+                'tautan_proyek' => 'https://instagram.com/fajar-keramik/glaze-set',
+                'image_url' => 'https://images.unsplash.com/photo-1563825838491-9e7314d3f5e5?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS014',
+                'jurusan_id' => 7,
+            ],
+            [
+                'judul' => 'Vas Bunga Abstrak dari Tanah Liat',
+                'deskripsi' => 'Pembuatan vas bunga dengan bentuk non-tradisional menggunakan teknik hand-building dan tekstur kasar.',
+                'tautan_proyek' => 'https://tokopedia.com/kriya-fajar/vas-abstrak',
+                'image_url' => 'https://images.unsplash.com/photo-1601051515250-8b0b8c8d8c3f?w=500&h=300&fit=crop',
+                'status' => 'terkirim', // **PERBAIKAN: Diubah dari 'draft' menjadi 'terkirim'**
+                'nis_nip' => 'NIS014',
+                'jurusan_id' => 7,
+            ],
+            [
+                'judul' => 'Relief Dinding Keramik Motif Nusantara',
+                'deskripsi' => 'Relief dinding berukuran 1x1 meter dengan motif ukiran tradisional dari berbagai daerah di Nusantara.',
+                'tautan_proyek' => 'https://drive.google.com/fajar/relief-nusantara',
+                'image_url' => 'https://images.unsplash.com/photo-1596706788874-5e5d3c8c72b2?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS014',
+                'jurusan_id' => 7,
+            ],
+
+            // --- Tata Busana (ID 8) ---
+            [
+                'judul' => 'Perancangan Busana Pesta Malam',
+                'deskripsi' => 'Desain dan pembuatan gaun pesta malam dengan teknik draperi dan aplikasi payet. Dilengkapi dengan dokumentasi proses menjahit.',
+                'tautan_proyek' => 'https://instagram.com/gita-busana/gaun-pesta',
+                'image_url' => 'https://images.unsplash.com/photo-1543888514-61c16928738b?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS015',
+                'jurusan_id' => 8,
+            ],
+            [
+                'judul' => 'Koleksi Busana Muslim Ready-to-Wear',
+                'deskripsi' => 'Pembuatan 3 looks koleksi busana muslim harian yang nyaman dan trendi untuk pasar remaja.',
+                'tautan_proyek' => 'https://shopee.co.id/gita-busana/koleksi-muslim',
+                'image_url' => 'https://images.unsplash.com/photo-1583091001402-45e31e5f8b9e?w=500&h=300&fit=crop',
+                'status' => 'dinilai',
+                'nis_nip' => 'NIS015',
+                'jurusan_id' => 8,
+            ],
+            [
+                'judul' => 'Sistem Informasi Pengukuran Pakaian',
+                'deskripsi' => 'Aplikasi sederhana berbasis web untuk mencatat dan mengelola data ukuran pelanggan. Dibuat dengan HTML, CSS (TailwindCSS), dan JavaScript.',
+                'tautan_proyek' => 'https://github.com/gita-kirana/sistem-ukur',
+                'image_url' => 'https://images.unsplash.com/photo-1583911048474-067980f7f3f2?w=500&h=300&fit=crop',
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS015',
+                'jurusan_id' => 8,
             ],
         ];
 
-        foreach ($proyekData as $data) {
+        foreach ($proyekDataFinal as $data) {
             $siswa = $siswaUsers->where('nis_nip', $data['nis_nip'])->first();
-            
+
             if ($siswa) {
+                // Hapus nis_nip sebelum create, karena kolom itu tidak ada di tabel 'proyeks'
+                // Ini mengatasi error 'has no column named nis_nip'
+                $dataProyek = $data;
+                unset($dataProyek['nis_nip']);
+
                 Proyek::create([
                     'user_id' => $siswa->id,
-                    'jurusan_id' => $siswa->jurusan_id,
-                    'judul' => $data['judul'],
-                    'deskripsi' => $data['deskripsi'],
-                    'tautan_proyek' => $data['tautan_proyek'],
-                    'image_url' => $data['image_url'],
-                    'status' => $data['status'],
+                    'jurusan_id' => $siswa->jurusan_id, // Menggunakan jurusan_id dari siswa (lebih aman)
+                    'judul' => $dataProyek['judul'],
+                    'deskripsi' => $dataProyek['deskripsi'],
+                    'tautan_proyek' => $dataProyek['tautan_proyek'],
+                    'image_url' => $dataProyek['image_url'],
+                    'status' => $dataProyek['status'],
                 ]);
             }
         }

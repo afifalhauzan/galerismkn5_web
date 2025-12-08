@@ -7,6 +7,7 @@ export interface User {
     nis_nip?: string;
     jurusan_id?: number;
     jurusan_name?: string;
+    kelas?: string;
     created_at: string;
     updated_at: string;
 }
@@ -29,6 +30,7 @@ export interface Penilaian {
     created_at: string;
     updated_at: string;
     guru?: User;
+    user_name?: string;
 }
 
 export interface Proyek {

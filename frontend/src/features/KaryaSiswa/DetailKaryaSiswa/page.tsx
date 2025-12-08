@@ -145,7 +145,7 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                                     <div className="flex items-center">
                                         <span className="text-sm font-medium text-gray-500 w-20">Nilai:</span>
                                         <div className="flex items-center">
-                                            <span className="text-2xl font-bold text-blue-600 mr-2">
+                                            <span className="text-lg font-bold text-sky-600 mr-1">
                                                 {proyek.penilaian.nilai}
                                             </span>
                                             <span className="text-sm text-gray-500">/100</span>

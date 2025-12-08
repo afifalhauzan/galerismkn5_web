@@ -12,6 +12,7 @@ interface User {
     role: string;
     jurusan_id?: number;
     jurusan_name?: string;
+    kelas?: string;
     isGuru: () => boolean;
     isSiswa: () => boolean;
 }

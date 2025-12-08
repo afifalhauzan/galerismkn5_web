@@ -18,7 +18,7 @@ class ProjekController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Proyek::with(['user', 'jurusan', 'penilaian']);
+            $query = Proyek::with(['user', 'jurusan', 'penilaian.guru']);
 
             // Filter by status if provided
             if ($request->has('status')) {
@@ -168,7 +168,7 @@ class ProjekController extends Controller
                 'status' => $request->status ?? 'terkirim',
             ]);
 
-            $proyek->load(['user', 'jurusan', 'penilaian']);
+            $proyek->load(['user', 'jurusan', 'penilaian.guru']);
 
             // Prepare comprehensive success response
             $response = [
@@ -223,7 +223,7 @@ class ProjekController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $proyek = Proyek::with(['user', 'jurusan', 'penilaian'])->findOrFail($id);
+            $proyek = Proyek::with(['user', 'jurusan', 'penilaian.guru'])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
@@ -362,7 +362,7 @@ class ProjekController extends Controller
 
             $proyek->update($data);
 
-            $proyek->load(['user', 'jurusan', 'penilaian']);
+            $proyek->load(['user', 'jurusan', 'penilaian.guru']);
 
             // Prepare comprehensive success response
             $response = [
@@ -437,7 +437,7 @@ class ProjekController extends Controller
     public function myProjects(Request $request): JsonResponse
     {
         try {
-            $query = Proyek::with(['jurusan', 'penilaian'])
+            $query = Proyek::with(['jurusan', 'penilaian.guru'])
                 ->where('user_id', Auth::id());
 
             // Filter by status if provided

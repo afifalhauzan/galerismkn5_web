@@ -12,12 +12,25 @@ class Penilaian extends Model
     protected $fillable = [
         'proyek_id',
         'guru_id',
-        'nilai_bintang',
+        'nilai',
+        'catatan',
     ];
 
     protected $casts = [
-        'nilai_bintang' => 'integer',
+        'nilai' => 'integer',
     ];
+
+    protected $appends = [
+        'user_name',
+    ];
+
+    /**
+     * Get the user name from the related guru
+     */
+    public function getUserNameAttribute()
+    {
+        return $this->guru ? $this->guru->name : null;
+    }
 
     /**
      * Get the proyek that this penilaian belongs to
@@ -36,26 +49,34 @@ class Penilaian extends Model
     }
 
     /**
-     * Scope to get penilaian by star rating
+     * Scope to get penilaian by numeric score
      */
-    public function scopeByStars($query, $stars)
+    public function scopeByScore($query, $score)
     {
-        return $query->where('nilai_bintang', $stars);
+        return $query->where('nilai', $score);
     }
 
     /**
-     * Scope to get high ratings (4-5 stars)
+     * Scope to get high ratings (80-100)
      */
     public function scopeHighRating($query)
     {
-        return $query->whereIn('nilai_bintang', [4, 5]);
+        return $query->where('nilai', '>=', 80);
     }
 
     /**
-     * Scope to get low ratings (1-2 stars)
+     * Scope to get low ratings (1-60)
      */
     public function scopeLowRating($query)
     {
-        return $query->whereIn('nilai_bintang', [1, 2]);
+        return $query->where('nilai', '<=', 60);
+    }
+
+    /**
+     * Scope to get medium ratings (61-79)
+     */
+    public function scopeMediumRating($query)
+    {
+        return $query->whereBetween('nilai', [61, 79]);
     }
 }

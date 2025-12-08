@@ -21,13 +21,14 @@ class PenilaianSeeder extends Seeder
         foreach ($proyeksDinilai as $proyek) {
             $randomGuru = $gurus->random();
             
-            // Create random rating between 3-5 stars for sample data
-            $rating = rand(3, 5);
+            // Create random rating between 70-95 for sample data (good to excellent)
+            $rating = rand(70, 95);
             
             Penilaian::create([
                 'proyek_id' => $proyek->id,
                 'guru_id' => $randomGuru->id,
-                'nilai_bintang' => $rating,
+                'nilai' => $rating,
+                'catatan' => 'Karya yang bagus dengan eksekusi yang baik.',
             ]);
         }
 
@@ -40,7 +41,8 @@ class PenilaianSeeder extends Seeder
             Penilaian::create([
                 'proyek_id' => $proyekTerkirim->id,
                 'guru_id' => $gurus->first()->id,
-                'nilai_bintang' => 4,
+                'nilai' => 88,
+                'catatan' => 'Proyek menunjukkan pemahaman yang baik tentang konsep yang diajarkan. Implementasi sudah sesuai dengan requirement.',
             ]);
         }
     }

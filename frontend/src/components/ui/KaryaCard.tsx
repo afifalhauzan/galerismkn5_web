@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { KaryaItem } from '@/types/proyek';
+import Link from "next/link";
 
 interface KaryaCardProps {
     karya: KaryaItem;
@@ -38,9 +39,9 @@ export default function KaryaCard({ karya }: KaryaCardProps) {
                 </p>
                 
                 {/* View Button */}
-                <button className="bg-sky-800 hover:bg-slate-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors w-full">
+                <Link href={`/karya/${karya.id}`} className="bg-sky-800 hover:bg-slate-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors w-full block text-center">
                     Lihat
-                </button>
+                </Link>
             </div>
         </div>
     );

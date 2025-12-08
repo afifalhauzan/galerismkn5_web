@@ -25,6 +25,7 @@ class User extends Authenticatable
         'nis_nip',
         'role',
         'jurusan_id',
+        'kelas',
     ];
 
     /**

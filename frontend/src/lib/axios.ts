@@ -74,8 +74,17 @@ export const poster = async (url: string, data: any, config?: any) => {
 };
 
 // Helper function for PUT requests with SWR mutation  
-export const putter = async (url: string, data: any) => {
-    const response = await axiosInstance.put(url, data);
+export const putter = async (url: string, data: any, config?: any) => {
+    // If data is FormData, let browser set Content-Type automatically
+    const requestConfig = data instanceof FormData ? {
+        ...config,
+        headers: {
+            ...config?.headers,
+            'Content-Type': undefined // Let browser set multipart boundary
+        }
+    } : config;
+    
+    const response = await axiosInstance.put(url, data, requestConfig);
     return response.data;
 };
 
