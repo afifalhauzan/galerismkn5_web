@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjekController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\AkunController;
+use App\Http\Controllers\PenilaianController;
 
 /**
  * Authentication Routes
@@ -82,4 +83,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/akuns/{id}', [AkunController::class, 'update'])->name('akuns.update.patch');
     Route::delete('/akuns/{id}', [AkunController::class, 'destroy'])->name('akuns.destroy');
     Route::get('/akuns-stats', [AkunController::class, 'stats'])->name('akuns.stats');
+
+    /**
+     * Penilaian (Grading) Routes
+     * CRUD operations for grading projects by teachers
+     */
+    Route::get('/penilaians', [PenilaianController::class, 'index'])->name('penilaians.index');
+    Route::post('/penilaians', [PenilaianController::class, 'store'])->name('penilaians.store');
+    Route::get('/penilaians/{id}', [PenilaianController::class, 'show'])->name('penilaians.show');
+    Route::put('/penilaians/{id}', [PenilaianController::class, 'update'])->name('penilaians.update');
+    Route::patch('/penilaians/{id}', [PenilaianController::class, 'update'])->name('penilaians.update.patch');
+    Route::delete('/penilaians/{id}', [PenilaianController::class, 'destroy'])->name('penilaians.destroy');
+    Route::post('/penilaians/check-permission', [PenilaianController::class, 'checkGradingPermission'])->name('penilaians.check');
 });

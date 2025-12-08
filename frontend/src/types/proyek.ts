@@ -34,6 +34,24 @@ export interface Penilaian {
     user_name?: string;
 }
 
+// Form data types for creating/updating penilaian
+export interface CreatePenilaianData {
+    proyek_id: number;
+    nilai: number;
+    catatan?: string;
+}
+
+export interface UpdatePenilaianData extends Partial<CreatePenilaianData> {}
+
+// Grading permission check response
+export interface GradingPermissionResponse {
+    success: boolean;
+    can_grade: boolean;
+    same_jurusan: boolean;
+    already_graded: boolean;
+    message: string;
+}
+
 export interface Proyek {
     id: number;
     user_id: number;

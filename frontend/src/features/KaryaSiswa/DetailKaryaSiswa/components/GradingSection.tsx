@@ -1,0 +1,256 @@
+import { useState, useEffect } from 'react';
+import { Star, AlertTriangle, CheckCircle, X } from 'lucide-react';
+import { useGradingPermission, usePenilaianMutations } from '@/hooks/PenilaianHooks';
+import type { Proyek, User } from '@/types/proyek';
+
+interface GradingSectionProps {
+  proyek: Proyek;
+  user: User;
+  onGradingComplete?: () => void;
+}
+
+export default function GradingSection({ proyek, user, onGradingComplete }: GradingSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [score, setScore] = useState(proyek.penilaian?.nilai || 0);
+  const [comment, setComment] = useState(proyek.penilaian?.catatan || '');
+  const [showForm, setShowForm] = useState(false);
+
+  const { permission, isLoading: checkingPermission, mutate: recheckPermission } = useGradingPermission(proyek.id);
+  const { createPenilaian, updatePenilaian, isCreating, isUpdating } = usePenilaianMutations();
+
+  const isTeacher = user?.role === 'guru';
+  const isAlreadyGraded = !!proyek.penilaian;
+  const canGrade = permission?.can_grade;
+  const sameJurusan = permission?.same_jurusan;
+  const isCurrentUserGrader = proyek.penilaian?.guru_id === user?.id;
+  const isMutating = isCreating || isUpdating;
+
+  useEffect(() => {
+    if (proyek.penilaian) {
+      setScore(proyek.penilaian.nilai);
+      setComment(proyek.penilaian.catatan || '');
+    }
+  }, [proyek.penilaian]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (score < 0 || score > 100) {
+      alert('Nilai harus antara 0-100');
+      return;
+    }
+
+    try {
+      if (isAlreadyGraded && isCurrentUserGrader) {
+        // Update existing grading
+        await updatePenilaian(proyek.penilaian!.id, {
+          nilai: score,
+          catatan: comment
+        });
+        alert('Penilaian berhasil diperbarui!');
+      } else {
+        // Create new grading
+        await createPenilaian({
+          proyek_id: proyek.id,
+          nilai: score,
+          catatan: comment
+        });
+        alert('Penilaian berhasil disimpan!');
+      }
+      
+      setShowForm(false);
+      recheckPermission();
+      onGradingComplete?.();
+    } catch (error: any) {
+      console.error('Error submitting grading:', error);
+      alert(error?.response?.data?.message || 'Terjadi kesalahan saat menyimpan penilaian');
+    }
+  };
+
+  if (!isTeacher) {
+    return null;
+  }
+
+  if (checkingPermission) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="flex items-center justify-center py-4">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-gray-600">Memeriksa akses penilaian...</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border">
+      {/* Header */}
+      <div className="p-6 border-b">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Star className="w-5 h-5 text-yellow-500" />
+            <h3 className="text-lg font-semibold text-gray-900">
+              {isAlreadyGraded ? 'Penilaian Proyek' : 'Beri Penilaian'}
+            </h3>
+          </div>
+          
+          {!sameJurusan && (
+            <div className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="text-sm font-medium">Beda Jurusan</span>
+            </div>
+          )}
+          
+          {isAlreadyGraded && sameJurusan && (
+            <div className="flex items-center gap-2 text-green-600">
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">Sudah Dinilai</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="p-6">
+        {/* Permission Message */}
+        {!sameJurusan && (
+          <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-sm font-medium text-amber-800 mb-1">
+                  Tidak dapat menilai proyek dari jurusan lain
+                </h4>
+                <p className="text-sm text-amber-700">
+                  Anda hanya dapat menilai proyek dari siswa di jurusan yang sama. 
+                  Proyek ini dari jurusan <strong>{proyek.jurusan?.nama}</strong>, 
+                  sedangkan Anda dari jurusan <strong>{user.jurusan?.nama}</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Already Graded Display */}
+        {isAlreadyGraded && sameJurusan && (
+          <div className="mb-4">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-medium text-blue-900">Penilaian Saat Ini</h4>
+                <span className="text-2xl font-bold text-blue-700">{proyek.penilaian!.nilai}/100</span>
+              </div>
+              
+              {proyek.penilaian!.catatan && (
+                <div className="mt-3">
+                  <p className="text-sm text-blue-800">
+                    <strong>Catatan:</strong> {proyek.penilaian!.catatan}
+                  </p>
+                </div>
+              )}
+              
+              <div className="mt-3 text-xs text-blue-700">
+                Dinilai oleh: {proyek.penilaian!.guru?.name || proyek.penilaian!.user_name} • {' '}
+                {new Date(proyek.penilaian!.created_at).toLocaleDateString('id-ID', {
+                  year: 'numeric',
+                  month: 'long', 
+                  day: 'numeric'
+                })}
+              </div>
+            </div>
+
+            {/* Edit/Update Button for Current Grader */}
+            {isCurrentUserGrader && (
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => setShowForm(!showForm)}
+                  className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-colors"
+                >
+                  {showForm ? 'Batal Edit' : 'Edit Penilaian'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Grading Form */}
+        {((!isAlreadyGraded && canGrade) || (isAlreadyGraded && isCurrentUserGrader && showForm)) && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="score" className="block text-sm font-medium text-gray-700 mb-2">
+                Nilai (0-100)
+              </label>
+              <input
+                type="number"
+                id="score"
+                value={score}
+                onChange={(e) => setScore(Number(e.target.value))}
+                min="0"
+                max="100"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Masukkan nilai 0-100"
+                disabled={isMutating}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
+                Catatan (opsional)
+              </label>
+              <textarea
+                id="comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Berikan catatan atau saran untuk siswa..."
+                disabled={isMutating}
+                maxLength={1000}
+              />
+              <p className="text-xs text-gray-500 mt-1">{comment.length}/1000 karakter</p>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                disabled={isMutating}
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isMutating ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    {isAlreadyGraded ? 'Memperbarui...' : 'Menyimpan...'}
+                  </div>
+                ) : (
+                  isAlreadyGraded ? 'Perbarui Penilaian' : 'Simpan Penilaian'
+                )}
+              </button>
+              
+              {showForm && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForm(false);
+                    setScore(proyek.penilaian?.nilai || 0);
+                    setComment(proyek.penilaian?.catatan || '');
+                  }}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                  disabled={isMutating}
+                >
+                  Batal
+                </button>
+              )}
+            </div>
+          </form>
+        )}
+
+        {/* No Permission Message */}
+        {!isAlreadyGraded && !canGrade && sameJurusan && (
+          <div className="text-center py-6 text-gray-500">
+            <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p>Proyek ini sudah dinilai oleh guru lain</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
