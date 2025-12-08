@@ -33,8 +33,17 @@ export default function GuruDashboard({ user, logout }: { user: any, logout: () 
                         </div>
                     </div>
 
+                     <div className="bg-white rounded-lg shadow-sm border p-6">
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-500">Jurusan</label>
+                                <p className="text-sm text-gray-900 mt-1">{user.jurusan?.nama || 'Jurusan tidak ditemukan'}</p>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Guru Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div className="bg-white overflow-hidden shadow rounded-lg">
                             <div className="p-6">
                                 <div className="flex items-center">
@@ -107,10 +116,10 @@ export default function GuruDashboard({ user, logout }: { user: any, logout: () 
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Guru Actions */}
-                    <div className="bg-white shadow rounded-lg">
+                    <div className="bg-white shadow rounded-lg mt-6">
                         <div className="px-6 py-4 border-b border-gray-200">
                             <h3 className="text-lg leading-6 font-medium text-gray-900">
                                 Tools Guru
@@ -119,14 +128,14 @@ export default function GuruDashboard({ user, logout }: { user: any, logout: () 
                         <div className="px-6 py-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <Link 
-                                    href="/galeri"
+                                    href={`/galeri?jurusan_id=${user.jurusan_id}`}
                                     className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
                                     <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
                                     <div className="ml-3 text-left">
                                         <p className="text-sm font-medium text-gray-900">Cek Galeri Siswa</p>
-                                        <p className="text-xs text-gray-500">Cek Karya</p>
+                                        <p className="text-xs text-gray-500">Lihat karya siswa jurusan Anda</p>
                                     </div>
                                 </Link>
                             </div>

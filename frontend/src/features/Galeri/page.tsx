@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useProjeks } from "@/hooks/ProjekHooks";
 import { useJurusans } from "@/hooks/JurusanHooks";
 import FilterDropdown from "./components/FilterDropdown";
@@ -16,14 +16,21 @@ const KELAS_OPTIONS = ["10", "11", "12"];
 
 export default function GaleriPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { jurusans, isLoading: isLoadingJurusans } = useJurusans();
 
-    // Filter states
-    const [selectedJurusan, setSelectedJurusan] = useState("");
-    const [selectedKelas, setSelectedKelas] = useState("");
-    const [selectedYear, setSelectedYear] = useState("");
+    // Get URL parameters
+    const urlJurusanId = searchParams.get('jurusan_id');
+    const urlKelas = searchParams.get('kelas');
+    const urlYear = searchParams.get('year');
+    const urlSearch = searchParams.get('search');
+
+    // Filter states - initialize from URL params if available
+    const [selectedJurusan, setSelectedJurusan] = useState(urlJurusanId || "");
+    const [selectedKelas, setSelectedKelas] = useState(urlKelas || "");
+    const [selectedYear, setSelectedYear] = useState(urlYear || "");
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(urlSearch || "");
 
     // Fetch projects with filters
     const { proyeks, pagination, isLoading, isError } = useProjeks({

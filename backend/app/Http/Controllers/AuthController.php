@@ -133,9 +133,10 @@ class AuthController extends Controller
         $user = $request->user();
 
         if (in_array($user->role, ['siswa'])) {
-            return response()->json([
-                'message' => 'Statistics not available for this user role'
-            ], 403);
+            $stats = [
+                'jumlahKarya' => $user->proyeks()->count(),
+                'totalViews' => $user->proyeks()->sum('views'),
+            ];
         }
 
         if ($user->isGuru()) {

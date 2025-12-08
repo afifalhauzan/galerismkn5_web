@@ -38,6 +38,7 @@ const customStyles = `
         background: #4F6C9C;
         color: white;
         border: none;
+        margin: 0 0 30px 0;
         border-radius: 4px;
         width: 40px;
         height: 40px;
