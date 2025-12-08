@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 
 class ProjekController extends Controller
 {
@@ -97,13 +98,13 @@ class ProjekController extends Controller
             // Handle image upload with detailed feedback
             if ($request->hasFile('image')) {
                 $imageFile = $request->file('image');
-                
+
                 // Get original file info
                 $originalName = $imageFile->getClientOriginalName();
                 $originalSize = $imageFile->getSize();
                 $mimeType = $imageFile->getMimeType();
                 $extension = $imageFile->getClientOriginalExtension();
-                
+
                 // Validate file integrity
                 if (!$imageFile->isValid()) {
                     return response()->json([
@@ -117,7 +118,7 @@ class ProjekController extends Controller
                     // Store file with original name preservation
                     $fileName = time() . '_' . str_replace(' ', '_', $originalName);
                     $path = $imageFile->storeAs('projects', $fileName, 'public');
-                    
+
                     if (!$path) {
                         throw new \Exception('Failed to store file');
                     }
@@ -129,7 +130,7 @@ class ProjekController extends Controller
                     }
 
                     $data['image_url'] = '/storage/' . $path;
-                    
+
                     // Prepare upload info for response
                     $uploadInfo = [
                         'original_name' => $originalName,
@@ -142,7 +143,7 @@ class ProjekController extends Controller
                         'path' => $path,
                         'uploaded_at' => now()->toISOString()
                     ];
-                    
+
                 } catch (\Exception $uploadException) {
                     return response()->json([
                         'success' => false,
@@ -252,6 +253,11 @@ class ProjekController extends Controller
         try {
             $proyek = Proyek::findOrFail($id);
 
+            Log::info('Method:', [$request->method()]);
+            Log::info('Content-Type:', [$request->header('Content-Type')]);
+            Log::info('All Data:', $request->all()); // Cek apakah judul/deskripsi ada di sini
+            Log::info('Has File:', [$request->hasFile('image')]);
+
             // Check if user owns this project or is admin
             $currentUser = Auth::user();
             if ($proyek->user_id !== $currentUser->id && $currentUser->role !== 'admin') {
@@ -290,72 +296,31 @@ class ProjekController extends Controller
 
             // Handle image upload if provided
             if ($request->hasFile('image')) {
-                $imageFile = $request->file('image');
-                
-                // Get original file info
-                $originalName = $imageFile->getClientOriginalName();
-                $originalSize = $imageFile->getSize();
-                $mimeType = $imageFile->getMimeType();
-                $extension = $imageFile->getClientOriginalExtension();
-                
-                // Validate file integrity
-                if (!$imageFile->isValid()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Invalid file upload',
-                        'error' => 'The uploaded file is corrupted or incomplete'
-                    ], 400);
+                // Delete old image if exists
+                if ($proyek->image_url && str_starts_with($proyek->image_url, '/storage/')) {
+                    $oldPath = str_replace('/storage/', '', $proyek->image_url);
+                    $oldFullPath = storage_path('app/public/' . $oldPath);
+                    if (file_exists($oldFullPath)) {
+                        unlink($oldFullPath);
+                    }
                 }
 
-                try {
-                    // Delete old image if exists
-                    if ($proyek->image_url && str_starts_with($proyek->image_url, '/storage/')) {
-                        $oldPath = str_replace('/storage/', '', $proyek->image_url);
-                        $oldFullPath = storage_path('app/public/' . $oldPath);
-                        if (file_exists($oldFullPath)) {
-                            unlink($oldFullPath);
-                        }
-                    }
+                $imageFile = $request->file('image');
+                $originalName = $imageFile->getClientOriginalName();
+                $fileName = time() . '_' . str_replace(' ', '_', $originalName);
+                $path = $imageFile->storeAs('projects', $fileName, 'public');
 
-                    // Store new file with original name preservation
-                    $fileName = time() . '_' . str_replace(' ', '_', $originalName);
-                    $path = $imageFile->storeAs('projects', $fileName, 'public');
-                    
-                    if (!$path) {
-                        throw new \Exception('Failed to store file');
-                    }
-
-                    // Verify file was actually stored
-                    $fullPath = storage_path('app/public/' . $path);
-                    if (!file_exists($fullPath)) {
-                        throw new \Exception('File verification failed after upload');
-                    }
-
+                if ($path) {
                     $data['image_url'] = '/storage/' . $path;
-                    
-                    // Prepare upload info for response
                     $uploadInfo = [
                         'original_name' => $originalName,
                         'stored_name' => $fileName,
-                        'size' => $originalSize,
-                        'size_formatted' => $this->formatBytes($originalSize),
-                        'mime_type' => $mimeType,
-                        'extension' => $extension,
-                        'url' => '/storage/' . $path,
-                        'path' => $path,
-                        'uploaded_at' => now()->toISOString()
+                        'url' => '/storage/' . $path
                     ];
-                    
-                } catch (\Exception $uploadException) {
+                } else {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Image upload failed',
-                        'error' => $uploadException->getMessage(),
-                        'upload_details' => [
-                            'original_name' => $originalName,
-                            'size' => $this->formatBytes($originalSize),
-                            'type' => $mimeType
-                        ]
+                        'message' => 'Failed to upload image'
                     ], 500);
                 }
             }

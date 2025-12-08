@@ -66,7 +66,7 @@ interface KaryaCarouselProps {
 export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
     const { karyaItems, isLoading, isError } = useKaryaItems({
         status: 'dinilai', // Only show graded/approved projects
-        limit: 6, // Limit to 6 items for carousel
+        limit: 10, //limit to 10 items
         page: 1
     });
 
@@ -147,6 +147,7 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
                     arrows={true}
                 >
                     {karyaItems.map((karya) => (
+                        console.log(karya),
                         <KaryaCard key={karya.id} karya={karya} />
                     ))}
                 </Carousel>

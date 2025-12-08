@@ -170,22 +170,32 @@ export function useUpdateProyek(id: number | string) {
         `/proyeks/${id}`,
         (url: string, { arg }: { arg: UpdateProjekData }) => {
             // Check if we have a file to upload
-            if (arg.image) {
+            if (arg.image instanceof File) {
                 const formData = new FormData();
+                
+                // 1. TAMBAHKAN INI: Method Spoofing untuk Laravel
+                formData.append('_method', 'PUT');
+
+                // Append data lainnya
                 if (arg.judul) formData.append('judul', arg.judul);
                 if (arg.deskripsi) formData.append('deskripsi', arg.deskripsi);
                 if (arg.tautan_proyek) formData.append('tautan_proyek', arg.tautan_proyek);
                 if (arg.jurusan_id) formData.append('jurusan_id', arg.jurusan_id.toString());
                 if (arg.status) formData.append('status', arg.status);
+                
                 formData.append('image', arg.image);
 
-                console.log("Updating proyek with image upload. FormData entries:");
+                console.log("Updating proyek with image upload (Spoofed PUT). FormData entries:");
                 for (let pair of formData.entries()) {
                     console.log(pair[0] + ': ' + pair[1]);
                 }
 
-                return putter(url, formData);
+                // 2. GUNAKAN 'poster' (POST) BUKAN 'putter' (PUT)
+                // PHP tidak bisa baca body multipart/form-data via PUT request.
+                // Kita kirim POST fisik, tapi Laravel baca sebagai PUT karena ada field _method.
+                return poster(url, formData);
             } else {
+                // Jika tidak ada gambar, update JSON biasa via PUT aman dilakukan
                 console.log("Updating proyek without image upload:", arg);
                 return putter(url, arg);
             }
@@ -196,9 +206,11 @@ export function useUpdateProyek(id: number | string) {
         try {
             const result = await trigger(proyekData);
             console.log("Proyek updated successfully:", result);
+            
             // Revalidate specific project and lists
             mutate(`/proyeks/${id}`);
             mutate((key) => typeof key === 'string' && (key.startsWith('/proyeks') || key.startsWith('/my-proyeks')));
+            
             return result;
         } catch (error) {
             throw error;

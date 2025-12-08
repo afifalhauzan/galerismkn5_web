@@ -1,16 +1,38 @@
 "use client";
 
-import { useProyek } from "@/hooks/ProjekHooks";
+import { useProyek, useDeleteProyek } from "@/hooks/ProjekHooks";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { showDeleteConfirmation, showDeleteSuccess, showDeleteError } from "../components/DeleteConfirmation";
 
 export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: () => void }) {
     const params = useParams();
     const router = useRouter();
     const proyekId = params.id as string;
     const { proyek, isLoading, isError, mutate } = useProyek(proyekId);
+    const { deleteProyek, isDeleting } = useDeleteProyek();
     const [showReview, setShowReview] = useState(false);
     const imageUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+
+    const handleDelete = async () => {
+        const confirmed = await showDeleteConfirmation({
+            title: "Apakah Anda yakin?",
+            text: "Proyek ini akan dihapus secara permanen!",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        });
+        
+        if (confirmed) {
+            try {
+                await deleteProyek(proyekId);
+                await showDeleteSuccess("Proyek telah berhasil dihapus.");
+                router.push('/karya'); // Redirect to karya list after deletion
+            } catch (error) {
+                console.error('Error deleting proyek:', error);
+                await showDeleteError("Gagal menghapus proyek. Silakan coba lagi.");
+            }
+        }
+    };
 
     if (isLoading) {
         return (
@@ -79,10 +101,10 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                                 <div className="flex items-start justify-between mb-4">
                                     <h2 className="text-2xl font-bold text-gray-900">{proyek.judul}</h2>
                                     <span className={`px-3 py-1 text-sm font-medium rounded-full ${proyek.status === 'terkirim'
-                                            ? 'bg-blue-100 text-blue-800'
-                                            : proyek.status === 'dinilai'
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-gray-100 text-gray-800'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : proyek.status === 'dinilai'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-gray-100 text-gray-800'
                                         }`}>
                                         {proyek.status === 'terkirim' ? 'Terkirim' :
                                             proyek.status === 'dinilai' ? 'Dinilai' : proyek.status}
@@ -120,7 +142,7 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                             {proyek.image_url ? (
                                 <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                                     <img
-                                        src={`${imageUrl}${proyek.image_url}`}  
+                                        src={`${imageUrl}${proyek.image_url}`}
                                         alt={proyek.judul}
                                         className="w-full h-full object-cover"
                                     />
@@ -142,32 +164,33 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                             <div className="bg-white rounded-lg shadow-sm border p-6">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Penilaian</h3>
                                 <div className="space-y-4">
-                                    <div className="flex items-center">
-                                        <span className="text-sm font-medium text-gray-500 w-20">Nilai:</span>
+                                    <div className="flex flex-row justify-between">
                                         <div className="flex items-center">
-                                            <span className="text-lg font-bold text-sky-600 mr-1">
-                                                {proyek.penilaian.nilai}
+                                            <div className="flex items-center">
+                                                <span className="text-3xl font-bold text-sky-600 mr-1">
+                                                    {proyek.penilaian.nilai}
+                                                </span>
+                                                <span className="text-xl text-gray-500">/100</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="text-sm font-medium text-gray-500 w-20">Dinilai oleh:</span>
+                                            <span className="text-sm text-gray-900">
+                                                {proyek.penilaian.user_name || 'Guru tidak ditemukan'}
                                             </span>
-                                            <span className="text-sm text-gray-500">/100</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-start">
-                                        <span className="text-sm font-medium text-gray-500 w-20 mt-1">Penilai:</span>
-                                        <span className="text-sm text-gray-900">
-                                            {proyek.penilaian.guru?.name || 'Guru tidak ditemukan'}
-                                        </span>
-                                    </div>
                                     {proyek.penilaian.catatan && (
-                                        <div className="flex items-start">
-                                            <span className="text-sm font-medium text-gray-500 w-20 mt-1">Catatan:</span>
+                                        <div className="flex flex-col items-start">
+                                            <span className="text-sm font-medium text-gray-500 w-20">Catatan:</span>
                                             <p className="text-sm text-gray-700 leading-relaxed">
                                                 {proyek.penilaian.catatan}
                                             </p>
                                         </div>
                                     )}
-                                    <div className="flex items-start">
-                                        <span className="text-sm font-medium text-gray-500 w-20 mt-1">Tanggal:</span>
+                                    <div className="flex flex-col items-start">
                                         <span className="text-sm text-gray-700">
+                                            <h2 className="text-sm font-medium text-gray-500">Dinilai pada :</h2>
                                             {new Date(proyek.penilaian.created_at).toLocaleDateString('id-ID', {
                                                 year: 'numeric',
                                                 month: 'long',
@@ -255,23 +278,32 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                         )}
 
                         {/* Actions */}
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Aksi</h3>
-                            <div className="space-y-3">
-                                <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                                    Edit Proyek
-                                </button>
-                                <button
-                                    onClick={() => setShowReview(!showReview)}
-                                    className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm"
-                                >
-                                    {showReview ? 'Sembunyikan Review' : 'Lihat Review'}
-                                </button>
-                                <button className="w-full border border-red-300 text-red-700 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors text-sm">
-                                    Hapus Proyek
-                                </button>
+                        {user && user.id === proyek.user_id && (
+                            <div className="bg-white rounded-lg shadow-sm border p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Aksi</h3>
+                                <div className="space-y-3">
+                                    <button 
+                                        onClick={() => router.push(`/karya/edit?id=${proyek.id}`)}
+                                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                    >
+                                        Edit Proyek
+                                    </button>
+                                    <button
+                                        onClick={() => setShowReview(!showReview)}
+                                        className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                                    >
+                                        {showReview ? 'Sembunyikan Review' : 'Lihat Review'}
+                                    </button>
+                                    <button 
+                                        onClick={handleDelete}
+                                        disabled={isDeleting}
+                                        className="w-full border border-red-300 text-red-700 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isDeleting ? 'Menghapus...' : 'Hapus Proyek'}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Review Section */}
                         {showReview && proyek.penilaian && (

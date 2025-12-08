@@ -131,7 +131,7 @@ export default function Navbar({ className = "" }: NavbarProps) {
                                         <div className="flex items-center bg-sky-700 bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-[6px] space-x-3">
                                             <FaCircleUser className="text-white text-3xl" />
                                             <div className="text-white">
-                                                <div className="text-sm font-medium">Hi, {user.name}</div>
+                                                <div className="text-sm font-medium overflow-hidden text-ellipsis line-clamp-1">Hi, {user.name}</div>
                                                 <div className="text-xs text-gray-200">{user.role}</div>
                                             </div>
                                             <button
