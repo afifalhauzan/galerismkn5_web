@@ -130,31 +130,32 @@ class AuthController extends Controller
      */
     public function userStats(Request $request)
     {
-        try {
-            $user = $request->user();
+        $user = $request->user();
 
-            if (!in_array($user->role, ['siswa'])) {
-                return response()->json([
-                    'message' => 'Statistics not available for this user role'
-                ], 403);
-            }
+        if (in_array($user->role, ['siswa'])) {
+            return response()->json([
+                'message' => 'Statistics not available for this user role'
+            ], 403);
+        }
 
+        if ($user->isGuru()) {
             $stats = [
                 'jumlahKarya' => $user->proyeks()->count(),
-                'userViews' => $user->proyeks()->sum('views'),
+                'totalViews' => $user->proyeks()->sum('views'),
             ];
-
-            return response()->json([
-                'stats' => $stats
-            ], 200);
-        } catch (\Exception $e) {
-            // INI HANYA UNTUK DEBUGGING, HAPUS SETELAH KETEMU MASALAHNYA
-            return response()->json([
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString() // Opsional
-            ], 500);
         }
+
+        if ($user->isAdmin()) {
+            $stats = [
+                'totalUsers' => User::count(),
+                'totalGuru' => User::where('role', 'guru')->count(),
+                'totalSiswa' => User::where('role', 'siswa')->count(),
+                'totalProyeks' => \App\Models\Proyek::count(),
+            ];
+        }
+
+        return response()->json([
+            'stats' => $stats
+        ], 200);
     }
 }

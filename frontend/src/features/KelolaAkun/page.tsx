@@ -9,6 +9,7 @@ import UserFilters from "./components/UserFilters";
 import UserTable from "./components/UserTable";
 import UserTablePagination from "./components/UserTablePagination";
 import UserModal from "./components/UserModal";
+import { MdAccountCircle } from "react-icons/md";
 
 export default function KelolaAkun({ user, logout }: { user: any, logout: () => void }) {
     const { jurusans } = useJurusans();
@@ -122,10 +123,10 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:mt-20">
                 {/* Header */}
                 <div className="mb-8">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-left md:justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">Kelola Akun</h1>
                             <p className="mt-2 text-gray-600">
@@ -134,7 +135,7 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
                         </div>
                         <button
                             onClick={handleAddUser}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                            className="hidden md:flex bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 mt-4 md:mt-0 rounded-lg font-medium transition-colors items-center space-x-2"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -149,15 +150,11 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
                             <div className="bg-white overflow-hidden shadow rounded-lg">
                                 <div className="p-5">
                                     <div className="flex items-center">
-                                        <div className="flex-shrink-0">
-                                            <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                            </svg>
-                                        </div>
+                                        <MdAccountCircle className="h-10 w-10 text-sky-600"/>
                                         <div className="ml-5 w-0 flex-1">
                                             <dl>
                                                 <dt className="text-sm font-medium text-gray-500 truncate">
-                                                    Total Akun
+                                                    Total Akun {selectedRole ? `(${selectedRole})` : ''}
                                                 </dt>
                                                 <dd className="text-lg font-medium text-gray-900">
                                                     {pagination.total}
@@ -266,6 +263,16 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
                     isLoading={isSubmitting}
                 />
             </div>
+
+            {/* Mobile Floating Add Button */}
+            <button
+                onClick={handleAddUser}
+                className="md:hidden fixed bottom-25 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:shadow-xl z-50"
+            >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+            </button>
         </div>
     );
 }

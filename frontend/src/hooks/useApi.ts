@@ -50,12 +50,13 @@ export function useUserStats() {
 
     return {
         stats: {
-            totalUsers: 0,
-            totalGuru: 0,
-            totalSiswa: 0,
-            totalGalleries: 0,
-            userUploads: 0,
-            userViews: 0,
+            totalUsers: data?.stats?.totalUsers || 0,
+            totalGuru: data?.stats?.totalGuru || 0,
+            totalSiswa: data?.stats?.totalSiswa || 0,
+            totalGalleries: data?.stats?.totalGalleries || 0,
+            userUploads: data?.stats?.userUploads || 0,
+            userViews: data?.stats?.userViews || 0,
+            totalProyeks: data?.stats?.totalProyeks || 0,
             todayActivities: 0,
             monthlyVisits: 0,
             favoritePhotos: 0,

@@ -25,7 +25,7 @@ export default function Hero() {
                     Selamat Datang!
                 </h1>
                 <p className="text-lg md:text-xl max-w-4xl leading-relaxed">
-                    Selamat datang di situs web galeri karya Akhir SMK Negeri 5 Malang. Pantau terus update karya siswa SMKN 5 Malang di halaman ini.
+                    Selamat datang di situs web galeri karya Akhir SMK Negeri 5 Malang. Selamat berkunjung!
                 </p>
             </div>
         </div>

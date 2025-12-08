@@ -81,7 +81,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-100 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -110,7 +110,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Masukkan nama lengkap"
@@ -129,7 +129,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               id="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Masukkan email"
@@ -149,7 +149,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               id="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Masukkan password"
@@ -167,7 +167,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               id="role"
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value as 'guru' | 'siswa' })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.role ? 'border-red-500' : 'border-gray-300'
               }`}
               required
@@ -188,7 +188,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               id="nis_nip"
               value={formData.nis_nip}
               onChange={(e) => setFormData({ ...formData, nis_nip: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.nis_nip ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder={`Masukkan ${formData.role === 'guru' ? 'NIP' : 'NIS'}`}
@@ -206,7 +206,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               id="jurusan_id"
               value={formData.jurusan_id}
               onChange={(e) => setFormData({ ...formData, jurusan_id: parseInt(e.target.value) })}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.jurusan_id ? 'border-red-500' : 'border-gray-300'
               }`}
               required
@@ -231,7 +231,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
                 id="kelas"
                 value={formData.kelas}
                 onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.kelas ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
@@ -260,7 +260,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
               {isLoading && (
                 <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
