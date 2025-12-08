@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useUserStats } from "@/hooks/useApi";
+import Link from "next/dist/client/link";
 
 // Guru Dashboard Component
 export default function GuruDashboard({ user, logout }: { user: any, logout: () => void }) {
@@ -27,7 +28,7 @@ export default function GuruDashboard({ user, logout }: { user: any, logout: () 
                                 📚 Selamat Datang, {user.name}!
                             </h2>
                             <p className="mt-2 text-gray-600">
-                                Kelola galeri digital dan konten pembelajaran SMKN 5
+                                Kelola & Nilai Galeri Siswa SMKN 5 Malang
                             </p>
                         </div>
                     </div>
@@ -117,35 +118,17 @@ export default function GuruDashboard({ user, logout }: { user: any, logout: () 
                         </div>
                         <div className="px-6 py-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <button className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
+                                <Link 
+                                    href="/galeri"
+                                    className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
                                     <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
                                     <div className="ml-3 text-left">
-                                        <p className="text-sm font-medium text-gray-900">Upload Foto</p>
-                                        <p className="text-xs text-gray-500">Tambah foto ke galeri</p>
+                                        <p className="text-sm font-medium text-gray-900">Cek Galeri Siswa</p>
+                                        <p className="text-xs text-gray-500">Cek Karya</p>
                                     </div>
-                                </button>
-
-                                <button className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-                                    <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    <div className="ml-3 text-left">
-                                        <p className="text-sm font-medium text-gray-900">Kelola Galeri</p>
-                                        <p className="text-xs text-gray-500">Edit, hapus foto</p>
-                                    </div>
-                                </button>
-
-                                <button className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-                                    <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                    </svg>
-                                    <div className="ml-3 text-left">
-                                        <p className="text-sm font-medium text-gray-900">Statistik</p>
-                                        <p className="text-xs text-gray-500">Lihat performa konten</p>
-                                    </div>
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

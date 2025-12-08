@@ -31,6 +31,19 @@ class ProjekController extends Controller
                 $query->where('jurusan_id', $request->jurusan_id);
             }
 
+            // Filter by year if provided
+            if ($request->has('year')) {
+                $year = $request->year;
+                $query->whereYear('created_at', $year);
+            }
+
+            // Filter by kelas if provided (from user relationship)
+            if ($request->has('kelas')) {
+                $query->whereHas('user', function ($q) use ($request) {
+                    $q->where('kelas', $request->kelas);
+                });
+            }
+
             // Search by title or description
             if ($request->has('search')) {
                 $search = $request->search;
@@ -42,7 +55,8 @@ class ProjekController extends Controller
 
             // Pagination
             $page = $request->get('page', 1);
-            $limit = $request->get('limit', 10);
+            $requestedLimit = $request->get('limit', 10);
+            $limit = min($requestedLimit, 5); // Enforce maximum of 5
 
             $proyeks = $query->latest()
                 ->paginate($limit, ['*'], 'page', $page);
@@ -412,7 +426,7 @@ class ProjekController extends Controller
 
             // Pagination
             $page = $request->get('page', 1);
-            $limit = $request->get('limit', 10);
+            $limit = $request->get('limit', 5);
 
             $proyeks = $query->latest()
                 ->paginate($limit, ['*'], 'page', $page);
@@ -433,6 +447,31 @@ class ProjekController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch user projects',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get the latest 5 projects for homepage/gallery preview
+     */
+    public function latest(): JsonResponse
+    {
+        try {
+            $proyeks = Proyek::with(['user', 'jurusan', 'penilaian.guru'])
+                ->where('status', 'dinilai') // Only show graded projects
+                ->latest()
+                ->take(5)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $proyeks
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch latest projects',
                 'error' => $e->getMessage()
             ], 500);
         }

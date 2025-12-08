@@ -272,9 +272,9 @@ export default function EditKaryaSiswa({ user, logout }: { user: any; logout: ()
                             Kembali
                         </Link>
                         <div className="border-l h-6 border-gray-300"></div>
-                        <h1 className="text-2xl font-bold text-gray-900">Unggah Karya</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">Edit Karya</h1>
                     </div>
-                    <p className="text-gray-600">Bagikan karya terbaikmu dengan komunitas SMKN 5!</p>
+                    <p className="text-gray-600">Sesuaikan Karyamu</p>
                 </div>
 
                 {/* Form */}

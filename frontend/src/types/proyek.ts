@@ -7,6 +7,7 @@ export interface User {
     nis_nip?: string;
     jurusan_id?: number;
     jurusan_name?: string;
+    jurusan?: Jurusan;
     kelas?: string;
     created_at: string;
     updated_at: string;
@@ -89,6 +90,8 @@ export interface ProjekQueryParams {
     status?: 'terkirim' | 'dinilai';
     jurusan_id?: number;
     search?: string;
+    year?: number;
+    kelas?: string;
 }
 
 // KaryaCard interface compatibility
@@ -115,4 +118,34 @@ export function proyekToKaryaItem(proyek: Proyek): KaryaItem {
         createdAt: proyek.created_at,
         status: proyek.status,
     };
+}
+
+// User/Account management types
+export interface CreateUserData {
+    name: string;
+    email: string;
+    password: string;
+    role: 'guru' | 'siswa';
+    nis_nip: string;
+    jurusan_id: number;
+    kelas?: string;
+}
+
+export interface UpdateUserData extends Partial<CreateUserData> {
+    password?: string;
+}
+
+export interface UserQueryParams {
+    page?: number;
+    limit?: number;
+    role?: 'guru' | 'siswa';
+    jurusan_id?: number;
+    kelas?: string;
+    search?: string;
+}
+
+export interface UserStats {
+    total_guru: number;
+    total_siswa: number;
+    by_jurusan: Record<string, Array<{role: string, count: number}>>;
 }

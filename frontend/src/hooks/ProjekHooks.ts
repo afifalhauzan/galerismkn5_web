@@ -21,6 +21,8 @@ function buildQueryString(params: ProjekQueryParams): string {
     if (params.status) queryParams.append('status', params.status);
     if (params.jurusan_id) queryParams.append('jurusan_id', params.jurusan_id.toString());
     if (params.search) queryParams.append('search', params.search);
+    if (params.year) queryParams.append('year', params.year.toString());
+    if (params.kelas) queryParams.append('kelas', params.kelas);
 
     const queryString = queryParams.toString();
     return queryString ? `?${queryString}` : '';
@@ -40,6 +42,8 @@ export function useProjeks(params: ProjekQueryParams = {}) {
             dedupingInterval: 30000, // 30 seconds
         }
     );
+
+    console.log("Fetched proyeks data with params", params, ":", data);
 
     return {
         proyeks: (data as PaginatedResponse<Proyek>)?.data || [],
@@ -63,6 +67,28 @@ export function useKaryaItems(params: ProjekQueryParams = {}) {
         pagination,
         isLoading,
         isError,
+        mutate,
+    };
+}
+
+/**
+ * Hook to fetch the latest 5 projects for homepage/preview
+ */
+export function useLatestProjeks() {
+    const { data, error, isLoading, mutate } = useSWR(
+        '/proyeks/latest',
+        fetcher,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: true,
+            dedupingInterval: 60000, // 1 minute
+        }
+    );
+
+    return {
+        proyeks: (data as ApiResponse<Proyek[]>)?.data || [],
+        isLoading,
+        isError: error,
         mutate,
     };
 }

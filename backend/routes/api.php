@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjekController;
 use App\Http\Controllers\JurusanController;
+use App\Http\Controllers\AkunController;
 
 /**
  * Authentication Routes
@@ -20,6 +21,7 @@ Route::post('/login', [AuthController::class, 'login']);
  * These routes can be accessed without authentication for public viewing
  */
 Route::get('/proyeks', [ProjekController::class, 'index'])->name('proyeks.index');
+Route::get('/proyeks/latest', [ProjekController::class, 'latest'])->name('proyeks.latest');
 Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyeks.show');
 
 /**
@@ -68,4 +70,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/proyeks/{proyek}', [ProjekController::class, 'update'])->name('proyeks.update.patch');
     Route::delete('/proyeks/{proyek}', [ProjekController::class, 'destroy'])->name('proyeks.destroy');
     Route::get('/my-proyeks', [ProjekController::class, 'myProjects'])->name('proyeks.my');
+
+    /**
+     * Admin-only Account Management Routes
+     * CRUD operations for managing guru and siswa accounts
+     */
+    Route::get('/akuns', [AkunController::class, 'index'])->name('akuns.index');
+    Route::post('/akuns', [AkunController::class, 'store'])->name('akuns.store');
+    Route::get('/akuns/{id}', [AkunController::class, 'show'])->name('akuns.show');
+    Route::put('/akuns/{id}', [AkunController::class, 'update'])->name('akuns.update');
+    Route::patch('/akuns/{id}', [AkunController::class, 'update'])->name('akuns.update.patch');
+    Route::delete('/akuns/{id}', [AkunController::class, 'destroy'])->name('akuns.destroy');
+    Route::get('/akuns-stats', [AkunController::class, 'stats'])->name('akuns.stats');
 });
