@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useProjeks } from "@/hooks/ProjekHooks";
 import { useJurusans } from "@/hooks/JurusanHooks";
@@ -14,7 +14,7 @@ const YEARS = Array.from({ length: 11 }, (_, i) => 2015 + i);
 // Kelas options
 const KELAS_OPTIONS = ["10", "11", "12"];
 
-export default function GaleriPage() {
+function GaleriContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { jurusans, isLoading: isLoadingJurusans } = useJurusans();
@@ -213,5 +213,25 @@ export default function GaleriPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+function LoadingFallback() {
+    return (
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:mt-25">
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function GaleriPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <GaleriContent />
+        </Suspense>
     );
 }
