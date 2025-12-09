@@ -14,17 +14,18 @@ class PenilaianSeeder extends Seeder
      */
     public function run(): void
     {
-        $proyeksDinilai = Proyek::where('status', 'dinilai')->get();
+        $proyeksDinilai = Proyek::get();
         $gurus = User::where('role', 'guru')->get();
 
         // Create penilaian for projects that have been assessed
         foreach ($proyeksDinilai as $proyek) {
             // Find guru from same department as the project
             $validGuru = $gurus->where('jurusan_id', $proyek->jurusan_id)->first();
+            $proyek->update(['status' => 'dinilai']); // change status to dinilai
             
             if ($validGuru) {
                 // Create random STAR rating between 1-5 for sample data (bad to excellent)
-                $rating = rand(1, 5);
+                $rating = rand(3, 5);
                 
                 // Generate appropriate comment based on rating
                 $comments = [

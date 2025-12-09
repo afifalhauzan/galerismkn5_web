@@ -67,6 +67,8 @@ interface KaryaCarouselProps {
 export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
     const { karyaItems, isLoading, isError } = useBestProjeks();
 
+    console.log('Featured Karya Items:', karyaItems);
+
     if (isLoading) {
         return (
             <div className={`py-8 ${className}`}>

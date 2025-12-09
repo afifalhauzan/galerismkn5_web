@@ -45,17 +45,57 @@ class UserSeeder extends Seeder
                 'jurusan_id' => 1, // Contoh: Ketua Jurusan RPL
             ],
             [
-                'name' => 'Siti Rahayu',
-                'email' => 'siti.rahayu@smkn5.com',
+                'name' => 'Dimas Santoso',
+                'email' => 'dimas.santoso@smkn5.com',
                 'nis_nip' => 'NIP002',
+                'password' => Hash::make('password'),
+                'role' => 'guru',
+                'jurusan_id' => 2, // Contoh: Ketua Jurusan TKJ
+            ],
+            [
+                'name' => 'Amilia',
+                'email' => 'amilia@smkn5.com',
+                'nis_nip' => 'NIP003',
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 3, // Contoh: Guru DKV
             ],
             [
+                'name' => 'Santi',
+                'email' => 'santi@smkn5.com',
+                'nis_nip' => 'NIP004',
+                'password' => Hash::make('password'),
+                'role' => 'guru',
+                'jurusan_id' => 4, // Contoh: Ketua Jurusan Animasi
+            ],
+            [
+                'name' => 'Handi Santoso',
+                'email' => 'handi.santoso@smkn5.com',
+                'nis_nip' => 'NIP005',
+                'password' => Hash::make('password'),
+                'role' => 'guru',
+                'jurusan_id' => 5, // Contoh: Ketua Jurusan Kriya Kayu
+            ],
+            [
+                'name' => 'Zara',
+                'email' => 'zara@smkn5.com',
+                'nis_nip' => 'NIP006',
+                'password' => Hash::make('password'),
+                'role' => 'guru',
+                'jurusan_id' => 6, // Contoh: Ketua Jurusan Kriya Tekstil
+            ],
+            [
+                'name' => 'anisa',
+                'email' => 'anisa.santoso@smkn5.com',
+                'nis_nip' => 'NIP007',
+                'password' => Hash::make('password'),
+                'role' => 'guru',
+                'jurusan_id' => 7, // Contoh: Ketua Jurusan Kriya Keramik
+            ],
+            [
                 'name' => 'Ahmad Fauzi',
                 'email' => 'ahmad.fauzi@smkn5.com',
-                'nis_nip' => 'NIP003',
+                'nis_nip' => 'NIP008',
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 8, // Contoh: Guru Tata Busana
