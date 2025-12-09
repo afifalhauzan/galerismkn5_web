@@ -23,6 +23,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', 'in:guru,siswa'],
             'jurusan_id' => ['required', 'exists:jurusans,id'],
+            'kelas' => ['required_if:role,siswa', 'in:10,11,12'],
         ]);
 
         $user = User::create([
@@ -32,6 +33,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'jurusan_id' => $request->jurusan_id,
+            'kelas' => $request->role === 'siswa' ? $request->kelas : null,
         ]);
 
         // Load jurusan relationship

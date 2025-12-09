@@ -23,7 +23,7 @@ interface AuthContextType {
     user: User | null;
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, nis: string, password: string, role: string, jurusan_id: number) => Promise<void>;
+    register: (name: string, email: string, nis: string, password: string, role: string, jurusan_id: number, kelas?: string) => Promise<void>;
     logout: () => Promise<void>;
     isLoading: boolean;
     error: string | null;
@@ -130,12 +130,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const register = async (name: string, email: string, nis: string, password: string, role: string, jurusan_id: number) => {
+    const register = async (name: string, email: string, nis: string, password: string, role: string, jurusan_id: number, kelas?: string) => {
         try {
             setIsLoading(true);
             setError(null);
 
-            const response = await axios.post("/register", {
+            const requestData: any = {
                 name,
                 email,
                 nis_nip: nis,
@@ -143,7 +143,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 password_confirmation: password,
                 role,
                 jurusan_id
-            });
+            };
+
+            // Add kelas only for siswa role
+            if (role === 'siswa' && kelas) {
+                requestData.kelas = kelas;
+            }
+
+            const response = await axios.post("/register", requestData);
 
             const { access_token, user: userData } = response.data;
 

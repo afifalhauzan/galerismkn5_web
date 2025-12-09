@@ -26,6 +26,7 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<any>(null);
 
     // Fetch users with filters
     const { users, pagination, isLoading, isError, mutate } = useUsers({
@@ -77,11 +78,13 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
 
     const handleAddUser = () => {
         setEditingUser(null);
+        setSubmitError(null);
         setIsModalOpen(true);
     };
 
     const handleEditUser = (user: User) => {
         setEditingUser(user);
+        setSubmitError(null);
         setIsModalOpen(true);
     };
 
@@ -103,6 +106,7 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
 
     const handleSubmitUser = async (data: CreateUserData | UpdateUserData) => {
         setIsSubmitting(true);
+        setSubmitError(null);
         try {
             if (editingUser) {
                 await updateUser(editingUser.id, data as UpdateUserData);
@@ -113,9 +117,11 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
             }
             await mutate(); // Refresh the data
             setIsModalOpen(false);
+            setSubmitError(null);
         } catch (error: any) {
             console.error('Error submitting user:', error);
-            throw error; // Re-throw to let modal handle it
+            setSubmitError(error);
+            // Don't re-throw, let the modal stay open with error
         } finally {
             setIsSubmitting(false);
         }
@@ -256,11 +262,15 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
                 {/* User Modal */}
                 <UserModal
                     isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        setSubmitError(null);
+                    }}
                     onSubmit={handleSubmitUser}
                     user={editingUser}
                     jurusans={jurusans}
                     isLoading={isSubmitting}
+                    error={submitError}
                 />
             </div>
 

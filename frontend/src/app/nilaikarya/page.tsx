@@ -76,7 +76,7 @@ export default function NilaiKaryaPage() {
     const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
     // Generate kelas options
-    const kelasOptions = ['X', 'XI', 'XII'];
+    const kelasOptions = ['10', '11', '12'];
 
     if (authLoading) {
         return <Spinner />;
@@ -135,7 +135,7 @@ export default function NilaiKaryaPage() {
                                         placeholder="Cari judul karya..."
                                         value={searchTerm}
                                         onChange={(e) => handleSearch(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                                        className="w-full text-gray-700 pl-10 pr-4 py-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                                     />
                                 </div>
                             </div>
@@ -145,7 +145,7 @@ export default function NilaiKaryaPage() {
                                 <select
                                     value={selectedYear}
                                     onChange={(e) => handleFilterChange('year', e.target.value)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                                    className="px-4 py-2 border text-gray-700 border-gray-400 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                                 >
                                     <option value="">Semua Tahun</option>
                                     {yearOptions.map(year => (
@@ -156,7 +156,7 @@ export default function NilaiKaryaPage() {
                                 <select
                                     value={selectedKelas}
                                     onChange={(e) => handleFilterChange('kelas', e.target.value)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                                    className="px-4 py-2 border text-gray-700 border-gray-400 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                                 >
                                     <option value="">Semua Kelas</option>
                                     {kelasOptions.map(kelas => (

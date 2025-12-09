@@ -8,11 +8,12 @@ interface UserModalProps {
   user?: User | null;
   jurusans: Jurusan[];
   isLoading?: boolean;
+  error?: any;
 }
 
 const KELAS_OPTIONS = ["10", "11", "12"];
 
-export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, isLoading }: UserModalProps) {
+export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, isLoading, error }: UserModalProps) {
   const [formData, setFormData] = useState<CreateUserData>({
     name: '',
     email: '',
@@ -23,10 +24,14 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
     kelas: ''
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  // Use error prop for backend errors and local state for frontend validation
+  const [frontendErrors, setFrontendErrors] = useState<Record<string, string>>({});
+  const backendErrors = error?.errors || {};
+  const errors = { ...frontendErrors, ...backendErrors };
 
   useEffect(() => {
     if (isOpen) {
+      setFrontendErrors({}); // Clear frontend validation errors
       if (user) {
         setFormData({
           name: user.name,
@@ -48,13 +53,45 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
           kelas: ''
         });
       }
-      setErrors({});
     }
   }, [isOpen, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
+    setFrontendErrors({}); // Clear previous validation errors
+
+    // Frontend validation
+    const validationErrors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      validationErrors.name = 'Nama lengkap harus diisi';
+    }
+    
+    if (!formData.email.trim()) {
+      validationErrors.email = 'Email harus diisi';
+    }
+    
+    if (!user && !formData.password.trim()) {
+      validationErrors.password = 'Password harus diisi';
+    }
+    
+    if (!formData.nis_nip.trim()) {
+      validationErrors.nis_nip = `${formData.role === 'guru' ? 'NIP' : 'NIS'} harus diisi`;
+    }
+    
+    if (!formData.jurusan_id || formData.jurusan_id === 0) {
+      validationErrors.jurusan_id = 'Jurusan harus dipilih';
+    }
+    
+    if (formData.role === 'siswa' && !formData.kelas?.trim()) {
+      validationErrors.kelas = 'Kelas harus dipilih';
+    }
+
+    // If there are validation errors, set them and don't submit
+    if (Object.keys(validationErrors).length > 0) {
+      setFrontendErrors(validationErrors);
+      return; // Don't submit
+    }
 
     try {
       const submitData = { ...formData };
@@ -72,9 +109,8 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
       await onSubmit(submitData);
       onClose();
     } catch (error: any) {
-      if (error.message.includes('validation') && error.errors) {
-        setErrors(error.errors);
-      }
+      // Error handling is done in paFrent component
+      console.error('Form submission error:', error);
     }
   };
 
@@ -100,6 +136,31 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
         </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+          {/* Error Message */}
+          {Object.keys(errors).length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">
+                    Terdapat kesalahan dalam form
+                  </h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <ul className="list-disc pl-5 space-y-1">
+                      {Object.entries(errors).map(([field, message]) => (
+                        <li key={field}>{Array.isArray(message) ? message.join(', ') : String(message)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -109,7 +170,12 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               type="text"
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, name: e.target.value });
+                if (frontendErrors.name) {
+                  setFrontendErrors({ ...frontendErrors, name: '' });
+                }
+              }}
               className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.name ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -205,7 +271,12 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
             <select
               id="jurusan_id"
               value={formData.jurusan_id}
-              onChange={(e) => setFormData({ ...formData, jurusan_id: parseInt(e.target.value) })}
+              onChange={(e) => {
+                setFormData({ ...formData, jurusan_id: parseInt(e.target.value) });
+                if (frontendErrors.jurusan_id) {
+                  setFrontendErrors({ ...frontendErrors, jurusan_id: '' });
+                }
+              }}
               className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.jurusan_id ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -230,7 +301,12 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               <select
                 id="kelas"
                 value={formData.kelas}
-                onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, kelas: e.target.value });
+                  if (frontendErrors.kelas) {
+                    setFrontendErrors({ ...frontendErrors, kelas: '' });
+                  }
+                }}
                 className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.kelas ? 'border-red-500' : 'border-gray-300'
                 }`}

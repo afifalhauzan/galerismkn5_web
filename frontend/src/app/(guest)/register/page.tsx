@@ -12,7 +12,8 @@ export default function RegisterPage() {
     nis: "",
     password: "",
     confirmPassword: "",
-    jurusan_id: ""
+    jurusan_id: "",
+    kelas: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -65,6 +66,10 @@ export default function RegisterPage() {
       errors.jurusan_id = "Jurusan wajib dipilih";
     }
 
+    if (!formData.kelas) {
+      errors.kelas = "Kelas wajib dipilih";
+    }
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -79,7 +84,7 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await register(formData.name, formData.email, formData.nis, formData.password, "siswa", parseInt(formData.jurusan_id));
+      await register(formData.name, formData.email, formData.nis, formData.password, "siswa", parseInt(formData.jurusan_id), formData.kelas);
       // Redirect is handled by AuthContext
     } catch (err) {
       // Error is handled by AuthContext
@@ -207,6 +212,30 @@ export default function RegisterPage() {
               )}
               {validationErrors.jurusan_id && (
                 <p className="mt-1 text-sm text-red-600">{validationErrors.jurusan_id}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="kelas" className="block text-sm font-medium text-gray-700">
+                Kelas
+              </label>
+              <select
+                id="kelas"
+                name="kelas"
+                required
+                value={formData.kelas}
+                onChange={handleChange}
+                className={`mt-1 appearance-none relative block w-full px-3 py-3 border ${
+                  validationErrors.kelas ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:z-10`}
+              >
+                <option value="">Pilih Kelas</option>
+                <option value="10">Kelas 10</option>
+                <option value="11">Kelas 11</option>
+                <option value="12">Kelas 12</option>
+              </select>
+              {validationErrors.kelas && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.kelas}</p>
               )}
             </div>
             
