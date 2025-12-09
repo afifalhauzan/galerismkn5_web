@@ -50,6 +50,9 @@ export interface GradingPermissionResponse {
     can_grade: boolean;
     same_jurusan: boolean;
     already_graded: boolean;
+    is_admin: boolean;
+    can_override: boolean;
+    existing_grader: string | null;
     message: string;
 }
 

@@ -23,6 +23,7 @@ Route::post('/login', [AuthController::class, 'login']);
  */
 Route::get('/proyeks', [ProjekController::class, 'index'])->name('proyeks.index');
 Route::get('/proyeks/latest', [ProjekController::class, 'latest'])->name('proyeks.latest');
+Route::get('/proyeks/best', [ProjekController::class, 'best'])->name('proyeks.best');
 Route::get('/proyeks/ungraded', [ProjekController::class, 'ungraded'])->name('proyeks.ungraded')->middleware('auth:sanctum');
 Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyeks.show');
 

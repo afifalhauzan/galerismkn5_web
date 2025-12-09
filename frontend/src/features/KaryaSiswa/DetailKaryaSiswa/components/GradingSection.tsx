@@ -6,10 +6,12 @@ import type { Proyek, User } from '@/types/proyek';
 interface GradingSectionProps {
   proyek: Proyek;
   user: User;
+  can_override?: boolean;
+  existing_grader?: string;
   onGradingComplete?: () => void;
 }
 
-export default function GradingSection({ proyek, user, onGradingComplete }: GradingSectionProps) {
+export default function GradingSection({ proyek, user, can_override, existing_grader, onGradingComplete }: GradingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [stars, setStars] = useState(proyek.penilaian?.bintang || 0);
   const [comment, setComment] = useState(proyek.penilaian?.catatan || '');
@@ -19,11 +21,16 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
   const { createPenilaian, updatePenilaian, isCreating, isUpdating } = usePenilaianMutations();
 
   const isTeacher = user?.role === 'guru';
+  const isAdmin = user?.role === 'admin';
   const isAlreadyGraded = !!proyek.penilaian;
   const canGrade = permission?.can_grade;
   const sameJurusan = permission?.same_jurusan;
+  const canOverride = permission?.can_override;
+  const existingGrader = permission?.existing_grader;
   const isCurrentUserGrader = proyek.penilaian?.guru_id === user?.id;
   const isMutating = isCreating || isUpdating;
+
+  console.log('GradingSection Permission:', permission);
 
   useEffect(() => {
     if (proyek.penilaian) {
@@ -41,13 +48,23 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
     }
 
     try {
-      if (isAlreadyGraded && isCurrentUserGrader) {
-        // Update existing grading
-        await updatePenilaian(proyek.penilaian!.id, {
-          bintang: stars,
-          catatan: comment
-        });
-        alert('Penilaian berhasil diperbarui!');
+      if (isAlreadyGraded && (isCurrentUserGrader || (isAdmin && canOverride))) {
+        // Update existing grading or admin override
+        if (isCurrentUserGrader) {
+          await updatePenilaian(proyek.penilaian!.id, {
+            bintang: stars,
+            catatan: comment
+          });
+          alert('Penilaian berhasil diperbarui!');
+        } else {
+          // Admin override - create new grading (backend will handle deletion)
+          await createPenilaian({
+            proyek_id: proyek.id,
+            bintang: stars,
+            catatan: comment
+          });
+          alert('Penilaian berhasil di-override!');
+        }
       } else {
         // Create new grading
         await createPenilaian({
@@ -67,7 +84,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
     }
   };
 
-  if (!isTeacher) {
+  if (!isTeacher && !isAdmin) {
     return null;
   }
 
@@ -112,7 +129,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
 
       <div className="p-6">
         {/* Permission Message */}
-        {!sameJurusan && (
+        {!sameJurusan && !isAdmin && (
           <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
@@ -130,8 +147,26 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
           </div>
         )}
 
+        {/* Admin Override Warning */}
+        {isAdmin && canOverride && (
+          <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-sm font-medium text-orange-800 mb-1">
+                  Override Penilaian Existing
+                </h4>
+                <p className="text-sm text-orange-700">
+                  Sebagai admin, Anda dapat meng-override penilaian yang sudah ada dari <strong>{existingGrader}</strong>. 
+                  Penilaian lama akan digantikan dengan penilaian baru Anda.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Already Graded Display */}
-        {isAlreadyGraded && sameJurusan && (
+        {isAlreadyGraded && (
           <div className="mb-4">
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center justify-between mb-3">
@@ -171,14 +206,14 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
               </div>
             </div>
 
-            {/* Edit/Update Button for Current Grader */}
-            {isCurrentUserGrader && (
+            {/* Edit/Update Button for Current Grader or Admin Override */}
+            {(isCurrentUserGrader || (isAdmin && canOverride)) && (
               <div className="mt-4 flex gap-2">
                 <button
                   onClick={() => setShowForm(!showForm)}
                   className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-colors"
                 >
-                  {showForm ? 'Batal Edit' : 'Edit Penilaian'}
+                  {showForm ? 'Batal Edit' : (isAdmin && !isCurrentUserGrader ? 'Override Penilaian' : 'Edit Penilaian')}
                 </button>
               </div>
             )}
@@ -186,7 +221,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
         )}
 
         {/* Grading Form */}
-        {((!isAlreadyGraded && canGrade) || (isAlreadyGraded && isCurrentUserGrader && showForm)) && (
+        {((!isAlreadyGraded && canGrade) || (isAlreadyGraded && (isCurrentUserGrader || (isAdmin && canOverride)) && showForm)) && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -250,7 +285,9 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
                     {isAlreadyGraded ? 'Memperbarui...' : 'Menyimpan...'}
                   </div>
                 ) : (
-                  isAlreadyGraded ? 'Perbarui Penilaian' : 'Simpan Penilaian'
+                  isAlreadyGraded 
+                    ? (isAdmin && !isCurrentUserGrader ? 'Override Penilaian' : 'Perbarui Penilaian')
+                    : 'Simpan Penilaian'
                 )}
               </button>
               
@@ -273,7 +310,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
         )}
 
         {/* No Permission Message */}
-        {!isAlreadyGraded && !canGrade && sameJurusan && (
+        {!isAlreadyGraded && !canGrade && sameJurusan && !isAdmin && (
           <div className="text-center py-6 text-gray-500">
             <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p>Proyek ini sudah dinilai oleh guru lain</p>

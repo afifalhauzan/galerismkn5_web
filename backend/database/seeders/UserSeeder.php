@@ -25,6 +25,15 @@ class UserSeeder extends Seeder
             'jurusan_id' => null,
         ]);
 
+        User::create([
+            'name' => 'Kepsek SMKN 5 (Pak Kepala Sekolah)',
+            'email' => 'kepsekadmin@smkn5.com',
+            'nis_nip' => 'ADM002',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'jurusan_id' => null,
+        ]);
+
         // Create guru users
         $gurus = [
             [

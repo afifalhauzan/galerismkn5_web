@@ -55,6 +55,32 @@ export function useProjeks(params: ProjekQueryParams = {}) {
 }
 
 /**
+ * Hook to fetch best projects (5 stars) for homepage display
+ */
+export function useBestProjeks() {
+    const { data, error, isLoading, mutate } = useSWR(
+        '/proyeks/best',
+        fetcher,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: true,
+            dedupingInterval: 60000, // 1 minute
+        }
+    );
+
+    const proyeks = (data as ApiResponse<Proyek[]>)?.data || [];
+    const karyaItems: KaryaItem[] = proyeks.map(proyek => proyekToKaryaItem(proyek));
+
+    return {
+        proyeks,
+        karyaItems,
+        isLoading,
+        isError: error,
+        mutate,
+    };
+}
+
+/**
  * Hook to fetch projects as KaryaItems for gallery display
  */
 export function useKaryaItems(params: ProjekQueryParams = {}) {

@@ -43,11 +43,11 @@ class PenilaianController extends Controller
     {
         $user = Auth::user();
 
-        // Check if user is a teacher
-        if ($user->role !== 'guru') {
+        // Check if user is a teacher or admin
+        if ($user->role !== 'guru' && $user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Only teachers can grade projects'
+                'message' => 'Only teachers and admins can grade projects'
             ], 403);
         }
 
@@ -60,21 +60,26 @@ class PenilaianController extends Controller
         // Get the project and check jurusan
         $proyek = Proyek::with('jurusan')->findOrFail($validated['proyek_id']);
         
-        // Check if teacher's jurusan matches project's jurusan
-        if ($user->jurusan_id !== $proyek->jurusan_id) {
+        // Check if teacher's jurusan matches project's jurusan (admin can override)
+        if ($user->role === 'guru' && $user->jurusan_id !== $proyek->jurusan_id) {
             return response()->json([
                 'success' => false,
                 'message' => 'You can only grade projects from your department'
             ], 403);
         }
 
-        // Check if already graded
+        // Check if already graded (admin can override)
         $existingPenilaian = Penilaian::where('proyek_id', $validated['proyek_id'])->first();
-        if ($existingPenilaian) {
+        if ($existingPenilaian && $user->role !== 'admin') {
             return response()->json([
                 'success' => false,
                 'message' => 'This project has already been graded'
             ], 409);
+        }
+
+        // If admin is overriding, delete existing grading first
+        if ($existingPenilaian && $user->role === 'admin') {
+            $existingPenilaian->delete();
         }
 
         // Create penilaian
@@ -138,7 +143,7 @@ class PenilaianController extends Controller
             ], 403);
         }
 
-        // Check if teacher's jurusan still matches project's jurusan (in case of transfers)
+        // Check if teacher's jurusan still matches project's jurusan (admin can override)
         if ($user->role === 'guru' && $user->jurusan_id !== $penilaian->proyek->jurusan_id) {
             return response()->json([
                 'success' => false,
@@ -196,26 +201,40 @@ class PenilaianController extends Controller
         $user = Auth::user();
         $proyekId = $request->input('proyek_id');
 
-        if ($user->role !== 'guru') {
+        if ($user->role !== 'guru' && $user->role !== 'admin') {
             return response()->json([
                 'success' => false,
                 'can_grade' => false,
-                'message' => 'Only teachers can grade projects'
+                'message' => 'Only teachers and admins can grade projects'
             ]);
         }
 
         $proyek = Proyek::with('jurusan')->findOrFail($proyekId);
-        $canGrade = $user->jurusan_id === $proyek->jurusan_id;
+        $sameJurusan = $user->jurusan_id === $proyek->jurusan_id;
         $alreadyGraded = Penilaian::where('proyek_id', $proyekId)->exists();
+        $existingPenilaian = Penilaian::where('proyek_id', $proyekId)->first();
+        
+        // Admin can always grade, teachers only from same jurusan
+        $canGrade = $user->role === 'admin' || ($sameJurusan && !$alreadyGraded);
+        
+        // Admin can override existing gradings
+        if ($user->role === 'admin' && $alreadyGraded) {
+            $canGrade = true;
+        }
 
         return response()->json([
             'success' => true,
-            'can_grade' => $canGrade && !$alreadyGraded,
-            'same_jurusan' => $canGrade,
+            'can_grade' => $canGrade,
+            'same_jurusan' => $sameJurusan,
             'already_graded' => $alreadyGraded,
-            'message' => $canGrade 
-                ? ($alreadyGraded ? 'Project already graded' : 'You can grade this project')
-                : 'You can only grade projects from your department'
+            'is_admin' => $user->role === 'admin',
+            'can_override' => $user->role === 'admin' && $alreadyGraded,
+            'existing_grader' => $existingPenilaian ? $existingPenilaian->guru->name : null,
+            'message' => $user->role === 'admin' 
+                ? ($alreadyGraded ? 'You can override the existing grading' : 'You can grade this project')
+                : ($sameJurusan 
+                    ? ($alreadyGraded ? 'Project already graded' : 'You can grade this project')
+                    : 'You can only grade projects from your department')
         ]);
     }
 }

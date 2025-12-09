@@ -551,6 +551,34 @@ class ProjekController extends Controller
     }
 
     /**
+     * Get the best projects (5 stars) for homepage display
+     */
+    public function best(): JsonResponse
+    {
+        try {
+            $proyeks = Proyek::with(['user', 'jurusan', 'penilaian.guru'])
+                ->whereHas('penilaian', function ($query) {
+                    $query->where('bintang', 5);
+                })
+                ->where('status', 'dinilai')
+                ->latest()
+                ->limit(10)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $proyeks
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch best projects',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Get the latest 5 projects for homepage/gallery preview
      */
     public function latest(): JsonResponse

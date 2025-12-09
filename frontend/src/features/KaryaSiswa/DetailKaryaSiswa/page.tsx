@@ -116,7 +116,7 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                         {/* <RatingCard proyek={proyek} /> */}
                         
                         {/* Grading Section - only for teachers */}
-                        {user?.role === 'guru' && (
+                        {(user?.role === 'guru' || user?.role === 'admin') && (
                             <GradingSection 
                                 proyek={proyek} 
                                 user={user}

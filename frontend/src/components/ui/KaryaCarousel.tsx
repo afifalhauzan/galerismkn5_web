@@ -3,7 +3,7 @@
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import KaryaCard from "@/components/ui/KaryaCard";
-import { useKaryaItems } from "@/hooks/ProjekHooks";
+import { useBestProjeks } from "@/hooks/ProjekHooks";
 import { Spinner } from "@/components/ui/spinner";
 
 // Carousel configuration
@@ -65,11 +65,7 @@ interface KaryaCarouselProps {
 }
 
 export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
-    const { karyaItems, isLoading, isError } = useKaryaItems({
-        status: 'dinilai', // Only show graded/approved projects
-        limit: 10, //limit to 10 items
-        page: 1
-    });
+    const { karyaItems, isLoading, isError } = useBestProjeks();
 
     if (isLoading) {
         return (
