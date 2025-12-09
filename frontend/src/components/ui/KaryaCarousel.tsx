@@ -38,7 +38,7 @@ const customStyles = `
         background: #4F6C9C;
         color: white;
         border: none;
-        margin: 0 0 30px 0;
+        margin: 0 0 70px 0;
         border-radius: 4px;
         width: 40px;
         height: 40px;
@@ -73,7 +73,7 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
         return (
             <div className={`py-8 ${className}`}>
                 <div className="mb-6">
-                    <h2 className="inline-block w-full text-center bg-sky-700 text-white px-6 py-3 rounded-full text-lg font-semibold">
+                    <h2 className="inline-block w-full text-center bg-gradient-to-r from-sky-400 to-sky-800 text-white px-6 py-3 rounded-full text-lg font-semibold">
                         Karya Unggulan
                     </h2>
                 </div>
@@ -91,7 +91,7 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
         return (
             <div className={`py-8 ${className}`}>
                 <div className="mb-6">
-                    <h2 className="inline-block w-full text-center bg-sky-700 text-white px-6 py-3 rounded-full text-lg font-semibold">
+                    <h2 className="inline-block w-full text-center bg-gradient-to-r from-sky-400 to-sky-800 text-white px-6 py-3 rounded-full text-lg font-semibold">
                         Karya Unggulan
                     </h2>
                 </div>
@@ -108,7 +108,7 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
         return (
             <div className={`py-8 ${className}`}>
                 <div className="mb-6">
-                    <h2 className="inline-block w-full text-center bg-sky-700 text-white px-6 py-3 rounded-full text-lg font-semibold">
+                    <h2 className="inline-block w-full text-center bg-gradient-to-r from-sky-400 to-sky-800 text-white px-6 py-3 rounded-full text-lg font-semibold">
                         Karya Unggulan
                     </h2>
                 </div>
@@ -126,8 +126,8 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
             <style>{customStyles}</style>
             
             <div className="mb-6">
-                <h2 className="inline-block w-full text-center bg-sky-700 text-white px-6 py-3 rounded-full text-lg font-semibold">
-                    Karya Unggulan
+                    <h2 className="inline-block w-full text-center bg-gradient-to-r from-sky-600 to-bluealt-200 text-white px-6 py-3 rounded-full text-lg font-semibold">
+                        Karya Unggulan
                 </h2>
             </div>
             
