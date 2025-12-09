@@ -7,7 +7,7 @@ export default function RatingCard({ proyek }: RatingCardProps) {
     return null;
   }
 
-  const rating = Math.round((proyek.penilaian.nilai / 100) * 5);
+  const rating = proyek.penilaian.bintang || 0;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -25,7 +25,7 @@ export default function RatingCard({ proyek }: RatingCardProps) {
             </svg>
           ))}
         </div>
-        <p className="text-sm text-gray-600">{rating}/5</p>
+        <p className="text-sm text-gray-600">{rating}/5 bintang</p>
       </div>
     </div>
   );

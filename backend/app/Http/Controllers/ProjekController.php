@@ -20,10 +20,33 @@ class ProjekController extends Controller
     {
         try {
             $query = Proyek::with(['user', 'jurusan', 'penilaian.guru']);
+            $user = Auth::user();
 
-            // Filter by status if provided
-            if ($request->has('status')) {
-                $query->byStatus($request->status);
+            // Teacher-specific logic: include terkirim projects from their department
+            if ($user && $user->role === 'guru' && $user->jurusan_id) {
+                if ($request->has('status')) {
+                    if ($request->status === 'terkirim') {
+                        // Only show terkirim projects from teacher's department
+                        $query->where('status', 'terkirim')
+                              ->where('jurusan_id', $user->jurusan_id);
+                    } else {
+                        $query->byStatus($request->status);
+                    }
+                } else {
+                    // Default: show dinilai projects + terkirim from teacher's department
+                    $query->where(function($q) use ($user) {
+                        $q->where('status', 'dinilai')
+                          ->orWhere(function($subQ) use ($user) {
+                              $subQ->where('status', 'terkirim')
+                                   ->where('jurusan_id', $user->jurusan_id);
+                          });
+                    });
+                }
+            } else {
+                // Non-teachers: existing logic
+                if ($request->has('status')) {
+                    $query->byStatus($request->status);
+                }
             }
 
             // Filter by jurusan if provided
@@ -447,6 +470,81 @@ class ProjekController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch user projects',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get ungraded projects for teachers (projects needing assessment)
+     */
+    public function ungraded(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+
+            // Only teachers can access this endpoint
+            if (!$user || $user->role !== 'guru' || !$user->jurusan_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. Only teachers can access ungraded projects.'
+                ], 403);
+            }
+
+            $query = Proyek::with(['user', 'jurusan'])
+                ->where('status', 'terkirim')
+                ->where('jurusan_id', $user->jurusan_id)
+                ->whereDoesntHave('penilaian'); // Projects without any assessment
+
+            // Search by title or description
+            if ($request->has('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('judul', 'like', "%{$search}%")
+                        ->orWhere('deskripsi', 'like', "%{$search}%");
+                });
+            }
+
+            // Filter by year if provided
+            if ($request->has('year')) {
+                $year = $request->year;
+                $query->whereYear('created_at', $year);
+            }
+
+            // Filter by kelas if provided (from user relationship)
+            if ($request->has('kelas')) {
+                $query->whereHas('user', function ($q) use ($request) {
+                    $q->where('kelas', $request->kelas);
+                });
+            }
+
+            // Pagination
+            $page = $request->get('page', 1);
+            $requestedLimit = $request->get('limit', 10);
+            $limit = min($requestedLimit, 20); // Maximum 20 for ungraded view
+
+            $proyeks = $query->latest()
+                ->paginate($limit, ['*'], 'page', $page);
+
+            return response()->json([
+                'success' => true,
+                'data' => $proyeks->items(),
+                'pagination' => [
+                    'current_page' => $proyeks->currentPage(),
+                    'last_page' => $proyeks->lastPage(),
+                    'per_page' => $proyeks->perPage(),
+                    'total' => $proyeks->total(),
+                    'from' => $proyeks->firstItem(),
+                    'to' => $proyeks->lastItem(),
+                ],
+                'message' => $proyeks->total() > 0 
+                    ? "Found {$proyeks->total()} ungraded projects from your department" 
+                    : "No ungraded projects found from your department"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch ungraded projects',
                 'error' => $e->getMessage()
             ], 500);
         }

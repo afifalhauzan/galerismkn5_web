@@ -11,7 +11,7 @@ interface GradingSectionProps {
 
 export default function GradingSection({ proyek, user, onGradingComplete }: GradingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [score, setScore] = useState(proyek.penilaian?.nilai || 0);
+  const [stars, setStars] = useState(proyek.penilaian?.bintang || 0);
   const [comment, setComment] = useState(proyek.penilaian?.catatan || '');
   const [showForm, setShowForm] = useState(false);
 
@@ -27,7 +27,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
 
   useEffect(() => {
     if (proyek.penilaian) {
-      setScore(proyek.penilaian.nilai);
+      setStars(proyek.penilaian.bintang || 0);
       setComment(proyek.penilaian.catatan || '');
     }
   }, [proyek.penilaian]);
@@ -35,8 +35,8 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (score < 0 || score > 100) {
-      alert('Nilai harus antara 0-100');
+    if (stars < 1 || stars > 5) {
+      alert('Rating harus antara 1-5 bintang');
       return;
     }
 
@@ -44,7 +44,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
       if (isAlreadyGraded && isCurrentUserGrader) {
         // Update existing grading
         await updatePenilaian(proyek.penilaian!.id, {
-          nilai: score,
+          bintang: stars,
           catatan: comment
         });
         alert('Penilaian berhasil diperbarui!');
@@ -52,7 +52,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
         // Create new grading
         await createPenilaian({
           proyek_id: proyek.id,
-          nilai: score,
+          bintang: stars,
           catatan: comment
         });
         alert('Penilaian berhasil disimpan!');
@@ -136,7 +136,21 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-blue-900">Penilaian Saat Ini</h4>
-                <span className="text-2xl font-bold text-blue-700">{proyek.penilaian!.nilai}/100</span>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-6 h-6 ${
+                        star <= (proyek.penilaian!.bintang || 0)
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  ))}
+                  <span className="ml-2 text-sm text-blue-700">
+                    ({proyek.penilaian!.bintang || 0}/5)
+                  </span>
+                </div>
               </div>
               
               {proyek.penilaian!.catatan && (
@@ -175,21 +189,36 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
         {((!isAlreadyGraded && canGrade) || (isAlreadyGraded && isCurrentUserGrader && showForm)) && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="score" className="block text-sm font-medium text-gray-700 mb-2">
-                Nilai (0-100)
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Rating (1-5 Bintang)
               </label>
-              <input
-                type="number"
-                id="score"
-                value={score}
-                onChange={(e) => setScore(Number(e.target.value))}
-                min="0"
-                max="100"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Masukkan nilai 0-100"
-                disabled={isMutating}
-              />
+              <div className="flex items-center gap-2 mb-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setStars(star)}
+                    disabled={isMutating}
+                    className={`p-1 rounded transition-colors ${
+                      isMutating ? 'cursor-not-allowed' : 'hover:bg-gray-100'
+                    }`}
+                  >
+                    <Star
+                      className={`w-8 h-8 ${
+                        star <= stars
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-300 hover:text-yellow-200'
+                      }`}
+                    />
+                  </button>
+                ))}
+                <span className="ml-2 text-sm text-gray-600">
+                  {stars > 0 ? `${stars}/5 bintang` : 'Pilih rating'}
+                </span>
+              </div>
+              {stars === 0 && (
+                <p className="text-sm text-red-500">Rating wajib dipilih</p>
+              )}
             </div>
 
             <div>
@@ -201,7 +230,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Berikan catatan atau saran untuk siswa..."
                 disabled={isMutating}
                 maxLength={1000}
@@ -230,7 +259,7 @@ export default function GradingSection({ proyek, user, onGradingComplete }: Grad
                   type="button"
                   onClick={() => {
                     setShowForm(false);
-                    setScore(proyek.penilaian?.nilai || 0);
+                    setStars(proyek.penilaian?.bintang || 0);
                     setComment(proyek.penilaian?.catatan || '');
                   }}
                   className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"

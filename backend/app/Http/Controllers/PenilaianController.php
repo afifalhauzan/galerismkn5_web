@@ -53,7 +53,7 @@ class PenilaianController extends Controller
 
         $validated = $request->validate([
             'proyek_id' => 'required|exists:proyeks,id',
-            'nilai' => 'required|integer|min:0|max:100',
+            'bintang' => 'required|integer|min:1|max:5',
             'catatan' => 'nullable|string|max:1000'
         ]);
 
@@ -81,7 +81,7 @@ class PenilaianController extends Controller
         $penilaian = Penilaian::create([
             'proyek_id' => $validated['proyek_id'],
             'guru_id' => $user->id,
-            'nilai' => $validated['nilai'],
+            'bintang' => $validated['bintang'],
             'catatan' => $validated['catatan']
         ]);
 
@@ -147,7 +147,7 @@ class PenilaianController extends Controller
         }
 
         $validated = $request->validate([
-            'nilai' => 'required|integer|min:0|max:100',
+            'bintang' => 'required|integer|min:1|max:5',
             'catatan' => 'nullable|string|max:1000'
         ]);
 

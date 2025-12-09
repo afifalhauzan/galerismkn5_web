@@ -26,7 +26,8 @@ export interface Penilaian {
     id: number;
     proyek_id: number;
     guru_id: number;
-    nilai: number;
+    nilai?: number; // Optional score 0-100
+    bintang?: number; // Star rating 1-5
     catatan?: string;
     created_at: string;
     updated_at: string;
@@ -37,7 +38,7 @@ export interface Penilaian {
 // Form data types for creating/updating penilaian
 export interface CreatePenilaianData {
     proyek_id: number;
-    nilai: number;
+    bintang: number; // Use stars instead of score
     catatan?: string;
 }
 

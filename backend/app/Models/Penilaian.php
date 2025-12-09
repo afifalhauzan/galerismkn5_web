@@ -13,11 +13,13 @@ class Penilaian extends Model
         'proyek_id',
         'guru_id',
         'nilai',
+        'bintang',
         'catatan',
     ];
 
     protected $casts = [
         'nilai' => 'integer',
+        'bintang' => 'integer',
     ];
 
     protected $appends = [

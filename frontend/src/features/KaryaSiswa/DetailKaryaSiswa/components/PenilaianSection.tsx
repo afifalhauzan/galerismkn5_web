@@ -1,3 +1,5 @@
+import { Star } from 'lucide-react';
+
 interface PenilaianSectionProps {
   proyek: any;
 }
@@ -12,12 +14,21 @@ export default function PenilaianSection({ proyek }: PenilaianSectionProps) {
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Penilaian</h3>
       <div className="space-y-4">
         <div className="flex flex-row justify-between">
-          <div className="flex items-center">
-            <div className="flex items-center">
-              <span className="text-3xl font-bold text-sky-600 mr-1">
-                {proyek.penilaian.nilai}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-7 h-7 ${
+                    star <= (proyek.penilaian.bintang || 0)
+                      ? 'text-yellow-400 fill-current'
+                      : 'text-gray-300'
+                  }`}
+                />
+              ))}
+              <span className="ml-2 text-lg font-semibold text-sky-600">
+                ({proyek.penilaian.bintang || 0}/5)
               </span>
-              <span className="text-xl text-gray-500">/100</span>
             </div>
           </div>
           <div className="flex items-center">

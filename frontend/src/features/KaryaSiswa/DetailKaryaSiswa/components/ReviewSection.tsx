@@ -42,7 +42,7 @@ export default function ReviewSection({ proyek, showReview, setShowReview }: Rev
                   </span>
                   <div className="flex">
                     {Array.from({ length: 5 }, (_, i) => {
-                      const rating = Math.round((proyek.penilaian!.nilai / 100) * 5);
+                      const rating = proyek.penilaian!.bintang || 0;
                       return (
                         <svg
                           key={i}

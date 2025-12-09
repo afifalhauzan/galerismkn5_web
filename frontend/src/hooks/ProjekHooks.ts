@@ -119,6 +119,33 @@ export function useMyProjeks(params: Omit<ProjekQueryParams, 'jurusan_id'> = {})
 }
 
 /**
+ * Hook to fetch ungraded projects for teachers (projects needing assessment)
+ */
+export function useUngradedProjeks(params: Omit<ProjekQueryParams, 'jurusan_id' | 'status'> = {}) {
+    const queryString = buildQueryString(params);
+    const { data, error, isLoading, mutate } = useSWR(
+        `/proyeks/ungraded${queryString}`,
+        fetcher,
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 30000, // 30 seconds
+        }
+    );
+
+    console.log("Fetched ungraded proyeks data:", data);
+
+    return {
+        proyeks: (data as PaginatedResponse<Proyek>)?.data || [],
+        pagination: (data as PaginatedResponse<Proyek>)?.pagination,
+        message: (data as PaginatedResponse<Proyek>)?.message || '',
+        isLoading,
+        isError: error,
+        mutate,
+    };
+}
+
+/**
  * Hook to fetch a single project by ID
  */
 export function useProyek(id: number | string) {

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
-import { HiHome, HiPhotograph, HiQuestionMarkCircle, HiUser, HiLogin } from "react-icons/hi";
+import { HiHome, HiPhotograph, HiQuestionMarkCircle, HiUser, HiLogin, HiClipboardCheck } from "react-icons/hi";
 import { FaCircleUser } from "react-icons/fa6";
 
 interface NavbarProps {
@@ -106,6 +106,18 @@ export default function Navbar({ className = "" }: NavbarProps) {
                                             }`}
                                     >
                                         Karya
+                                    </Link>
+                                )}
+
+                                {user?.role === 'guru' && (
+                                    <Link
+                                        href="/nilaikarya"
+                                        className={`text-white px-3 py-2 rounded-full text-sm font-medium transition-colors ${pathname === "/nilaikarya"
+                                            ? "bg-sky-600 hover:bg-sky-700"
+                                            : "hover:bg-sky-700"
+                                            }`}
+                                    >
+                                        Nilai Karya
                                     </Link>
                                 )}
 
@@ -216,6 +228,19 @@ export default function Navbar({ className = "" }: NavbarProps) {
                         >
                             <HiQuestionMarkCircle size={24} />
                             <span className="text-xs mt-1">Karya</span>
+                        </Link>
+                    )}
+
+                    {user?.role === 'guru' && (
+                        <Link
+                            href="/nilaikarya"
+                            className={`flex flex-col items-center py-2 px-3 transition-colors ${pathname === "/nilaikarya"
+                                ? "text-sky-700"
+                                : "text-gray-600 hover:text-blue-600"
+                                }`}
+                        >
+                            <HiClipboardCheck size={24} />
+                            <span className="text-xs mt-1">Nilai Karya</span>
                         </Link>
                     )}
 

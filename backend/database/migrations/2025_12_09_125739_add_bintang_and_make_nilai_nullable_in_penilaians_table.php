@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('penilaians', function (Blueprint $table) {
-            $table->integer('nilai')->unsigned()->default(0)->after('guru_id'); // Score 0-100
-            $table->text('catatan')->nullable()->after('nilai'); // Comment from teacher
+            $table->integer('bintang')->unsigned()->nullable()->after('nilai'); // Star rating 1-5
+            $table->integer('nilai')->unsigned()->nullable()->change(); // Make nilai nullable
         });
     }
 
@@ -23,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('penilaians', function (Blueprint $table) {
-            $table->dropColumn(['nilai', 'catatan']);
+            $table->dropColumn('bintang');
+            $table->integer('nilai')->unsigned()->default(0)->change(); // Revert nilai back to non-nullable
         });
     }
 };

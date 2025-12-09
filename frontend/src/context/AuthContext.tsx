@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import Cookies from 'js-cookie';
 import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
+import { Jurusan } from "@/types/proyek";
 
 interface User {
     id: number;
@@ -12,6 +13,7 @@ interface User {
     role: string;
     jurusan_id?: number;
     jurusan_name?: string;
+    jurusan?: Jurusan
     kelas?: string;
     isGuru: () => boolean;
     isSiswa: () => boolean;
