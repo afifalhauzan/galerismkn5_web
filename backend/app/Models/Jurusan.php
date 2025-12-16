@@ -23,6 +23,14 @@ class Jurusan extends Model
     }
 
     /**
+     * Get the kelas that belong to this jurusan
+     */
+    public function kelas()
+    {
+        return $this->hasMany(Kelas::class);
+    }
+
+    /**
      * Get the proyeks that belong to this jurusan
      */
     public function proyeks()

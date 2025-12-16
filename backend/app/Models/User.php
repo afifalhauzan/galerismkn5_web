@@ -25,7 +25,11 @@ class User extends Authenticatable
         'nis_nip',
         'role',
         'jurusan_id',
-        'kelas',
+        'kelas_id',
+        'nis',
+        'gender',
+        'is_active',
+        'is_alumni',
     ];
 
     /**
@@ -76,11 +80,35 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is active (has email and password)
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active && !is_null($this->email) && !is_null($this->password);
+    }
+
+    /**
+     * Check if user is registered (has email)
+     */
+    public function isRegistered(): bool
+    {
+        return !is_null($this->email);
+    }
+
+    /**
      * Get the jurusan that the student belongs to
      */
     public function jurusan()
     {
         return $this->belongsTo(Jurusan::class);
+    }
+
+    /**
+     * Get the kelas that the student belongs to
+     */
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class);
     }
 
     /**
@@ -113,5 +141,29 @@ class User extends Authenticatable
     public function scopeSiswa($query)
     {
         return $query->where('role', 'siswa');
+    }
+
+    /**
+     * Scope to get only active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope to get only registered users (with email)
+     */
+    public function scopeRegistered($query)
+    {
+        return $query->whereNotNull('email');
+    }
+
+    /**
+     * Scope to get only unregistered users (without email)
+     */
+    public function scopeUnregistered($query)
+    {
+        return $query->whereNull('email');
     }
 }

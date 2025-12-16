@@ -30,6 +30,15 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'role' => $this->faker ? $this->faker->randomElement(['siswa', 'guru']) : 'siswa',
+            'nis_nip' => $this->faker ? $this->faker->unique()->numerify('##########') : '1234567890',
+            'jurusan_id' => 1, // Default jurusan
+            'kelas_id' => null, // Will be set for students
+            'nis' => function (array $attributes) {
+                return $attributes['role'] === 'siswa' ? $this->faker->unique()->numerify('##########') : null;
+            },
+            'gender' => $this->faker ? $this->faker->randomElement(['L', 'P']) : 'L',
+            'is_active' => true, // Active by default (with email)
+            'is_alumni' => false,
         ];
     }
 
@@ -40,6 +49,53 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Create an unregistered user (for import scenarios).
+     */
+    public function unregistered(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email' => null,
+            'password' => null,
+            'email_verified_at' => null,
+            'remember_token' => null,
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Create a student user.
+     */
+    public function student(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'siswa',
+            'nis' => $this->faker->unique()->numerify('##########'),
+        ]);
+    }
+
+    /**
+     * Create a teacher user.
+     */
+    public function teacher(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'guru',
+            'nis' => null,
+        ]);
+    }
+
+    /**
+     * Create an admin user.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+            'nis' => null,
         ]);
     }
 }

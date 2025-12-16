@@ -14,7 +14,7 @@ class JurusanSeeder extends Seeder
     {
         $jurusans = [
             ['nama' => 'Rekayasa Perangkat Lunak', 'singkatan' => 'RPL'],       // ID 1
-            ['nama' => 'Teknik Komputer Jaringan', 'singkatan' => 'TKJ'],       // ID 2
+            ['nama' => 'Teknik Komputer Jaringan dan Telekomunikasi', 'singkatan' => 'TKJT'], // ID 2
             ['nama' => 'Desain Komunikasi Visual', 'singkatan' => 'DKV'],       // ID 3
             ['nama' => 'Animasi', 'singkatan' => 'Animasi'],                    // ID 4
             ['nama' => 'Kriya Kayu', 'singkatan' => 'KK'],                      // ID 5

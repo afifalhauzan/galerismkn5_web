@@ -23,6 +23,11 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'admin',
             'jurusan_id' => null,
+            'kelas_id' => null,
+            'nis' => null,
+            'gender' => 'L',
+            'is_active' => true,
+            'is_alumni' => false,
         ]);
 
         User::create([
@@ -32,6 +37,11 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'admin',
             'jurusan_id' => null,
+            'kelas_id' => null,
+            'nis' => null,
+            'gender' => 'L',
+            'is_active' => true,
+            'is_alumni' => false,
         ]);
 
         // Create guru users
@@ -43,6 +53,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 1, // Contoh: Ketua Jurusan RPL
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'L',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
             [
                 'name' => 'Dimas Santoso',
@@ -51,6 +66,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 2, // Contoh: Ketua Jurusan TKJ
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'L',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
             [
                 'name' => 'Amilia',
@@ -59,6 +79,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 3, // Contoh: Guru DKV
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'P',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
             [
                 'name' => 'Santi',
@@ -67,6 +92,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 4, // Contoh: Ketua Jurusan Animasi
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'P',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
             [
                 'name' => 'Handi Santoso',
@@ -75,6 +105,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 5, // Contoh: Ketua Jurusan Kriya Kayu
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'L',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
             [
                 'name' => 'Zara',
@@ -83,6 +118,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 6, // Contoh: Ketua Jurusan Kriya Tekstil
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'P',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
             [
                 'name' => 'anisa',
@@ -91,6 +131,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 7, // Contoh: Ketua Jurusan Kriya Keramik
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'P',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
             [
                 'name' => 'Ahmad Fauzi',
@@ -99,6 +144,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'guru',
                 'jurusan_id' => 8, // Contoh: Guru Tata Busana
+                'kelas_id' => null, // Guru tidak terikat pada satu kelas
+                'nis' => null,      // Guru tidak memiliki NIS
+                'gender' => 'L',
+                'is_active' => true,
+                'is_alumni' => false,
             ],
         ];
 
@@ -106,50 +156,147 @@ class UserSeeder extends Seeder
             User::create($guru);
         }
 
-        // Create siswa users
+        // Ambil semua Kelas yang sudah di-seed
+        $kelasCollection = \App\Models\Kelas::all();
+        
         $siswaData = [
-            // --- Siswa RPL (ID 1) ---
-            [ 'name' => 'Andi Pratama', 'email' => 'andi.pratama@student.smkn5.com', 'nis_nip' => 'NIS001', 'jurusan_id' => 1, 'kelas' => '10' ],
-            [ 'name' => 'Dewi Sari', 'email' => 'dewi.sari@student.smkn5.com', 'nis_nip' => 'NIS002', 'jurusan_id' => 1, 'kelas' => '11' ],
-            [ 'name' => 'Bambang Sudiro', 'email' => 'bambang.sudiro@student.smkn5.com', 'nis_nip' => 'NIS007', 'jurusan_id' => 1, 'kelas' => '12' ],
+            // --- Data awal Anda (Saya lengkapi penomorannya dari NIS001 sampai NIS017) ---
+            ['name' => 'Andi Pratama', 'email' => 'andi.pratama@student.smkn5.com', 'nis_nip' => 'NIS001', 'jurusan_id' => 1, 'tingkat' => '10', 'gender' => 'L'],
+            ['name' => 'Dewi Sari', 'email' => 'dewi.sari@student.smkn5.com', 'nis_nip' => 'NIS002', 'jurusan_id' => 1, 'tingkat' => '11', 'gender' => 'P'],
+            ['name' => 'Bambang Sudiro', 'email' => 'bambang.sudiro@student.smkn5.com', 'nis_nip' => 'NIS003', 'jurusan_id' => 1, 'tingkat' => '12', 'gender' => 'L'],
 
-            // --- Siswa TKJ (ID 2) ---
-            [ 'name' => 'Rizky Ramadhan', 'email' => 'rizky.ramadhan@student.smkn5.com', 'nis_nip' => 'NIS003', 'jurusan_id' => 2, 'kelas' => '12' ],
-            [ 'name' => 'Maya Sari', 'email' => 'maya.sari@student.smkn5.com', 'nis_nip' => 'NIS004', 'jurusan_id' => 2, 'kelas' => '10' ],
-            [ 'name' => 'Cahyo Utomo', 'email' => 'cahyo.utomo@student.smkn5.com', 'nis_nip' => 'NIS008', 'jurusan_id' => 2, 'kelas' => '11' ],
+            ['name' => 'Rizky Ramadhan', 'email' => 'rizky.ramadhan@student.smkn5.com', 'nis_nip' => 'NIS004', 'jurusan_id' => 2, 'tingkat' => '12', 'gender' => 'L'],
+            ['name' => 'Maya Sari', 'email' => 'maya.sari@student.smkn5.com', 'nis_nip' => 'NIS005', 'jurusan_id' => 2, 'tingkat' => '10', 'gender' => 'P'],
+            ['name' => 'Cahyo Utomo', 'email' => 'cahyo.utomo@student.smkn5.com', 'nis_nip' => 'NIS006', 'jurusan_id' => 2, 'tingkat' => '11', 'gender' => 'L'],
             
-            // --- Siswa DKV (ID 3) ---
-            [ 'name' => 'Joko Susilo', 'email' => 'joko.susilo@student.smkn5.com', 'nis_nip' => 'NIS005', 'jurusan_id' => 3, 'kelas' => '11' ], // Asumsi TKR diubah ke DKV di contoh Anda, saya kembalikan ke Joko di DKV
-            [ 'name' => 'Rina Wati', 'email' => 'rina.wati@student.smkn5.com', 'nis_nip' => 'NIS006', 'jurusan_id' => 3, 'kelas' => '12' ], // Asumsi TKR diubah ke DKV di contoh Anda, saya kembalikan ke Rina di DKV
-            [ 'name' => 'Dian Kusuma', 'email' => 'dian.kusuma@student.smkn5.com', 'nis_nip' => 'NIS009', 'jurusan_id' => 3, 'kelas' => '10' ],
+            ['name' => 'Joko Susilo', 'email' => 'joko.susilo@student.smkn5.com', 'nis_nip' => 'NIS007', 'jurusan_id' => 3, 'tingkat' => '11', 'gender' => 'L'],
+            ['name' => 'Rina Wati', 'email' => 'rina.wati@student.smkn5.com', 'nis_nip' => 'NIS008', 'jurusan_id' => 3, 'tingkat' => '12', 'gender' => 'P'],
+            ['name' => 'Dian Kusuma', 'email' => 'dian.kusuma@student.smkn5.com', 'nis_nip' => 'NIS009', 'jurusan_id' => 3, 'tingkat' => '10', 'gender' => 'P'],
             
-            // --- Siswa Animasi (ID 4) ---
-            [ 'name' => 'Tomi Hartono', 'email' => 'tomi.hartono@student.smkn5.com', 'nis_nip' => 'NIS010', 'jurusan_id' => 4, 'kelas' => '12' ],
-            [ 'name' => 'Lina Wijaya', 'email' => 'lina.wijaya@student.smkn5.com', 'nis_nip' => 'NIS011', 'jurusan_id' => 4, 'kelas' => '11' ],
+            ['name' => 'Tomi Hartono', 'email' => 'tomi.hartono@student.smkn5.com', 'nis_nip' => 'NIS010', 'jurusan_id' => 4, 'tingkat' => '12', 'gender' => 'L'],
+            ['name' => 'Lina Wijaya', 'email' => 'lina.wijaya@student.smkn5.com', 'nis_nip' => 'NIS011', 'jurusan_id' => 4, 'tingkat' => '11', 'gender' => 'P'],
 
-            // --- Siswa Kriya Kayu (ID 5) ---
-            [ 'name' => 'Slamet Riyadi', 'email' => 'slamet.riyadi@student.smkn5.com', 'nis_nip' => 'NIS012', 'jurusan_id' => 5, 'kelas' => '10' ],
+            ['name' => 'Slamet Riyadi', 'email' => 'slamet.riyadi@student.smkn5.com', 'nis_nip' => 'NIS012', 'jurusan_id' => 5, 'tingkat' => '10', 'gender' => 'L'],
 
-            // --- Siswa Kriya Tekstil (ID 6) ---
-            [ 'name' => 'Nisa Farida', 'email' => 'nisa.farida@student.smkn5.com', 'nis_nip' => 'NIS013', 'jurusan_id' => 6, 'kelas' => '11' ],
+            ['name' => 'Nisa Farida', 'email' => 'nisa.farida@student.smkn5.com', 'nis_nip' => 'NIS013', 'jurusan_id' => 6, 'tingkat' => '11', 'gender' => 'P'],
             
-            // --- Siswa Kriya Keramik (ID 7) ---
-            [ 'name' => 'Fajar Abadi', 'email' => 'fajar.abadi@student.smkn5.com', 'nis_nip' => 'NIS014', 'jurusan_id' => 7, 'kelas' => '12' ],
+            ['name' => 'Fajar Abadi', 'email' => 'fajar.abadi@student.smkn5.com', 'nis_nip' => 'NIS014', 'jurusan_id' => 7, 'tingkat' => '12', 'gender' => 'L'],
             
-            // --- Siswa Tata Busana (ID 8) ---
-            [ 'name' => 'Gita Kirana', 'email' => 'gita.kirana@student.smkn5.com', 'nis_nip' => 'NIS015', 'jurusan_id' => 8, 'kelas' => '10' ],
+            ['name' => 'Gita Kirana', 'email' => 'gita.kirana@student.smkn5.com', 'nis_nip' => 'NIS015', 'jurusan_id' => 8, 'tingkat' => '10', 'gender' => 'P'],
+            
+            ['name' => 'Budi Wijaya', 'email' => 'budi.wijaya@student.smkn5.com', 'nis_nip' => 'NIS016', 'jurusan_id' => 1, 'tingkat' => '10', 'gender' => 'L'],
+            ['name' => 'Sari Indah', 'email' => 'sari.indah@student.smkn5.com', 'nis_nip' => 'NIS017', 'jurusan_id' => 2, 'tingkat' => '11', 'gender' => 'P'],
+            
+            // --- Siswa Tambahan untuk memenuhi minimal 2 siswa per kelas ---
+            // Saya akan menggunakan Faker/data dummy untuk mengisi kebutuhan hingga 114 siswa
         ];
 
-        foreach ($siswaData as $siswa) {
+        // Generator untuk NIS berikutnya
+        $nisCounter = 18; // Mulai dari NIS018
+
+        $jurusans = Jurusan::all();
+        $tingkatKelas = ['10', '11', '12'];
+        $romanNumerals = ['I', 'II', 'III'];
+
+        // Loop melalui setiap kelas yang telah Anda buat dan tambahkan siswa
+        foreach ($jurusans as $jurusan) {
+            foreach ($tingkatKelas as $tingkat) {
+                // Ambil semua Kelas untuk Jurusan dan Tingkat saat ini
+                $kelasDiTingkat = $kelasCollection
+                    ->where('jurusan_id', $jurusan->id)
+                    ->where('tingkat', $tingkat);
+
+                // Pastikan setiap kelas memiliki minimal 2 siswa.
+                foreach ($kelasDiTingkat as $kelas) {
+                    $siswaPerKelas = 2; // Target minimal
+                    
+                    for ($i = 0; $i < $siswaPerKelas; $i++) {
+                        $nis = 'NIS' . str_pad($nisCounter++, 3, '0', STR_PAD_LEFT);
+                        $gender = ($i % 2 == 0) ? 'L' : 'P';
+                        
+                        // Simple name generation without Faker to avoid dependency issues
+                        $firstNames = $gender == 'L' ? 
+                            ['Ahmad', 'Budi', 'Doni', 'Eko', 'Fajar', 'Gilang', 'Hadi', 'Indra', 'Joko', 'Kurnia'] :
+                            ['Ani', 'Bella', 'Citra', 'Dewi', 'Eka', 'Fitri', 'Gita', 'Hani', 'Indah', 'Jihan'];
+                        $lastNames = ['Pratama', 'Sari', 'Wijaya', 'Utomo', 'Santoso', 'Kusuma', 'Riyadi', 'Farida', 'Hartono', 'Kirana'];
+                        
+                        $firstName = $firstNames[array_rand($firstNames)];
+                        $lastName = $lastNames[array_rand($lastNames)];
+                        $nama = $firstName . ' ' . $lastName;
+                        $email = strtolower(str_replace(' ', '.', $nama)) . $nisCounter . '@student.smkn5.com';
+
+                        $siswaData[] = [
+                            'name' => $nama,
+                            'email' => $email,
+                            'nis_nip' => $nis,
+                            'jurusan_id' => $jurusan->id,
+                            'tingkat' => $tingkat,
+                            'gender' => $gender,
+                            'kelas_id' => $kelas->id, // Tambahkan kelas_id di sini
+                        ];
+                    }
+                }
+            }
+        }
+        
+        // --- PROSES PEMBUATAN USER SISWA ---
+        
+        // Asumsikan data awal yang Anda berikan belum memiliki 'kelas_id'.
+        // Kita harus mengaitkan siswa awal Anda ke kelas yang benar secara manual (atau acak).
+        
+        // Kita akan mengelompokkan siswaData yang sudah ada berdasarkan jurusan dan tingkatnya
+        $siswaByGroup = collect($siswaData)->groupBy(function ($item) {
+            return $item['jurusan_id'] . '-' . $item['tingkat'];
+        });
+
+        $finalSiswaData = [];
+
+        foreach ($siswaByGroup as $key => $siswaGroup) {
+            list($jurusanId, $tingkat) = explode('-', $key);
+            
+            // Ambil semua Kelas yang sesuai dengan Jurusan dan Tingkat ini
+            $availableClasses = $kelasCollection
+                ->where('jurusan_id', (int)$jurusanId)
+                ->where('tingkat', $tingkat)
+                ->pluck('id')
+                ->toArray();
+                
+            if (empty($availableClasses)) continue; // Skip jika tidak ada kelas ditemukan
+
+            $classIndex = 0;
+            $classCount = count($availableClasses);
+            
+            // Distribusikan siswa ke kelas secara merata (round-robin)
+            foreach ($siswaGroup as $siswa) {
+                $siswa['kelas_id'] = $availableClasses[$classIndex % $classCount];
+                $finalSiswaData[] = $siswa;
+                $classIndex++;
+            }
+        }
+
+        // Simpan semua Siswa ke database
+        foreach ($finalSiswaData as $siswa) {
+            // Randomly make some siswa inactive (30% chance)
+            $isActive = rand(1, 100) <= 70; // 70% active, 30% inactive
+            
+            // Inactive students should not have email and password
+            $email = $isActive ? $siswa['email'] : null;
+            $password = $isActive ? Hash::make('password') : null;
+            
             User::create([
                 'name' => $siswa['name'],
-                'email' => $siswa['email'],
+                'email' => $email,
                 'nis_nip' => $siswa['nis_nip'],
-                'password' => Hash::make('password'),
+                'nis' => $siswa['nis_nip'], // Use nis_nip as nis for students
+                'password' => $password,
                 'role' => 'siswa',
                 'jurusan_id' => $siswa['jurusan_id'],
-                'kelas' => $siswa['kelas'],
+                'kelas_id' => $siswa['kelas_id'], // Tambahkan kolom kelas_id
+                'gender' => $siswa['gender'] ?? 'L',
+                'is_active' => $isActive,
+                'is_alumni' => false,
             ]);
         }
+
     }
 }
