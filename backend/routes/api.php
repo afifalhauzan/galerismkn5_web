@@ -7,7 +7,7 @@ use App\Http\Controllers\ProjekController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\PenilaianController;
-use App\Http\Controllers\Admin\StudentImportController;
+use App\Http\Controllers\StudentImportController;
 
 /**
  * Authentication Routes
@@ -34,6 +34,12 @@ Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyek
  */
 Route::get('/jurusans', [JurusanController::class, 'index'])->name('jurusans.index');
 Route::get('/jurusans/{jurusan}', [JurusanController::class, 'show'])->name('jurusans.show');
+
+/**
+ * Public Template Download
+ * Public route for downloading Excel import template
+ */
+Route::get('/download-template', [StudentImportController::class, 'downloadTemplate'])->name('public.template.download');
 
 /**
  * Protected Routes
@@ -92,7 +98,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
      * Admin-only routes for importing students from Excel files
      */
     Route::post('/admin/import-students', [StudentImportController::class, 'import'])->name('students.import');
-    Route::get('/admin/download-template', [StudentImportController::class, 'downloadTemplate'])->name('students.import.template');
     Route::get('/admin/students/import/status', [StudentImportController::class, 'getImportStatus'])->name('students.import.status');
 
     /**

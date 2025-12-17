@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Imports\SiswaImport;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -22,6 +23,22 @@ class StudentImportController extends Controller
     public function import(Request $request): JsonResponse
     {
         try {
+            // Check if user is authenticated and is admin
+            if (!auth()->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access'
+                ], 401);
+            }
+
+            $user = auth()->user();
+            if (!$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Admin privileges required.'
+                ], 403);
+            }
+
             // Validate the request has a file
             $request->validate([
                 'file' => 'required|file|mimes:xlsx,xls,csv|max:10240' // 10MB max
@@ -102,17 +119,9 @@ class StudentImportController extends Controller
     public function downloadTemplate()
     {
         try {
-            // Create template with correct column headers as specified
+            // Create empty template with just headers
             $headers = [
-                ['No', 'NIS', 'Nama Lengkap', 'Jenis Kelamin', 'Nama Kelas'],
-                [1, '2407001', 'Ahmad Fauzan', 'L', '10 TKJT I'],
-                [2, '2407002', 'Bayu Prakoso', 'L', '10 TKJT I'],
-                [3, '2407003', 'Cindy Aulia', 'P', '10 TKJT II'],
-                [4, '2407004', 'Dedi Kurniawan', 'L', '11 RPL I'],
-                [5, '2407005', 'Erlinda Sari', 'P', '10 DKV I'],
-                [6, '2407011', 'Kiki Amalia', 'P', '11 TKJT I'],
-                [7, '2407012', 'Lukman Hakim', 'L', '10 RPL II'],
-                [8, '2407013', 'Mawar Melati', 'P', '12 KK I'],
+                ['nama_lengkap', 'kelas', 'nis', 'gender'],
             ];
 
             $filename = 'template_import_siswa.xlsx';
@@ -150,6 +159,22 @@ class StudentImportController extends Controller
     public function getImportStatus(): JsonResponse
     {
         try {
+            // Check if user is authenticated and is admin
+            if (!auth()->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access'
+                ], 401);
+            }
+
+            $user = auth()->user();
+            if (!$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Admin privileges required.'
+                ], 403);
+            }
+
             // Get basic statistics
             $totalSiswa = \App\Models\User::where('role', 'siswa')->count();
             $activeSiswa = \App\Models\User::where('role', 'siswa')->where('is_active', true)->count();

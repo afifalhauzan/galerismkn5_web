@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useUsers, useUserMutations } from "@/hooks/UserHooks";
 import { useJurusans } from "@/hooks/JurusanHooks";
+import { useExcelAdmin } from "@/hooks/ExcelAdminHooks";
 import { User, CreateUserData, UpdateUserData } from "@/types/proyek";
 import UserFilters from "./components/UserFilters";
 import UserTable from "./components/UserTable";
@@ -14,6 +15,14 @@ import { MdAccountCircle } from "react-icons/md";
 export default function KelolaAkun({ user, logout }: { user: any, logout: () => void }) {
     const { jurusans } = useJurusans();
     const { createUser, updateUser, deleteUser } = useUserMutations();
+    const {
+        importStudents,
+        downloadTemplate,
+        isImporting,
+        isDownloading,
+        importError,
+        downloadError,
+    } = useExcelAdmin();
 
     // Filter states
     const [selectedRole, setSelectedRole] = useState("");
@@ -27,6 +36,10 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<any>(null);
+
+    // Local import states
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [localImportError, setLocalImportError] = useState<string | null>(null);
 
     // Fetch users with filters
     const { users, pagination, isLoading, isError, mutate } = useUsers({
@@ -127,6 +140,47 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
         }
     };
 
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            setLocalImportError(null);
+        }
+    };
+
+    const handleImportExcel = async () => {
+        if (!selectedFile) {
+            setLocalImportError('Silakan pilih file Excel terlebih dahulu');
+            return;
+        }
+
+        setLocalImportError(null);
+        
+        try {
+            const result = await importStudents(selectedFile);
+            
+            alert(`Import berhasil! ${result.imported_rows} siswa berhasil diimpor dari ${result.total_rows} baris.`);
+            await mutate(); // Refresh the data
+            setSelectedFile(null);
+            
+            // Reset file input
+            const fileInput = document.getElementById('excel-upload') as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
+        } catch (error: any) {
+            console.error('Error importing Excel:', error);
+            setLocalImportError(error.message || 'Terjadi kesalahan saat mengimpor file');
+        }
+    };
+
+    const handleDownloadTemplate = async () => {
+        try {
+            await downloadTemplate();
+        } catch (error: any) {
+            console.error('Error downloading template:', error);
+            alert(error.message || 'Terjadi kesalahan saat mengunduh template');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:mt-20">
@@ -217,7 +271,93 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
                         </div>
                     )}
                 </div>
-
+                {/* Excel Import Section */}
+                <div className="bg-white shadow rounded-lg p-6 mb-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                        <div>
+                            <h2 className="text-lg font-medium text-gray-900 mb-2">Import Data Siswa</h2>
+                            <p className="text-sm text-gray-600">
+                                Upload file Excel untuk mengimpor data siswa secara massal
+                            </p>
+                        </div>
+                        <button
+                            onClick={handleDownloadTemplate}
+                            disabled={isDownloading}
+                            className="mt-4 md:mt-0 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                        >
+                            {isDownloading ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Mengunduh...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    <span>Download Template</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row md:items-end space-y-4 md:space-y-0 md:space-x-4">
+                        <div className="flex-1">
+                            <label htmlFor="excel-upload" className="block text-sm font-medium text-gray-700 mb-2">
+                                Pilih File Excel
+                            </label>
+                            <input
+                                id="excel-upload"
+                                type="file"
+                                accept=".xlsx,.xls,.csv"
+                                onChange={handleFileUpload}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {selectedFile && (
+                                <p className="mt-1 text-sm text-gray-600">
+                                    File terpilih: {selectedFile.name}
+                                </p>
+                            )}
+                        </div>
+                        
+                        <button
+                            onClick={handleImportExcel}
+                            disabled={!selectedFile || isImporting}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                        >
+                            {isImporting ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Mengimpor...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                                    </svg>
+                                    <span>Import Excel</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                    
+                    {(localImportError || importError || downloadError) && (
+                        <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                            {localImportError || importError?.message || downloadError?.message}
+                        </div>
+                    )}
+                    
+                    <div className="mt-4 text-xs text-gray-500">
+                        <p>Format file yang didukung: .xlsx, .xls, .csv (maksimal 10MB)</p>
+                        <p>Kolom yang diperlukan: Nama Lengkap, NIS, Kelas, Jenis Kelamin</p>
+                    </div>
+                </div>
                 {/* Filters */}
                 <UserFilters
                     selectedRole={selectedRole}

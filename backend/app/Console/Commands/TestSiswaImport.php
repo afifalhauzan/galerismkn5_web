@@ -14,14 +14,14 @@ class TestSiswaImport extends Command
      *
      * @var string
      */
-    protected $signature = 'test:siswa-import {file=test_import_siswa.csv}';
+    protected $signature = 'test:siswa-import {file : The path to the Excel file to import}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Test importing students from Excel/CSV file';
+    protected $description = 'Test importing students from Excel/XLSX file';
 
     /**
      * Execute the console command.

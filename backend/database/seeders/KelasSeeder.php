@@ -24,7 +24,7 @@ class KelasSeeder extends Seeder
             $classCount = $isTeknologi ? 3 : 2;
             
             // Create classes for each grade level (10, 11, 12)
-            foreach (['10', '11', '12'] as $tingkat) {
+            foreach (['X', 'XI', 'XII'] as $tingkat) {
                 // Create classes with Roman numerals
                 $romanNumerals = ['I', 'II', 'III'];
                 
