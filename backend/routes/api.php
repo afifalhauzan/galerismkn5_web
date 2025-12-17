@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjekController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\PenilaianController;
+use App\Http\Controllers\Admin\StudentImportController;
 
 /**
  * Authentication Routes
@@ -85,6 +86,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/akuns/{id}', [AkunController::class, 'update'])->name('akuns.update.patch');
     Route::delete('/akuns/{id}', [AkunController::class, 'destroy'])->name('akuns.destroy');
     Route::get('/akuns-stats', [AkunController::class, 'stats'])->name('akuns.stats');
+
+    /**
+     * Student Excel Import Routes
+     * Admin-only routes for importing students from Excel files
+     */
+    Route::post('/admin/import-students', [StudentImportController::class, 'import'])->name('students.import');
+    Route::get('/admin/download-template', [StudentImportController::class, 'downloadTemplate'])->name('students.import.template');
+    Route::get('/admin/students/import/status', [StudentImportController::class, 'getImportStatus'])->name('students.import.status');
 
     /**
      * Penilaian (Grading) Routes
