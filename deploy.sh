@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Production Deployment Script for Galeri SMKN5
 echo "🚀 Starting production deployment..."
 
@@ -49,4 +47,3 @@ docker compose -f docker-compose.prod.yaml exec backend chmod -R 775 /var/lib/ng
 echo "✅ Deployment completed!"
 echo "   Frontend: 3001"
 echo "   Backend:  8001"
-```
