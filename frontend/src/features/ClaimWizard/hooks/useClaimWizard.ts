@@ -143,7 +143,7 @@ export const useClaimWizard = () => {
 
   const canProceed = () => {
     if (currentStep === 1) {
-      return formData.selectedJurusan && formData.selectedKelas && formData.selectedNis;
+      return !!(formData.selectedJurusan && formData.selectedKelas && formData.selectedNis);
     }
     return true;
   };
