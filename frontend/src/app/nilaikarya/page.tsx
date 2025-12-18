@@ -294,7 +294,7 @@ function ProjectCard({ proyek, onGraded }: { proyek: Proyek; onGraded: () => voi
                     {proyek.user?.kelas && (
                         <div className="flex items-center space-x-2">
                             <span className="w-4 h-4 text-center text-xs font-bold">K</span>
-                            <span>Kelas {proyek.user.kelas}</span>
+                            <span>{proyek.user.kelas.nama_kelas}</span>
                         </div>
                     )}
                 </div>

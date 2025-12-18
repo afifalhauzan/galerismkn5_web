@@ -5,11 +5,13 @@ export interface User {
     email_verified_at?: string;
     role: 'admin' | 'guru' | 'siswa';
     nis_nip?: string;
+    nis?: string;
     jurusan_id?: number;
     jurusan_name?: string;
     jurusan?: Jurusan;
     kelas_id?: number;
     kelas?: Kelas;
+    is_active?: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -26,8 +28,7 @@ export interface Jurusan {
 export interface Kelas {
     id: number;
     nama_kelas: string;
-    tingkat: string;
-    nomor_kelas: number;
+    tingkat: number;
     jurusan_id: number;
     jurusan?: Jurusan;
     created_at?: string;

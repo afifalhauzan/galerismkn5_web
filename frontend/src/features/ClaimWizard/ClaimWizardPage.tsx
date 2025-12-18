@@ -87,7 +87,7 @@ export function ClaimWizardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4 pt-10 md:pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4 pt-10 md:pt-30">
       <div className="max-w-2xl w-full">
         <WizardHeader />
         

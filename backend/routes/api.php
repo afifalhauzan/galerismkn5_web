@@ -10,6 +10,7 @@ use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\StudentImportController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\Auth\ClaimAccountController;
+use App\Http\Controllers\DashboardStatsController;
 
 /**
  * Authentication Routes
@@ -68,6 +69,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('auth.logout.all');
 
     Route::get('/user-stats', [AuthController::class, 'userStats'])->name('user.stats');
+    
+    /**
+     * Dashboard Statistics Routes
+     * High-level statistics and monitoring for admin and guru roles
+     */
+    Route::get('/dashboard/stats', [DashboardStatsController::class, 'index'])->name('dashboard.stats');
+    Route::get('/dashboard/stats/jurusan/{jurusanId}', [DashboardStatsController::class, 'jurusanStats'])->name('dashboard.stats.jurusan');
     
     /**
      * Get user profile information
