@@ -30,6 +30,7 @@ class User extends Authenticatable
         'gender',
         'is_active',
         'is_alumni',
+        'email_verified_at',
     ];
 
     /**

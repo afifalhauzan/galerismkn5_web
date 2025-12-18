@@ -3,11 +3,67 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kelas;
+use App\Models\Jurusan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class SiswaController extends Controller
 {
+    /**
+     * Get all jurusans
+     */
+    public function getJurusans(): JsonResponse
+    {
+        try {
+            $jurusans = Jurusan::orderBy('nama')->get(['id', 'nama', 'singkatan']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $jurusans
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch jurusans',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get available students (unregistered/inactive) by kelas_id
+     */
+    public function getAvailableStudents(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'kelas_id' => 'required|exists:kelas,id'
+            ]);
+
+            $kelasId = $request->get('kelas_id');
+
+            $students = User::siswa()
+                ->unregistered() // email is null
+                ->where('is_active', false) // is_active is false
+                ->where('kelas_id', $kelasId)
+                ->select('id', 'name', 'nis')
+                ->orderBy('name')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $students
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch available students',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Get kelas by jurusan ID
      */

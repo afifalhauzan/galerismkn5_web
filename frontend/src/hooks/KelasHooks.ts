@@ -10,6 +10,13 @@ interface Kelas {
   jurusan_id: number;
 }
 
+interface AvailableStudent {
+  id: number;
+  name: string;
+  nis: string;
+  kelas_id: number;
+}
+
 /**
  * Hook to fetch kelas by jurusan ID
  */
@@ -29,6 +36,31 @@ export function useKelasByJurusan(jurusanId?: number | null) {
 
     return {
         kelas: (data as ApiResponse<Kelas[]>)?.data || [],
+        isLoading,
+        isError: error,
+        mutate,
+    };
+}
+
+/**
+ * Hook to fetch available students by kelas ID for account claiming
+ */
+export function useAvailableStudents(kelasId?: number | null) {
+    const shouldFetch = kelasId && kelasId > 0;
+    const { data, error, isLoading, mutate } = useSWR(
+        shouldFetch ? `/siswa/available?kelas_id=${kelasId}` : null,
+        fetcher,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: true,
+            dedupingInterval: 30000, // 30 seconds
+        }
+    );
+
+    console.log(`Fetched available students for kelas ID ${kelasId}:`, data);
+
+    return {
+        students: (data as ApiResponse<AvailableStudent[]>)?.data || [],
         isLoading,
         isError: error,
         mutate,

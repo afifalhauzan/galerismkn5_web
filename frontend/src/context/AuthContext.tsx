@@ -32,6 +32,8 @@ interface AuthContextType {
     isLoading: boolean;
     error: string | null;
     clearError: () => void;
+    setUser: (user: User | null) => void;
+    setToken: (token: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -213,7 +215,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             logout, 
             isLoading, 
             error, 
-            clearError 
+            clearError,
+            setUser,
+            setToken 
         }}>
             {children}
         </AuthContext.Provider>

@@ -9,6 +9,7 @@ use App\Http\Controllers\AkunController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\StudentImportController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\Auth\ClaimAccountController;
 
 /**
  * Authentication Routes
@@ -33,8 +34,15 @@ Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyek
  * Public Jurusan Routes
  * These routes provide access to department/major information for forms
  */
-Route::get('/jurusans', [JurusanController::class, 'index'])->name('jurusans.index');
+Route::get('/jurusans', [SiswaController::class, 'getJurusans'])->name('jurusans.index');
 Route::get('/jurusans/{jurusan}', [JurusanController::class, 'show'])->name('jurusans.show');
+
+/**
+ * Public Student Onboarding Routes
+ * These routes support the student account claiming process
+ */
+Route::get('/siswa/available', [SiswaController::class, 'getAvailableStudents'])->name('siswa.available');
+Route::post('/auth/claim', [ClaimAccountController::class, 'store'])->name('auth.claim');
 
 /**
  * Public Kelas Routes
