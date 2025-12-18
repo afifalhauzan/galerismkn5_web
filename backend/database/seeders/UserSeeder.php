@@ -195,7 +195,7 @@ class UserSeeder extends Seeder
         $nisCounter = 18; // Mulai dari NIS018
 
         $jurusans = Jurusan::all();
-        $tingkatKelas = ['10', '11', '12'];
+        $tingkatKelas = ['X', 'XI', 'XII'];
         $romanNumerals = ['I', 'II', 'III'];
 
         // Loop melalui setiap kelas yang telah Anda buat dan tambahkan siswa

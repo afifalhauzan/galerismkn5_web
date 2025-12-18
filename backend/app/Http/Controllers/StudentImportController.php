@@ -119,25 +119,21 @@ class StudentImportController extends Controller
     public function downloadTemplate()
     {
         try {
-            // Create empty template with just headers
-            $headers = [
-                ['nama_lengkap', 'kelas', 'nis', 'gender'],
-            ];
-
             $filename = 'template_import_siswa.xlsx';
+            $filePath = storage_path('app/' . $filename);
 
-            // Create and download the Excel file
-            return Excel::download(new class($headers) implements FromArray {
-                protected $data;
+            // Check if template file exists
+            if (!file_exists($filePath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Template file not found. Please contact administrator.'
+                ], 404);
+            }
 
-                public function __construct($data) {
-                    $this->data = $data;
-                }
-
-                public function array(): array {
-                    return $this->data;
-                }
-            }, $filename);
+            // Return the file as download
+            return response()->download($filePath, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Template download error', [
@@ -146,7 +142,7 @@ class StudentImportController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error generating template: ' . $e->getMessage()
+                'message' => 'Error downloading template: ' . $e->getMessage()
             ], 500);
         }
     }

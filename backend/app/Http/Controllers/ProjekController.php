@@ -19,7 +19,7 @@ class ProjekController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Proyek::with(['user', 'jurusan', 'penilaian.guru']);
+            $query = Proyek::with(['user.kelas', 'jurusan', 'penilaian.guru']);
             $user = Auth::user();
 
             // Teacher-specific logic: include terkirim projects from their department
@@ -60,11 +60,14 @@ class ProjekController extends Controller
                 $query->whereYear('created_at', $year);
             }
 
-            // Filter by kelas if provided (from user relationship)
+            // Filter by kelas tingkat if provided (X, XI, XII)
             if ($request->has('kelas')) {
-                $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('kelas', $request->kelas);
-                });
+                $kelasFilter = $request->kelas;
+                if (in_array($kelasFilter, ['X', 'XI', 'XII'])) {
+                    $query->whereHas('user.kelas', function ($q) use ($kelasFilter) {
+                        $q->where('tingkat', $kelasFilter);
+                    });
+                }
             }
 
             // Search by title or description
@@ -261,7 +264,7 @@ class ProjekController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $proyek = Proyek::with(['user', 'jurusan', 'penilaian.guru'])->findOrFail($id);
+            $proyek = Proyek::with(['user.kelas', 'jurusan', 'penilaian.guru'])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
@@ -491,7 +494,7 @@ class ProjekController extends Controller
                 ], 403);
             }
 
-            $query = Proyek::with(['user', 'jurusan'])
+            $query = Proyek::with(['user.kelas', 'jurusan'])
                 ->where('status', 'terkirim')
                 ->where('jurusan_id', $user->jurusan_id)
                 ->whereDoesntHave('penilaian'); // Projects without any assessment
@@ -511,11 +514,14 @@ class ProjekController extends Controller
                 $query->whereYear('created_at', $year);
             }
 
-            // Filter by kelas if provided (from user relationship)
+            // Filter by kelas tingkat if provided (X, XI, XII)
             if ($request->has('kelas')) {
-                $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('kelas', $request->kelas);
-                });
+                $kelasFilter = $request->kelas;
+                if (in_array($kelasFilter, ['X', 'XI', 'XII'])) {
+                    $query->whereHas('user.kelas', function ($q) use ($kelasFilter) {
+                        $q->where('tingkat', $kelasFilter);
+                    });
+                }
             }
 
             // Pagination
@@ -556,7 +562,7 @@ class ProjekController extends Controller
     public function best(): JsonResponse
     {
         try {
-            $proyeks = Proyek::with(['user', 'jurusan', 'penilaian.guru'])
+            $proyeks = Proyek::with(['user.kelas', 'jurusan', 'penilaian.guru'])
                 ->whereHas('penilaian', function ($query) {
                     $query->where('bintang', 5);
                 })
@@ -584,7 +590,7 @@ class ProjekController extends Controller
     public function latest(): JsonResponse
     {
         try {
-            $proyeks = Proyek::with(['user', 'jurusan', 'penilaian.guru'])
+            $proyeks = Proyek::with(['user.kelas', 'jurusan', 'penilaian.guru'])
                 ->where('status', 'dinilai') // Only show graded projects
                 ->latest()
                 ->take(5)

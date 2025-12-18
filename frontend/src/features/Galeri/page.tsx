@@ -12,7 +12,7 @@ import Pagination from "./components/Pagination";
 const YEARS = Array.from({ length: 11 }, (_, i) => 2015 + i);
 
 // Kelas options
-const KELAS_OPTIONS = ["10", "11", "12"];
+const KELAS_OPTIONS = ["X", "XI", "XII"];
 
 function GaleriContent() {
     const router = useRouter();

@@ -24,8 +24,7 @@ class ProyekSeeder extends Seeder
                 'tautan_proyek' => 'https://github.com/bambangsudiro/absensi-qr',
                 'image_url' => 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
-                'nis_nip' => 'NIS007',
-                'jurusan_id' => 1,
+                'nis_nip' => 'NIS020',
             ],
             [
                 'judul' => 'Sistem Informasi Perpustakaan',
@@ -33,8 +32,7 @@ class ProyekSeeder extends Seeder
                 'tautan_proyek' => 'https://github.com/andipratama/sistem-perpustakaan',
                 'image_url' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
-                'nis_nip' => 'NIS001',
-                'jurusan_id' => 1,
+                'nis_nip' => 'NIS021',
             ],
             [
                 'judul' => 'E-Commerce Sederhana',
@@ -42,19 +40,17 @@ class ProyekSeeder extends Seeder
                 'tautan_proyek' => 'https://github.com/dewisari/ecommerce-app',
                 'image_url' => 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
-                'nis_nip' => 'NIS002',
-                'jurusan_id' => 1,
+                'nis_nip' => 'NIS022',
             ],
 
-            // --- TKJ (ID 2) ---
+            // --- TKJT (ID 2) ---
             [
                 'judul' => 'Monitoring Jaringan Komputer',
                 'deskripsi' => 'Sistem monitoring untuk memantau status perangkat jaringan di lab komputer. Menggunakan SNMP untuk monitoring real-time.',
                 'tautan_proyek' => 'https://github.com/rizkyramadhan/network-monitoring',
                 'image_url' => 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
-                'nis_nip' => 'NIS003',
-                'jurusan_id' => 2,
+                'nis_nip' => 'NIS004',
             ],
             [
                 'judul' => 'Konfigurasi Server Web',
@@ -62,17 +58,15 @@ class ProyekSeeder extends Seeder
                 'tautan_proyek' => 'https://github.com/mayasari/web-server-config',
                 'image_url' => 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
-                'nis_nip' => 'NIS004',
-                'jurusan_id' => 2,
+                'nis_nip' => 'NIS005',
             ],
             [
                 'judul' => 'Jaringan Wireless Skala Sekolah',
                 'deskripsi' => 'Perancangan topologi dan konfigurasi jaringan wireless di lingkungan sekolah menggunakan Mikrotik.',
                 'tautan_proyek' => 'https://github.com/cahyoutomo/wireless-skala-sekolah',
                 'image_url' => 'https://images.unsplash.com/photo-1599385552718-450f375c35f6?w=500&h=300&fit=crop',
-                'status' => 'terkirim', // **PERBAIKAN: Diubah dari 'draft' menjadi 'terkirim'**
-                'nis_nip' => 'NIS008',
-                'jurusan_id' => 2,
+                'status' => 'terkirim',
+                'nis_nip' => 'NIS006',
             ],
 
             // --- DKV (ID 3) ---
@@ -82,8 +76,7 @@ class ProyekSeeder extends Seeder
                 'tautan_proyek' => 'https://behance.net/jokosusilo/brand-design-smkn5',
                 'image_url' => 'https://images.unsplash.com/photo-1544256718-3c306d8601c0?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
-                'nis_nip' => 'NIS005',
-                'jurusan_id' => 3,
+                'nis_nip' => 'NIS007',
             ],
             [
                 'judul' => 'Infografis Pencegahan COVID-19',
@@ -91,8 +84,7 @@ class ProyekSeeder extends Seeder
                 'tautan_proyek' => 'https://dribbble.com/rinawati/covid-infographics',
                 'image_url' => 'https://images.unsplash.com/photo-1620288229410-d0d473b18c5e?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
-                'nis_nip' => 'NIS006',
-                'jurusan_id' => 3,
+                'nis_nip' => 'NIS008',
             ],
             [
                 'judul' => 'Prototype Aplikasi Mobile Sekolah',
@@ -101,7 +93,6 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1626019554316-24e037c688c3?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
                 'nis_nip' => 'NIS009',
-                'jurusan_id' => 3,
             ],
 
             // --- Animasi (ID 4) ---
@@ -112,7 +103,6 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1588692795893-6c7c0f16e3b5?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
                 'nis_nip' => 'NIS010',
-                'jurusan_id' => 4,
             ],
             [
                 'judul' => 'Motion Graphics Profil Sekolah',
@@ -121,19 +111,9 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1558981408-db0ecd4a317e?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
                 'nis_nip' => 'NIS011',
-                'jurusan_id' => 4,
-            ],
-            [
-                'judul' => 'Model 3D Karakter Maskot Sekolah',
-                'deskripsi' => 'Pembuatan model 3D karakter maskot sekolah siap animasi. Dibuat menggunakan Blender.',
-                'tautan_proyek' => 'https://artstation.com/tomi-maskot',
-                'image_url' => 'https://images.unsplash.com/photo-1616782358984-2579b291583a?w=500&h=300&fit=crop',
-                'status' => 'terkirim',
-                'nis_nip' => 'NIS010',
-                'jurusan_id' => 4,
             ],
 
-            // --- Kriya Kayu (ID 5) ---
+            // --- Kriya Kreatif Kayu & Rotan (ID 5) ---
             [
                 'judul' => 'Desain Kursi Ergonomis Lipat',
                 'deskripsi' => 'Perancangan dan pembuatan prototipe kursi belajar lipat yang ergonomis dari kayu jati Belanda.',
@@ -141,7 +121,6 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1517436329497-2e1c3a6d9b9c?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
                 'nis_nip' => 'NIS012',
-                'jurusan_id' => 5,
             ],
             [
                 'judul' => 'Maket Rumah Adat Jawa',
@@ -150,19 +129,9 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1582046808794-d4b65a5e305e?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
                 'nis_nip' => 'NIS012',
-                'jurusan_id' => 5,
-            ],
-            [
-                'judul' => 'Hiasan Dinding Geometris Kayu',
-                'deskripsi' => 'Produk kriya kayu berupa hiasan dinding dengan pola geometris modern menggunakan teknik laser-cut dan finishing natural.',
-                'tautan_proyek' => 'https://tokopedia.com/kriya-slamet/hiasan-geometris',
-                'image_url' => 'https://images.unsplash.com/photo-1596706788874-5e5d3c8c72b2?w=500&h=300&fit=crop',
-                'status' => 'terkirim',
-                'nis_nip' => 'NIS012',
-                'jurusan_id' => 5,
             ],
 
-            // --- Kriya Tekstil (ID 6) ---
+            // --- Kriya Kreatif Batik & Tekstil (ID 6) ---
             [
                 'judul' => 'Kain Batik Motif Flora Sekolah',
                 'deskripsi' => 'Perancangan dan pembuatan kain batik tulis dengan motif flora khas lingkungan sekolah.',
@@ -170,7 +139,6 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1581005891393-2c1b1c1d1a1b?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
                 'nis_nip' => 'NIS013',
-                'jurusan_id' => 6,
             ],
             [
                 'judul' => 'Taplak Meja Tenun Ikat Modern',
@@ -179,19 +147,9 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1587522533031-158c5f590b1e?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
                 'nis_nip' => 'NIS013',
-                'jurusan_id' => 6,
-            ],
-            [
-                'judul' => 'Aplikasi Sulam Benang di Jaket Denim',
-                'deskripsi' => 'Proyek kreatif aplikasi sulaman tangan dengan teknik cross-stitch pada jaket denim.',
-                'tautan_proyek' => 'https://drive.google.com/nisa-tekstil/sulam-denim',
-                'image_url' => 'https://images.unsplash.com/photo-1511993215234-a690e54b68f5?w=500&h=300&fit=crop',
-                'status' => 'terkirim',
-                'nis_nip' => 'NIS013',
-                'jurusan_id' => 6,
             ],
 
-            // --- Kriya Keramik (ID 7) ---
+            // --- Kriya Kreatif Keramik (ID 7) ---
             [
                 'judul' => 'Set Peralatan Makan Keramik Glaze',
                 'deskripsi' => 'Pembuatan 4 set peralatan makan (piring, mangkuk, cangkir) dari keramik dengan teknik glazing warna-warni.',
@@ -199,28 +157,17 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1563825838491-9e7314d3f5e5?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
                 'nis_nip' => 'NIS014',
-                'jurusan_id' => 7,
             ],
             [
                 'judul' => 'Vas Bunga Abstrak dari Tanah Liat',
                 'deskripsi' => 'Pembuatan vas bunga dengan bentuk non-tradisional menggunakan teknik hand-building dan tekstur kasar.',
                 'tautan_proyek' => 'https://tokopedia.com/kriya-fajar/vas-abstrak',
                 'image_url' => 'https://images.unsplash.com/photo-1601051515250-8b0b8c8d8c3f?w=500&h=300&fit=crop',
-                'status' => 'terkirim', // **PERBAIKAN: Diubah dari 'draft' menjadi 'terkirim'**
-                'nis_nip' => 'NIS014',
-                'jurusan_id' => 7,
-            ],
-            [
-                'judul' => 'Relief Dinding Keramik Motif Nusantara',
-                'deskripsi' => 'Relief dinding berukuran 1x1 meter dengan motif ukiran tradisional dari berbagai daerah di Nusantara.',
-                'tautan_proyek' => 'https://drive.google.com/fajar/relief-nusantara',
-                'image_url' => 'https://images.unsplash.com/photo-1596706788874-5e5d3c8c72b2?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
                 'nis_nip' => 'NIS014',
-                'jurusan_id' => 7,
             ],
 
-            // --- Tata Busana (ID 8) ---
+            // --- Desain dan Produksi Busana (ID 8) ---
             [
                 'judul' => 'Perancangan Busana Pesta Malam',
                 'deskripsi' => 'Desain dan pembuatan gaun pesta malam dengan teknik draperi dan aplikasi payet. Dilengkapi dengan dokumentasi proses menjahit.',
@@ -228,7 +175,6 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1543888514-61c16928738b?w=500&h=300&fit=crop',
                 'status' => 'terkirim',
                 'nis_nip' => 'NIS015',
-                'jurusan_id' => 8,
             ],
             [
                 'judul' => 'Koleksi Busana Muslim Ready-to-Wear',
@@ -237,16 +183,6 @@ class ProyekSeeder extends Seeder
                 'image_url' => 'https://images.unsplash.com/photo-1583091001402-45e31e5f8b9e?w=500&h=300&fit=crop',
                 'status' => 'dinilai',
                 'nis_nip' => 'NIS015',
-                'jurusan_id' => 8,
-            ],
-            [
-                'judul' => 'Sistem Informasi Pengukuran Pakaian',
-                'deskripsi' => 'Aplikasi sederhana berbasis web untuk mencatat dan mengelola data ukuran pelanggan. Dibuat dengan HTML, CSS (TailwindCSS), dan JavaScript.',
-                'tautan_proyek' => 'https://github.com/gita-kirana/sistem-ukur',
-                'image_url' => 'https://images.unsplash.com/photo-1583911048474-067980f7f3f2?w=500&h=300&fit=crop',
-                'status' => 'terkirim',
-                'nis_nip' => 'NIS015',
-                'jurusan_id' => 8,
             ],
         ];
 
@@ -254,14 +190,13 @@ class ProyekSeeder extends Seeder
             $siswa = $siswaUsers->where('nis_nip', $data['nis_nip'])->first();
 
             if ($siswa) {
-                // Hapus nis_nip sebelum create, karena kolom itu tidak ada di tabel 'proyeks'
-                // Ini mengatasi error 'has no column named nis_nip'
+                // Remove nis_nip from data as it's not a column in proyeks table
                 $dataProyek = $data;
                 unset($dataProyek['nis_nip']);
 
                 Proyek::create([
                     'user_id' => $siswa->id,
-                    'jurusan_id' => $siswa->jurusan_id, // Menggunakan jurusan_id dari siswa (lebih aman)
+                    'jurusan_id' => $siswa->jurusan_id, // Use siswa's jurusan_id for consistency
                     'judul' => $dataProyek['judul'],
                     'deskripsi' => $dataProyek['deskripsi'],
                     'tautan_proyek' => $dataProyek['tautan_proyek'],

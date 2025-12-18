@@ -26,7 +26,7 @@ class PenilaianController extends Controller
             ], 403);
         }
 
-        $penilaians = Penilaian::with(['proyek.user', 'guru'])
+        $penilaians = Penilaian::with(['proyek.user.kelas', 'guru'])
             ->where('guru_id', $user->id)
             ->get();
 
@@ -108,7 +108,7 @@ class PenilaianController extends Controller
      */
     public function show(string $id)
     {
-        $penilaian = Penilaian::with(['proyek.user', 'guru'])->findOrFail($id);
+        $penilaian = Penilaian::with(['proyek.user.kelas', 'guru'])->findOrFail($id);
         $user = Auth::user();
 
         // Check permissions: only the grader, project owner, or admin can view
