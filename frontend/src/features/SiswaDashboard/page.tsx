@@ -53,7 +53,7 @@ export default function SiswaDashboard({ user, logout }: { user: any, logout: ()
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-500">Kelas</label>
-                                <p className="text-sm text-gray-900 mt-1">{user.kelas || 'Kelas tidak ditemukan'}</p>
+                                <p className="text-sm text-gray-900 mt-1">{user.kelas?.nama_kelas || 'Kelas tidak ditemukan'}</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-500">Email</label>

@@ -8,6 +8,7 @@ use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\StudentImportController;
+use App\Http\Controllers\SiswaController;
 
 /**
  * Authentication Routes
@@ -34,6 +35,13 @@ Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyek
  */
 Route::get('/jurusans', [JurusanController::class, 'index'])->name('jurusans.index');
 Route::get('/jurusans/{jurusan}', [JurusanController::class, 'show'])->name('jurusans.show');
+
+/**
+ * Public Kelas Routes
+ * These routes provide access to class information for forms
+ */
+Route::get('/kelas', [SiswaController::class, 'getAllKelas'])->name('kelas.index');
+Route::get('/kelas/by-jurusan', [SiswaController::class, 'getKelasByJurusan'])->name('kelas.by-jurusan');
 
 /**
  * Public Template Download

@@ -28,7 +28,7 @@ class AkunController extends Controller
     public function index(Request $request): JsonResponse
     {
         $this->checkAdminAccess();
-        $query = User::with('jurusan');
+        $query = User::with(['jurusan', 'kelas']);
 
         // Filter by role (guru or siswa only)
         if ($request->has('role') && in_array($request->role, ['guru', 'siswa'])) {
@@ -44,8 +44,8 @@ class AkunController extends Controller
         }
 
         // Filter by kelas (for siswa)
-        if ($request->has('kelas') && $request->kelas) {
-            $query->where('kelas', $request->kelas);
+        if ($request->has('kelas_id') && $request->kelas_id) {
+            $query->where('kelas_id', $request->kelas_id);
         }
 
         // Search functionality
@@ -89,7 +89,7 @@ class AkunController extends Controller
             'role' => 'required|in:guru,siswa',
             'nis_nip' => 'required|string|max:20|unique:users',
             'jurusan_id' => 'required|exists:jurusans,id',
-            'kelas' => 'required_if:role,siswa|nullable|string|max:10',
+            'kelas_id' => 'required_if:role,siswa|nullable|exists:kelas,id',
         ]);
 
         if ($validator->fails()) {
@@ -107,10 +107,10 @@ class AkunController extends Controller
             'role' => $request->role,
             'nis_nip' => $request->nis_nip,
             'jurusan_id' => $request->jurusan_id,
-            'kelas' => $request->role === 'siswa' ? $request->kelas : null,
+            'kelas_id' => $request->role === 'siswa' ? $request->kelas_id : null,
         ]);
 
-        $user->load('jurusan');
+        $user->load(['jurusan', 'kelas']);
 
         return response()->json([
             'success' => true,
@@ -125,7 +125,7 @@ class AkunController extends Controller
     public function show($id): JsonResponse
     {
         $this->checkAdminAccess();
-        $user = User::with('jurusan')->find($id);
+        $user = User::with(['jurusan', 'kelas'])->find($id);
 
         if (!$user || $user->role === 'admin') {
             return response()->json([
@@ -162,7 +162,7 @@ class AkunController extends Controller
             'role' => 'sometimes|required|in:guru,siswa',
             'nis_nip' => 'sometimes|required|string|max:20|unique:users,nis_nip,' . $id,
             'jurusan_id' => 'sometimes|required|exists:jurusans,id',
-            'kelas' => 'sometimes|nullable|string|max:10',
+            'kelas_id' => 'sometimes|nullable|exists:kelas,id',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -175,20 +175,20 @@ class AkunController extends Controller
             ], 422);
         }
 
-        $updateData = $request->only(['name', 'email', 'role', 'nis_nip', 'jurusan_id', 'kelas']);
+        $updateData = $request->only(['name', 'email', 'role', 'nis_nip', 'jurusan_id', 'kelas_id']);
 
         // Hash password if provided
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
         }
 
-        // Set kelas to null for guru role
+        // Set kelas_id to null for guru role
         if ($request->role === 'guru') {
-            $updateData['kelas'] = null;
+            $updateData['kelas_id'] = null;
         }
 
         $user->update($updateData);
-        $user->load('jurusan');
+        $user->load(['jurusan', 'kelas']);
 
         return response()->json([
             'success' => true,

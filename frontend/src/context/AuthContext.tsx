@@ -5,18 +5,22 @@ import Cookies from 'js-cookie';
 import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { Jurusan } from "@/types/proyek";
+import { Kelas } from "@/types/proyek";
 
-interface User {
+export interface User {
     id: number;
     name: string;
     email: string;
-    role: string;
+    email_verified_at?: string;
+    role: 'admin' | 'guru' | 'siswa';
+    nis_nip?: string;
     jurusan_id?: number;
     jurusan_name?: string;
-    jurusan?: Jurusan
-    kelas?: string;
-    isGuru: () => boolean;
-    isSiswa: () => boolean;
+    jurusan?: Jurusan;
+    kelas_id?: number;
+    kelas?: Kelas;
+    created_at: string;
+    updated_at: string;
 }
 
 interface AuthContextType {

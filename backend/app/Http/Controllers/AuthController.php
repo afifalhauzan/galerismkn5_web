@@ -23,7 +23,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', 'in:guru,siswa'],
             'jurusan_id' => ['required', 'exists:jurusans,id'],
-            'kelas' => ['required_if:role,siswa', 'in:10,11,12'],
+            'kelas_id' => ['required_if:role,siswa', 'exists:kelas,id'],
         ]);
 
         $user = User::create([
@@ -33,11 +33,11 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'jurusan_id' => $request->jurusan_id,
-            'kelas' => $request->role === 'siswa' ? $request->kelas : null,
+            'kelas_id' => $request->role === 'siswa' ? $request->kelas_id : null,
         ]);
 
-        // Load jurusan relationship
-        $user->load('jurusan');
+        // Load relationships
+        $user->load(['jurusan', 'kelas']);
 
         // Add jurusan_name to user data
         $userData = $user->toArray();
@@ -69,7 +69,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = User::where('email', $request->email)->with('jurusan')->firstOrFail();
+        $user = User::where('email', $request->email)->with(['jurusan', 'kelas'])->firstOrFail();
 
         // Add jurusan_name to user data
         $userData = $user->toArray();
@@ -90,7 +90,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->load('jurusan');
+        $user = $request->user()->load(['jurusan', 'kelas']);
 
         // Add jurusan_name to user data
         $userData = $user->toArray();

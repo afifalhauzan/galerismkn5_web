@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { User, CreateUserData, UpdateUserData, Jurusan } from "@/types/proyek";
+import { useKelasByJurusan } from "@/hooks/KelasHooks";
 
 interface UserModalProps {
   isOpen: boolean;
@@ -21,8 +22,11 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
     role: 'siswa',
     nis_nip: '',
     jurusan_id: 0,
-    kelas: ''
+    kelas_id: 0
   });
+
+  // Fetch kelas based on selected jurusan
+  const { kelas, isLoading: kelasLoading, isError: kelasError } = useKelasByJurusan(formData.jurusan_id > 0 ? formData.jurusan_id : null);
 
   // Use error prop for backend errors and local state for frontend validation
   const [frontendErrors, setFrontendErrors] = useState<Record<string, string>>({});
@@ -34,13 +38,13 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
       setFrontendErrors({}); // Clear frontend validation errors
       if (user) {
         setFormData({
-          name: user.name,
-          email: user.email,
+          name: user.name || '',
+          email: user.email || '',
           password: '',
           role: user.role as 'guru' | 'siswa',
           nis_nip: user.nis_nip || '',
           jurusan_id: user.jurusan_id || 0,
-          kelas: user.kelas || ''
+          kelas_id: user.kelas_id || 0
         });
       } else {
         setFormData({
@@ -50,7 +54,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
           role: 'siswa',
           nis_nip: '',
           jurusan_id: 0,
-          kelas: ''
+          kelas_id: 0
         });
       }
     }
@@ -83,8 +87,8 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
       validationErrors.jurusan_id = 'Jurusan harus dipilih';
     }
     
-    if (formData.role === 'siswa' && !formData.kelas?.trim()) {
-      validationErrors.kelas = 'Kelas harus dipilih';
+    if (formData.role === 'siswa' && (!formData.kelas_id || formData.kelas_id === 0)) {
+      validationErrors.kelas_id = 'Kelas harus dipilih';
     }
 
     // If there are validation errors, set them and don't submit
@@ -101,9 +105,9 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
         delete (submitData as any).password;
       }
       
-      // Set kelas to empty if role is guru
+      // Set kelas_id to undefined if role is guru
       if (submitData.role === 'guru') {
-        submitData.kelas = '';
+        submitData.kelas_id = undefined;
       }
 
       await onSubmit(submitData);
@@ -272,7 +276,12 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               id="jurusan_id"
               value={formData.jurusan_id}
               onChange={(e) => {
-                setFormData({ ...formData, jurusan_id: parseInt(e.target.value) });
+                const newJurusanId = parseInt(e.target.value);
+                setFormData({ 
+                  ...formData, 
+                  jurusan_id: newJurusanId,
+                  kelas_id: 0 // Reset kelas when jurusan changes
+                });
                 if (frontendErrors.jurusan_id) {
                   setFrontendErrors({ ...frontendErrors, jurusan_id: '' });
                 }
@@ -295,31 +304,42 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
           {/* Kelas (only for siswa) */}
           {formData.role === 'siswa' && (
             <div>
-              <label htmlFor="kelas" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="kelas_id" className="block text-sm font-medium text-gray-700 mb-1">
                 Kelas *
               </label>
               <select
-                id="kelas"
-                value={formData.kelas}
+                id="kelas_id"
+                value={formData.kelas_id || 0}
                 onChange={(e) => {
-                  setFormData({ ...formData, kelas: e.target.value });
-                  if (frontendErrors.kelas) {
-                    setFrontendErrors({ ...frontendErrors, kelas: '' });
+                  setFormData({ ...formData, kelas_id: parseInt(e.target.value) });
+                  if (frontendErrors.kelas_id) {
+                    setFrontendErrors({ ...frontendErrors, kelas_id: '' });
                   }
                 }}
                 className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.kelas ? 'border-red-500' : 'border-gray-300'
+                  errors.kelas_id ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
+                disabled={kelasLoading || formData.jurusan_id === 0}
               >
-                <option value="">Pilih Kelas</option>
-                {KELAS_OPTIONS.map((kelas) => (
-                  <option key={kelas} value={kelas}>
-                    Kelas {kelas}
+                <option value={0}>
+                  {formData.jurusan_id === 0 
+                    ? 'Pilih jurusan terlebih dahulu' 
+                    : kelasLoading 
+                      ? 'Memuat kelas...' 
+                      : 'Pilih Kelas'
+                  }
+                </option>
+                {kelas.map((kelasItem) => (
+                  <option key={kelasItem.id} value={kelasItem.id}>
+                    {kelasItem.nama_kelas}
                   </option>
                 ))}
               </select>
-              {errors.kelas && <p className="mt-1 text-sm text-red-600">{errors.kelas}</p>}
+              {errors.kelas_id && <p className="mt-1 text-sm text-red-600">{errors.kelas_id}</p>}
+              {formData.jurusan_id > 0 && kelas.length === 0 && !kelasLoading && (
+                <p className="mt-1 text-sm text-yellow-600">Belum ada kelas untuk jurusan ini</p>
+              )}
             </div>
           )}
 

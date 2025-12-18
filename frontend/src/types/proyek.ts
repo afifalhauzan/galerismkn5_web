@@ -8,7 +8,8 @@ export interface User {
     jurusan_id?: number;
     jurusan_name?: string;
     jurusan?: Jurusan;
-    kelas?: string;
+    kelas_id?: number;
+    kelas?: Kelas;
     created_at: string;
     updated_at: string;
 }
@@ -20,6 +21,17 @@ export interface Jurusan {
     deskripsi?: string;
     created_at: string;
     updated_at: string;
+}
+
+export interface Kelas {
+    id: number;
+    nama_kelas: string;
+    tingkat: string;
+    nomor_kelas: number;
+    jurusan_id: number;
+    jurusan?: Jurusan;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface Penilaian {
@@ -150,7 +162,7 @@ export interface CreateUserData {
     role: 'guru' | 'siswa';
     nis_nip: string;
     jurusan_id: number;
-    kelas?: string;
+    kelas_id?: number;
 }
 
 export interface UpdateUserData extends Partial<CreateUserData> {
