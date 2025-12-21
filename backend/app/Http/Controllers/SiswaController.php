@@ -81,8 +81,8 @@ class SiswaController extends Controller
 
             $kelas = Kelas::where('jurusan_id', $jurusanId)
                 ->orderBy('tingkat')
-                ->orderBy('nomor_kelas')
-                ->get(['id', 'nama_kelas', 'tingkat', 'nomor_kelas']);
+                ->orderBy('nama_kelas')
+                ->get(['id', 'nama_kelas', 'tingkat']);
 
             return response()->json([
                 'success' => true,
@@ -106,8 +106,8 @@ class SiswaController extends Controller
             $kelas = Kelas::with('jurusan:id,nama')
                 ->orderBy('tingkat')
                 ->orderBy('jurusan_id')
-                ->orderBy('nomor_kelas')
-                ->get(['id', 'nama_kelas', 'tingkat', 'nomor_kelas', 'jurusan_id']);
+                ->orderBy('nama_kelas')
+                ->get(['id', 'nama_kelas', 'tingkat', 'jurusan_id']);
 
             return response()->json([
                 'success' => true,

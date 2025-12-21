@@ -42,14 +42,12 @@ class SiswaControllerTest extends TestCase
         $this->kelas1 = Kelas::create([
             'nama_kelas' => 'X RPL 1',
             'tingkat' => 'X',
-            'nomor_kelas' => 1,
             'jurusan_id' => $this->jurusan1->id
         ]);
 
         $this->kelas2 = Kelas::create([
             'nama_kelas' => 'XI TKJ 1', 
             'tingkat' => 'XI',
-            'nomor_kelas' => 1,
             'jurusan_id' => $this->jurusan2->id
         ]);
     }

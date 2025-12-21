@@ -6,7 +6,6 @@ interface Kelas {
   id: number;
   nama_kelas: string;
   tingkat: string;
-  nomor_kelas: number;
   jurusan_id: number;
 }
 
