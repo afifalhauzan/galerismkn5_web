@@ -122,22 +122,49 @@ class StudentImportController extends Controller
             $filename = 'template_import_siswa.xlsx';
             $filePath = storage_path('app/' . $filename);
 
-            // Check if template file exists
-            if (!file_exists($filePath)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Template file not found. Please contact administrator.'
-                ], 404);
+            // If static template file exists, use it
+            if (file_exists($filePath)) {
+                return response()->download($filePath, $filename, [
+                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                ]);
             }
 
-            // Return the file as download
-            return response()->download($filePath, $filename, [
+            // Generate template dynamically if static file doesn't exist
+            $templateData = [
+                ['No', 'NIS', 'Nama Lengkap', 'Jenis Kelamin', 'Nama Kelas'], // Header row
+                ['1', '2024001', 'John Doe', 'L', '10 RPL I'], // Example data
+                ['2', '2024002', 'Jane Smith', 'P', '11 TKJT II'], // Example data
+                ['3', '2024003', 'Ahmad Rahman', 'L', '12 DKV I'], // Example data
+            ];
+
+            // Create a temporary file with the template
+            $tempFile = tempnam(sys_get_temp_dir(), 'template_siswa');
+            
+            // Use a simple implementation with FromArray
+            $export = new class($templateData) implements FromArray {
+                private $data;
+                
+                public function __construct($data) {
+                    $this->data = $data;
+                }
+                
+                public function array(): array {
+                    return $this->data;
+                }
+            };
+
+            Excel::store($export, basename($tempFile) . '.xlsx', 'local');
+            $generatedPath = storage_path('app/' . basename($tempFile) . '.xlsx');
+
+            // Return the generated file
+            return response()->download($generatedPath, $filename, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            ]);
+            ])->deleteFileAfterSend(true);
 
         } catch (\Exception $e) {
             Log::error('Template download error', [
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([

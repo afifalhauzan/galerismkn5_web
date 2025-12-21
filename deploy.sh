@@ -28,6 +28,10 @@ docker compose -f docker-compose.prod.yaml exec backend php artisan view:cache
 # Generate Storage Link
 docker compose -f docker-compose.prod.yaml exec backend php artisan storage:link
 
+# Ensure Excel import template exists
+echo "📋 Ensuring Excel import template exists..."
+docker compose -f docker-compose.prod.yaml exec backend test -f /var/www/html/storage/app/template_import_siswa.xlsx || echo "Template file not found, will be generated dynamically when requested"
+
 # Migrasi Database
 docker compose -f docker-compose.prod.yaml exec backend php artisan migrate --force
 

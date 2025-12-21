@@ -58,6 +58,10 @@ COPY . .
 # Install PHP dependencies with dev dependencies for seeding
 RUN composer install --optimize-autoloader --no-interaction
 
+# Ensure Excel import template exists in storage
+RUN mkdir -p /var/www/html/storage/app \
+    && test -f /var/www/html/storage/app/template_import_siswa.xlsx || echo "Template will be generated dynamically"
+
 # Run database migrations and seeders (if needed)
 # Note: This requires database connection, so it's better to run these commands after container starts
 

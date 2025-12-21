@@ -65,13 +65,20 @@ export function useExcelMutations() {
     } = useSWRMutation(
         '/download-template',
         async (url: string) => {
-            const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-            const response = await fetch(`${baseURL}${url}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                },
-            });
+            // Use the configured axios instance for proper auth and base URL handling
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${url}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        // Add authorization header if token exists
+                        ...(typeof window !== 'undefined' && localStorage.getItem('token') && {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        })
+                    },
+                }
+            );
 
             if (!response.ok) {
                 throw new Error(`Template download failed: ${response.status} ${response.statusText}`);
@@ -122,6 +129,8 @@ export function useExcelMutations() {
             a.download = 'template_import_siswa.xlsx';
             document.body.appendChild(a);
             a.click();
+
+            console.log('link: ', a.href);
             
             // Cleanup
             window.URL.revokeObjectURL(url);
