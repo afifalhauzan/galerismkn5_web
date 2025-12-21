@@ -168,7 +168,7 @@ export default function StatsPage() {
                                     </div>
                                 </div>
                                 
-                                <div className="flex space-x-2 print:hidden">
+                                <div className="flex flex-col md:flex-row space-x-2 print:hidden">
                                     <button
                                         onClick={fetchStats}
                                         disabled={isLoading}

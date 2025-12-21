@@ -314,7 +314,7 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
                         {/* File/Link Field */}
                         <div>
                             <label htmlFor="tautan_proyek" className="block text-sm font-medium text-gray-700 mb-2">
-                                File/Link Proyek
+                                File/Link Proyek <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="url"
@@ -332,7 +332,7 @@ export default function AddKaryaSiswa({ user, logout }: { user: any; logout: () 
                                 <p className="mt-1 text-sm text-red-600">{errors.tautan_proyek}</p>
                             )}
                             <p className="mt-1 text-sm text-gray-500">
-                                Opsional. Tambahkan link ke GitHub, portfolio online, atau platform lainnya.
+                                Wajib. Tambahkan link ke GitHub, portfolio online, atau platform lainnya.
                             </p>
                         </div>
 
