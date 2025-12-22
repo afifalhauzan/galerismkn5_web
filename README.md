@@ -64,10 +64,10 @@ cd galerismkn5_web
 2. Konfigurasi Environment
 Salin file .env.example menjadi .env di masing-masing folder (backend & frontend) dan sesuaikan variabelnya (DB Credentials, APP_KEY, API URL).
 
-3. Build dan Jalankan Container
-docker compose up -d --build
+3. Build dan Jalankan script : chmod +x deploy.sh
+./deploy.sh
 
-4. Setup Database (Sekali Saja)
+5. Setup Database (Sekali Saja)
 docker compose exec backend php artisan migrate --seed
 
 ---
@@ -90,3 +90,4 @@ karya.smkn5malang.sch.id {
 ## 📄 Lisensi
 
 Dikembangkan oleh Tim Capstone/PKL SMKN 5 Malang (2025).
+
