@@ -130,11 +130,11 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                             onDelete={handleDelete}
                             isDeleting={isDeleting}
                         />
-                        <ReviewSection 
+                        {/* <ReviewSection 
                             proyek={proyek} 
                             showReview={showReview} 
                             setShowReview={setShowReview} 
-                        />
+                        /> */}
                     </div>
                 </div>
             </div>

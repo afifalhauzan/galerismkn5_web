@@ -49,7 +49,7 @@ export default function Navbar({ className = "" }: NavbarProps) {
                             <div className="flex-shrink-0 flex items-center">
                                 <Link href="/" className="flex flex-row text-white text-xl justify-center items-center font-bold space-x-2">
                                     <Image src="/logosmkn5.png" alt="Logo" width={40} height={40} />
-                                    <h1 className="">Galeri SMKN 5</h1>
+                                    <h1 className="">Galeri SMKN 5 Malang</h1>
                                 </Link>
                             </div>
 

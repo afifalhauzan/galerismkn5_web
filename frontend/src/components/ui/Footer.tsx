@@ -63,24 +63,24 @@ export default function Footer() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div className="space-y-2">
                             <Link href="" className="block text-gray-200 hover:text-white transition-colors">
-                                <span className="mr-2">›</span>Kriya Kayu
+                                <span className="mr-2">›</span>Kriya Kreatif Kayu & Rotan
                             </Link>
                             <Link href="" className="block text-gray-200 hover:text-white transition-colors">
-                                <span className="mr-2">›</span>Kriya Tekstil
+                                <span className="mr-2">›</span>Kriya Kreatif Batik & Tekstil
                             </Link>
                             <Link href="" className="block text-gray-200 hover:text-white transition-colors">
                                 <span className="mr-2">›</span>Animasi
                             </Link>
                             <Link href="" className="block text-gray-200 hover:text-white transition-colors">
-                                <span className="mr-2">›</span>TKJ
+                                <span className="mr-2">›</span>TKJT
                             </Link>
                         </div>
                         <div className="space-y-2">
                             <Link href="" className="block text-gray-200 hover:text-white transition-colors">
-                                <span className="mr-2">›</span>Kriya Keramik
+                                <span className="mr-2">›</span>Kriya Kreatif Keramik
                             </Link>
                             <Link href="" className="block text-gray-200 hover:text-white transition-colors">
-                                <span className="mr-2">›</span>Tata Busana
+                                <span className="mr-2">›</span>Desain dan Produksi Busana
                             </Link>
                             <Link href="" className="block text-gray-200 hover:text-white transition-colors">
                                 <span className="mr-2">›</span>RPL

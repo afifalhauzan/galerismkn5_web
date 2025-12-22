@@ -7,6 +7,7 @@ import { useJurusans } from "@/hooks/JurusanHooks";
 import FilterDropdown from "./components/FilterDropdown";
 import KaryaCard from "./components/KaryaCard";
 import Pagination from "./components/Pagination";
+import { MdHideImage } from "react-icons/md";
 
 // Years data from 2015 to 2025
 const YEARS = Array.from({ length: 11 }, (_, i) => 2015 + i);
@@ -177,8 +178,8 @@ function GaleriContent() {
                         {proyeks.length === 0 ? (
                             <div className="text-center py-12">
                                 <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8">
-                                    <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+                                    <svg className="mx-auto h-20 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <MdHideImage className="mx-auto h-20 w-16 text-gray-400 mb-4" />
                                     </svg>
                                     <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada karya ditemukan</h3>
                                     <p className="text-gray-600">
