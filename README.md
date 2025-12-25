@@ -1,16 +1,16 @@
-# Galeri Proyek Akhir SMKN 5 Malang
+# SMKN 5 Malang Final Project Gallery
 
-Platform terpusat untuk pengumpulan, pameran (showcase), dan penilaian proyek akhir siswa SMKN 5 Malang. Sistem ini dirancang dengan arsitektur decoupled untuk memastikan performa tinggi, keamanan data, dan skalabilitas.
+A centralized platform for collecting, showcasing, and assessing final projects of SMKN 5 Malang students. This system is designed with a decoupled architecture to ensure high performance, data security, and scalability.
 
 ---
 
-## 🚀 Fitur Utama
+## 🚀 Key Features
 
-* Public Gallery: Showcase karya siswa yang dapat diakses oleh publik tanpa login.
-* Student Dashboard: Pengunggahan tautan proyek (GDrive/Youtube/Github) dan pemantauan status nilai.
-* Teacher Dashboard: Peninjauan proyek berdasarkan jurusan dan pemberian nilai sistem bintang (1-5).
-* Super Admin (Kepsek/Waka): Manajemen pengguna dan kontrol penuh terhadap hak akses (Role Management).
-* PWA Ready: Dapat diinstal di perangkat Android/iOS untuk akses cepat seperti aplikasi native.
+* Public Gallery: Showcase student work that is publicly accessible without logging in.
+* Student Dashboard: Upload project links (GDrive/YouTube/Github) and monitor grade status.
+* Teacher Dashboard: Review projects by major and assign star ratings (1-5).
+* Super Admin (Principal/Vice Principal): User management and full control over access rights (Role Management).
+* PWA Ready: Can be installed on Android/iOS devices for quick access like a native app.
 
 ---
 
@@ -34,60 +34,58 @@ Platform terpusat untuk pengumpulan, pameran (showcase), dan penilaian proyek ak
 
 ---
 
-## 📂 Struktur Monorepo
+## 📂 Monorepo Structure
 
 .
-├── backend/            # Laravel API Source Code
-├── frontend/           # Next.js Frontend Source Code
-├── docker-compose.yml  # Docker Orchestration
+├── backend/ # Laravel API Source Code
+├── frontend/ # Next.js Frontend Source Code
+├── docker-compose.yml # Docker Orchestration
 └── README.md
 
 ---
 
-## ⚙️ Kebutuhan Server (Minimum)
+## ⚙️ Server Requirements (Minimum)
 
-* OS: Linux (Ubuntu 20.04+ direkomendasikan)
+* OS: Linux (Ubuntu 20.04+ recommended)
 * RAM: 2 GB
-* Storage: 20 GB (Hanya metadata, file utama di-host di layanan eksternal)
+* Storage: 20 GB (Metadata only, main files are hosted on an external service)
 * Dependencies: Docker Engine & Docker Compose
 
 ---
 
-## 🚀 Panduan Instalasi (Produksi)
+## 🚀 Installation Guide (Production)
 
-Sistem ini dikemas menggunakan Docker untuk memastikan isolasi lingkungan dan kemudahan deployment.
+This system is packaged using Docker to ensure environment isolation and ease of deployment.
 
-1. Kloning Repositori
+1. Clone the Repository
 git clone https://github.com/afifalhauzan/galerismkn5_web.git
 cd galerismkn5_web
 
-2. Konfigurasi Environment
-Salin file .env.example menjadi .env di masing-masing folder (backend & frontend) dan sesuaikan variabelnya (DB Credentials, APP_KEY, API URL).
+2. Configure the Environment
+Copy the .env.example file into .env in each folder (backend & frontend) and adjust the variables (DB Credentials, APP_KEY, API URL).
 
-3. Build dan Jalankan script : chmod +x deploy.sh
+3. Build and Run the script: chmod +x deploy.sh
 ./deploy.sh
 
-5. Setup Database (Sekali Saja)
+5. Setup the Database (Only Once)
 docker compose exec backend php artisan migrate --seed
 
 ---
 
-## 🌐 Konfigurasi Domain & SSL
+## 🌐 Domain & SSL Configuration
 
-Sistem ini direkomendasikan berjalan di belakang Reverse Proxy (seperti Caddy atau Nginx).
+This system is recommended to run behind a Reverse Proxy (such as Caddy or Nginx).
 
-Contoh Konfigurasi Caddyfile:
+Example Caddyfile Configuration:
 karya.smkn5malang.sch.id {
-    # Frontend (Next.js)
-    reverse_proxy localhost:3000
-    
-    # Backend API (Laravel)
-    reverse_proxy /api/* localhost:8000
-}
+# Frontend (Next.js)
+reverse_proxy localhost:3000
 
+# Backend API (Laravel)
+reverse_proxy /api/* localhost:8000
+}
 ---
 
-## 📄 Lisensi
+## 📄 License
 
-Dikembangkan oleh Tim Capstone/PKL SMKN 5 Malang (2025).
-
+Developed by the SMKN 5 Malang Capstone/PKL Team (2025).
