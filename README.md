@@ -1,6 +1,6 @@
 # SMKN 5 Malang Final Project Gallery
 
-A centralized platform for collecting, showcasing, and assessing final projects of SMKN 5 Malang students. This system is designed with a decoupled architecture to ensure high performance, data security, and scalability.
+A centralized platform for collecting, showcasing, and assessing final projects of SMKN 5 Malang students. This system is designed with a decoupled architecture to ensure scalability.
 
 ---
 
@@ -89,3 +89,4 @@ reverse_proxy /api/* localhost:8000
 ## 📄 License
 
 Developed by the SMKN 5 Malang Capstone/PKL Team (2025).
+
