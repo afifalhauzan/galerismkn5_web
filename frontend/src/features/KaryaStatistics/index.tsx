@@ -100,17 +100,17 @@ export default function KaryaStatisticsPage() {
                     
                     {/* Header Section */}
                     <div className="mb-8">
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                    <div className="bg-emerald-100 p-2 rounded-lg">
+                        <div className="bg-white rounded-lg shadow-sm p-6">
+                            <div className="flex flex-col md:flex-row items-center justify-between">
+                                <div className="flex items-center text-center md:text-left space-x-3">
+                                    <div className="hidden md:block bg-emerald-100 p-2 rounded-lg">
                                         <HiChartBar className="w-6 h-6 text-emerald-600" />
                                     </div>
                                     <div>
                                         <h1 className="text-2xl font-bold text-gray-900">
                                             Monitoring Pengumpulan Karya
                                         </h1>
-                                        <p className="text-gray-600">
+                                        <p className="text-gray-600 mt-2 md:mt-0">
                                             {stats?.user_role === 'admin' 
                                                 ? 'Statistik pengumpulan karya seluruh jurusan'
                                                 : `Statistik pengumpulan karya jurusan ${stats?.filtered_by_jurusan || 'Anda'}`
@@ -119,18 +119,18 @@ export default function KaryaStatisticsPage() {
                                     </div>
                                 </div>
                                 
-                                <div className="flex flex-col md:flex-row space-x-2 print:hidden">
+                                <div className="flex flex-row justify-between mt-4 md:mt-0 space-x-4 print:hidden">
                                     <button
                                         onClick={fetchStats}
                                         disabled={isLoading}
-                                        className="flex items-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                                        className="flex items-center w-full px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                                     >
                                         <HiRefresh className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                                         Refresh
                                     </button>
                                     <button
                                         onClick={handlePrint}
-                                        className="flex items-center px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                                        className="flex items-center w-full px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
                                     >
                                         <HiPrinter className="w-4 h-4 mr-2" />
                                         Cetak
@@ -167,7 +167,7 @@ export default function KaryaStatisticsPage() {
                             {stats && (
                                 <div className="space-y-4">
                                     {stats.data.map((jurusan) => (
-                                        <div key={jurusan.jurusan_nama} className="bg-white rounded-lg shadow-sm border">
+                                        <div key={jurusan.jurusan_nama} className="bg-white rounded-lg shadow-sm">
                                             <div 
                                                 className="p-4 cursor-pointer hover:bg-gray-50"
                                                 onClick={() => toggleJurusan(jurusan.jurusan_nama)}
@@ -222,7 +222,7 @@ export default function KaryaStatisticsPage() {
                                                                 </div>
 
                                                                 {/* Tabs */}
-                                                                <div className="flex space-x-1 mb-4">
+                                                                <div className="flex flex-col md:flex-row space-x-1 mb-4">
                                                                     <button
                                                                         onClick={() => setKelasTab(kelasKey, 'submitted')}
                                                                         className={`px-3 py-2 text-sm font-medium rounded-lg ${

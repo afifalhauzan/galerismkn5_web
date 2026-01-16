@@ -16,8 +16,8 @@ interface SummaryCardsProps {
 
 export function SummaryCards({ summary }: SummaryCardsProps) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
                 <div className="flex items-center">
                     <div className="bg-blue-100 p-2 rounded-lg">
                         <HiUsers className="w-6 h-6 text-blue-600" />
@@ -31,7 +31,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
                 <div className="flex items-center">
                     <div className="bg-emerald-100 p-2 rounded-lg">
                         <HiCheckCircle className="w-6 h-6 text-emerald-600" />
@@ -45,7 +45,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
                 <div className="flex items-center">
                     <div className="bg-orange-100 p-2 rounded-lg">
                         <HiClock className="w-6 h-6 text-orange-600" />
@@ -59,7 +59,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
                 <div className="flex items-center">
                     <div className="bg-purple-100 p-2 rounded-lg">
                         <HiChartBar className="w-6 h-6 text-purple-600" />
