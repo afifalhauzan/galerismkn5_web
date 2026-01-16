@@ -31,7 +31,7 @@ services:
       - ./backend/.env.production:/var/www/html/.env
     depends_on:
       - mysql
-      - redis
+#      - redis
     # Add Healthcheck to ensure Nginx/PHP are actually running
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
@@ -80,17 +80,17 @@ services:
     command: --default-authentication-plugin=mysql_native_password
 
   # --- Redis Cache ---
-  redis:
-    image: redis:7-alpine
-    container_name: galerismkn5_redis
-    restart: unless-stopped
-    ports:
-      - "6380:6379" # <--- CHANGED: Host 6380 maps to Container 6379
-    volumes:
-      - redis_data:/data
-    networks:
-      - galeri_network
-    command: redis-server --appendonly yes
+# redis:
+#    image: redis:7-alpine
+#    container_name: galerismkn5_redis
+#    restart: unless-stopped
+#    ports:
+#      - "6380:6379" # <--- CHANGED: Host 6380 maps to Container 6379
+#    volumes:
+#      - redis_data:/data
+#    networks:
+#      - galeri_network
+#    command: redis-server --appendonly yes
 
 volumes:
   mysql_data:
