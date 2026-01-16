@@ -33,7 +33,7 @@ export default function GuruDashboard({ user, logout }: { user: any, logout: () 
                         </div>
                     </div>
 
-                     <div className="bg-white rounded-lg shadow-sm border p-6">
+                     <div className="bg-white rounded-lg shadow-sm p-6">
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-500">Jurusan</label>
