@@ -18,6 +18,8 @@ import {
     HiRefresh
 } from "react-icons/hi";
 import { SummaryCards } from "./components/SummaryCards";
+import { SearchBar } from "./components/SearchBar";
+import { useKaryaStatisticsFilter } from "./hooks/useKaryaStatisticsFilter";
 import { StatsResponse } from "../../types/karya";
 
 export default function KaryaStatisticsPage() {
@@ -28,6 +30,21 @@ export default function KaryaStatisticsPage() {
     const [error, setError] = useState<string | null>(null);
     const [expandedJurusan, setExpandedJurusan] = useState<string[]>([]);
     const [activeKelasTab, setActiveKelasTab] = useState<Record<string, 'submitted' | 'pending'>>({});
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Filter stats based on search term
+    const filteredStats = useKaryaStatisticsFilter(stats, searchTerm);
+
+    // Auto-expand all jurusan when searching, collapse when search is cleared
+    useEffect(() => {
+        if (searchTerm.trim() && filteredStats?.data) {
+            // Expand all filtered jurusan when searching
+            setExpandedJurusan(filteredStats.data.map(j => j.jurusan_nama));
+        } else if (!searchTerm.trim() && stats?.data) {
+            // When search is cleared, collapse all except first jurusan
+            setExpandedJurusan(stats.data.length > 0 ? [stats.data[0].jurusan_nama] : []);
+        }
+    }, [searchTerm, filteredStats, stats]);
 
     // Role Guard: Redirect siswa to dashboard
     useEffect(() => {
@@ -161,12 +178,15 @@ export default function KaryaStatisticsPage() {
                     ) : (
                         <>
                             {/* Summary Cards */}
-                            {stats && <SummaryCards summary={stats.summary} />}
+                            {filteredStats && <SummaryCards summary={filteredStats.summary} />}
+
+                            {/* Search Bar */}
+                            <SearchBar onSearch={setSearchTerm} />
 
                             {/* Jurusan Accordion */}
-                            {stats && (
+                            {filteredStats && (
                                 <div className="space-y-4">
-                                    {stats.data.map((jurusan) => (
+                                    {filteredStats.data.map((jurusan) => (
                                         <div key={jurusan.jurusan_nama} className="bg-white rounded-lg shadow-sm">
                                             <div 
                                                 className="p-4 cursor-pointer hover:bg-gray-50"
