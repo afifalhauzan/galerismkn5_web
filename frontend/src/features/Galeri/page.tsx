@@ -9,7 +9,7 @@ import KaryaCard from "./components/KaryaCard";
 import Pagination from "./components/Pagination";
 import { MdHideImage } from "react-icons/md";
 
-const YEARS = Array.from({ length: 11 }, (_, i) => 2015 + i);
+const YEARS = Array.from({ length: 6 }, (_, i) => 2025 + i);
 
 const KELAS_OPTIONS = ["X", "XI", "XII"];
 

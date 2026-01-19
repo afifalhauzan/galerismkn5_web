@@ -1,14 +1,15 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import Slider from "react-slick";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import { useHeroCarousel } from "@/hooks/HeroCarouselHooks";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 export default function HeroCarousel() {
     const sliderRef = useRef<Slider>(null);
+    const { slides, isLoading, isUsingFallback } = useHeroCarousel();
 
     const settings = {
         dots: true,
@@ -22,46 +23,38 @@ export default function HeroCarousel() {
         arrows: false, // We'll use custom arrows
     };
 
-    const slides = [
-        {
-            id: 1,
-            image: "/fotosmkn5landing.png",
-            title: "Selamat Datang!",
-            subtitle: "Selamat datang di situs web galeri karya Akhir SMK Negeri 5 Malang. Selamat berkunjung!"
-        },
-        {
-            id: 2,
-            image: "/fotosmkn5landing.png",
-            title: "Selamat Datang!",
-            subtitle: "Selamat datang di situs web galeri karya Akhir SMK Negeri 5 Malang. Selamat berkunjung!"
-        },
-        {
-            id: 3,
-            image: "/fotosmkn5landing.png",
-            title: "Selamat Datang!",
-            subtitle: "Selamat datang di situs web galeri karya Akhir SMK Negeri 5 Malang. Selamat berkunjung!"
-        },
-        {
-            id: 4,
-            image: "/fotosmkn5landing.png",
-            title: "Selamat Datang!",
-            subtitle: "Selamat datang di situs web galeri karya Akhir SMK Negeri 5 Malang. Selamat berkunjung!"
-        }
-    ];
+    // Show loading state or fallback message
+    if (isLoading) {
+        return (
+            <div className="relative w-full h-120 md:h-96 mb-8 rounded-2xl overflow-hidden shadow-lg bg-gray-200 flex items-center justify-center">
+                <div className="text-gray-600">Loading...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="relative w-full h-120 md:h-96 mb-8 rounded-2xl overflow-hidden shadow-lg">
+            {/* Show fallback indicator if using mock data */}
+            {isUsingFallback && (
+                <div className="absolute top-2 left-2 z-30 bg-yellow-500/80 text-white text-xs px-2 py-1 rounded">
+                    Using fallback data
+                </div>
+            )}
+            
             <Slider ref={sliderRef} {...settings}>
                 {slides.map((slide) => (
                     <div key={slide.id} className="relative w-full h-120 md:h-96">
                         {/* Background Image */}
                         <div className="absolute inset-0">
-                            <Image
-                                src={slide.image}
-                                alt="SMKN 5 Malang Building"
-                                fill
-                                className="object-cover"
-                                priority={slide.id === 1}
+                            <img
+                                src={slide.fullImageUrl}
+                                alt={slide.title || "SMKN 5 Malang Building"}
+                                className="object-cover w-full h-full"
+                                onError={(e) => {
+                                    // Fallback to local image on error
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = '/fotosmkn5landing.png';
+                                }}
                             />
                             <div className="absolute inset-0 bg-bluealt-200/30"></div>
                             <div className="absolute inset-0 bg-black/40"></div>

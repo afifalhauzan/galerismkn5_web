@@ -11,6 +11,7 @@ use App\Http\Controllers\StudentImportController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\Auth\ClaimAccountController;
 use App\Http\Controllers\DashboardStatsController;
+use App\Http\Controllers\HeroCarouselController;
 
 /**
  * Authentication Routes
@@ -20,6 +21,12 @@ use App\Http\Controllers\DashboardStatsController;
 // Public authentication routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+/**
+ * Public Hero Carousel Routes
+ * Public route for displaying carousel slides on homepage
+ */
+Route::get('/carousel-slides', [HeroCarouselController::class, 'carousel'])->name('carousel.slides');
 
 /**
  * Public Proyek Routes
@@ -135,4 +142,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/penilaians/{id}', [PenilaianController::class, 'update'])->name('penilaians.update.patch');
     Route::delete('/penilaians/{id}', [PenilaianController::class, 'destroy'])->name('penilaians.destroy');
     Route::post('/penilaians/check-permission', [PenilaianController::class, 'checkGradingPermission'])->name('penilaians.check');
+    
+    /**
+     * Hero Carousel Management Routes (Admin only)
+     * CRUD operations for managing homepage carousel images
+     */
+    Route::apiResource('hero-images', HeroCarouselController::class);
 });
