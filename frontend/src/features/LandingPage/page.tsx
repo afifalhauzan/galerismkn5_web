@@ -5,6 +5,7 @@ import Link from "next/link";
 import Hero from "@/components/ui/Hero";
 import KaryaCarousel from "@/components/ui/KaryaCarousel";
 import KaryaCarouselServer from "@/components/ui/KaryaCarouselServer";
+import Image from "next/image";
 
 interface LandingPageProps {
     user?: any;
@@ -15,6 +16,17 @@ interface LandingPageProps {
 export default function LandingPage({ user, logout, isLoading }: LandingPageProps) {
     return (
         <div className="flex min-h-screen w-full flex-col items-center">
+            <div className="flex md:hidden items-center justify-center w-full mt-0 mb-4">
+                {/* <div className="flex flex-row text-white text-xl justify-center items-center font-bold space-x-2 py-2 pb-8">
+                    <Image src="/logosmkn5.png" alt="Logo" width={50} height={50} />
+                    <h1 className="text-blue-600">Galeri SMKN 5 Malang</h1>
+                </div> */}
+                <div className="flex flex-row w-full text-center bg-bluealt-200 text-white rounded-full text-lg font-semibold py-3 justify-center items-center space-x-6">
+                    <Image src="/logosmkn5.png" alt="Logo" width={50} height={50} />
+                    <h1 className="text-white text-xl">Galeri SMKN 5 Malang</h1>
+                </div>
+            </div>
+
             <div className="w-full max-w-6xl px-0 md:px-8 md:py-8 md:py-20">
                 <Hero />
 

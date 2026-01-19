@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/dist/client/link";
 import Image from "next/image";
 
 export default function Hero() {
@@ -17,7 +18,7 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-bluealt-200/30"></div>
                 <div className="absolute inset-0 bg-black/40"></div>
             </div>
-            
+
             <div className="relative z-10 flex flex-col justify-center items-center h-full text-white text-center px-4">
                 <h1 className="text-4xl md:text-5xl font-bold mb-4">
                     Selamat Datang!
