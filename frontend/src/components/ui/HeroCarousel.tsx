@@ -13,11 +13,12 @@ export default function HeroCarousel() {
     const settings = {
         dots: true,
         infinite: true,
-        speed: 500,
+        speed: 600,
         slidesToShow: 1,
         slidesToScroll: 1,
         autoplay: true,
         autoplaySpeed: 4000,
+        cssEase: "ease-in-out",
         arrows: false, // We'll use custom arrows
     };
 
