@@ -2,12 +2,11 @@ import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { fetcher, poster, putter, deleter } from '@/lib/axios';
 
-// User Profile Hook
 export function useProfile() {
     const { data, error, isLoading, mutate } = useSWR('/profile', fetcher, {
         revalidateOnFocus: true,
         revalidateOnReconnect: true,
-        dedupingInterval: 60000, // 1 minute
+        dedupingInterval: 60000,
     });
 
     return {
@@ -18,7 +17,6 @@ export function useProfile() {
     };
 }
 
-// Gallery Photos Hook
 export function usePhotos(page = 1, limit = 12) {
     const { data, error, isLoading, mutate } = useSWR(
         `/photos?page=${page}&limit=${limit}`, 

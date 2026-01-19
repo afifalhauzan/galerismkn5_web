@@ -4,7 +4,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserStats } from "@/hooks/useApi";
 import Link from "next/dist/client/link";
 
-// Admin Dashboard Component
 export default function AdminDashboard({ user, logout }: { user: any, logout: () => void }) {
     const { stats, isLoading: statsLoading, isError } = useUserStats();
 
@@ -25,7 +24,7 @@ export default function AdminDashboard({ user, logout }: { user: any, logout: ()
                     <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
                         <div className="bg-violet-800 px-6 py-8 text-white rounded-t-lg">
                             <h2 className="text-2xl font-bold">
-                                🛡️ Admin Dashboard - {user.name}
+                                Admin Dashboard - {user.name}
                             </h2>
                             <p className="mt-2 text-gray-200">
                                 Kelola sistem galeri digital SMKN 5 dengan akses Akun Siswa & Guru

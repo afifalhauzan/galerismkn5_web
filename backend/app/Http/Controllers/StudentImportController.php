@@ -39,25 +39,20 @@ class StudentImportController extends Controller
                 ], 403);
             }
 
-            // Validate the request has a file
             $request->validate([
                 'file' => 'required|file|mimes:xlsx,xls,csv|max:10240' // 10MB max
             ]);
 
             $file = $request->file('file');
 
-            // Create import instance
             $import = new SiswaImport();
 
-            // Execute the import
             Excel::import($import, $file);
 
-            // Get import statistics
             $importedCount = $import->getImportedCount();
             $errorCount = $import->getErrorCount();
             $totalRows = $importedCount + $errorCount;
 
-            // Prepare response message
             $message = "Import completed successfully";
             if ($errorCount > 0) {
                 $message .= " with {$errorCount} errors";
@@ -75,7 +70,6 @@ class StudentImportController extends Controller
             ], 200);
 
         } catch (ValidationException $e) {
-            // Handle validation errors from Excel import
             $errors = [];
             foreach ($e->errors() as $error) {
                 $errors[] = $error;
@@ -131,10 +125,10 @@ class StudentImportController extends Controller
 
             // Generate template dynamically if static file doesn't exist
             $templateData = [
-                ['No', 'NIS', 'Nama Lengkap', 'Jenis Kelamin', 'Nama Kelas'], // Header row
-                ['1', '2024001', 'John Doe', 'L', '10 RPL I'], // Example data
-                ['2', '2024002', 'Jane Smith', 'P', '11 TKJT II'], // Example data
-                ['3', '2024003', 'Ahmad Rahman', 'L', '12 DKV I'], // Example data
+                ['No', 'NIS', 'Nama Lengkap', 'Jenis Kelamin', 'Nama Kelas'],
+                ['1', '2024001', 'John Doe', 'L', '10 RPL I'],
+                ['2', '2024002', 'Jane Smith', 'P', '11 TKJT II'],
+                ['3', '2024003', 'Ahmad Rahman', 'L', '12 DKV I'],
             ];
 
             // Create a temporary file with the template
@@ -156,7 +150,6 @@ class StudentImportController extends Controller
             Excel::store($export, basename($tempFile) . '.xlsx', 'local');
             $generatedPath = storage_path('app/' . basename($tempFile) . '.xlsx');
 
-            // Return the generated file
             return response()->download($generatedPath, $filename, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])->deleteFileAfterSend(true);

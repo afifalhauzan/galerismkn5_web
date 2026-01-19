@@ -21,13 +21,11 @@ class PenilaianSeeder extends Seeder
         foreach ($proyeksDinilai as $proyek) {
             // Find guru from same department as the project
             $validGuru = $gurus->where('jurusan_id', $proyek->jurusan_id)->first();
-            $proyek->update(['status' => 'dinilai']); // change status to dinilai
+            $proyek->update(['status' => 'dinilai']);
             
             if ($validGuru) {
-                // Create random STAR rating between 1-5 for sample data (bad to excellent)
                 $rating = rand(3, 5);
                 
-                // Generate appropriate comment based on rating
                 $comments = [
                     1 => 'Perlu perbaikan signifikan dalam beberapa aspek.',
                     2 => 'Ada beberapa aspek yang perlu diperbaiki.',

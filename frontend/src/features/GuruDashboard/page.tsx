@@ -4,7 +4,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserStats } from "@/hooks/useApi";
 import Link from "next/dist/client/link";
 
-// Guru Dashboard Component
 export default function GuruDashboard({ user, logout }: { user: any, logout: () => void }) {
     const { stats, isLoading: statsLoading, isError } = useUserStats();
 

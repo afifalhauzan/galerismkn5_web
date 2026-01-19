@@ -9,10 +9,8 @@ import KaryaCard from "./components/KaryaCard";
 import Pagination from "./components/Pagination";
 import { MdHideImage } from "react-icons/md";
 
-// Years data from 2015 to 2025
 const YEARS = Array.from({ length: 11 }, (_, i) => 2015 + i);
 
-// Kelas options
 const KELAS_OPTIONS = ["X", "XI", "XII"];
 
 function GaleriContent() {

@@ -7,7 +7,6 @@ export default function Footer() {
     return (
         <footer className="hidden md:block bg-bluealt-200 text-white pt-12">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-8">
-                {/* SMKN 5 Malang Section with Map */}
                 <div>
                     <div className="flex items-center mb-4">
                         <Image 
@@ -36,7 +35,6 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Contact Information */}
                 <div>
                     <div className="mb-6">
                         <h4 className="text-md font-semibold mb-2">Email</h4>
@@ -57,7 +55,6 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Program Keahlian */}
                 <div>
                     <h4 className="text-md font-semibold mb-4">Program Keahlian</h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
@@ -93,7 +90,6 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Copyright Section */}
             <div className="text-sm border-t bg-sky-900 border-gray-700 mt-8 py-3 text-center">
                 <p className="text-gray-300">
                     Made with <Link href="" className="text-white underline hover:text-blue-200">AYIDA</Link> 2025

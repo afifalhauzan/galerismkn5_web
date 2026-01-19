@@ -45,7 +45,6 @@ export default function Navbar({ className = "" }: NavbarProps) {
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="bg-bluealt-200 shadow-md rounded-full px-6">
                         <div className="flex justify-between items-center h-16">
-                            {/* Logo */}
                             <div className="flex-shrink-0 flex items-center">
                                 <Link href="/" className="flex flex-row text-white text-xl justify-center items-center font-bold space-x-2">
                                     <Image src="/logosmkn5.png" alt="Logo" width={40} height={40} />

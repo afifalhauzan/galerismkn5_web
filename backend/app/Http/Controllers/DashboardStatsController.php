@@ -155,12 +155,10 @@ class DashboardStatsController extends Controller
     {
         $user = $request->user();
         
-        // Access Control
         if ($user->role === 'siswa') {
             abort(403, 'Access denied');
         }
         
-        // Additional access control for guru
         if ($user->role === 'guru' && $user->jurusan_id !== (int)$jurusanId) {
             abort(403, 'You can only view statistics for your assigned jurusan');
         }

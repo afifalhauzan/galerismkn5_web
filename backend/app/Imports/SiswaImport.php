@@ -26,7 +26,7 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation
     public function model(array $row)
     {
         try {
-            // Skip empty rows - check key fields
+            // Skip empty rows
             if (empty($row['nama_lengkap']) || empty($row['nis']) || empty($row['nama_kelas'])) {
                 Log::info("Skipping empty row", ['row' => $row]);
                 return null;
@@ -42,22 +42,21 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation
                 return null;
             }
 
-            // Normalize gender from jenis_kelamin
             $gender = $this->parseGender($row['jenis_kelamin'] ?? 'L');
 
             // Create or update user with security constraints
             $user = User::updateOrCreate(
-                ['nis_nip' => trim($row['nis'])], // Use NIS as unique key for nis_nip
+                ['nis_nip' => trim($row['nis'])],
                 [
-                    'name' => trim($row['nama_lengkap']), // Map nama_lengkap to name
-                    'nis' => trim($row['nis']), // Keep nis field
+                    'name' => trim($row['nama_lengkap']),
+                    'nis' => trim($row['nis']),
                     'gender' => $gender,
                     'kelas_id' => $kelas->id,
-                    'jurusan_id' => $kelas->jurusan_id, // Get from kelas relationship
+                    'jurusan_id' => $kelas->jurusan_id,
                     'role' => 'siswa',
-                    'is_active' => false,  // Security: always inactive
-                    'email' => null,       // Security: no email
-                    'password' => null,    // Security: no password
+                    'is_active' => false, 
+                    'email' => null,       
+                    'password' => null,   
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
@@ -98,10 +97,8 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation
             return null;
         }
 
-        // Clean the input
         $kelasName = trim($kelasName);
 
-        // Find kelas by exact nama_kelas match (case insensitive)
         $kelas = Kelas::whereRaw('LOWER(nama_kelas) = LOWER(?)', [$kelasName])->first();
 
         return $kelas;

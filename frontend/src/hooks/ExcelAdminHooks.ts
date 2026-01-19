@@ -25,7 +25,6 @@ export interface ImportResult {
     message: string;
 }
 
-// Hook for fetching import status/statistics
 export function useImportStatus() {
     const { data, error, mutate, isValidating } = useSWR<ApiResponse<ImportStats>>(
         '/admin/students/import/status',

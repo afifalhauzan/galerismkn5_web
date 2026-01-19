@@ -51,7 +51,7 @@ export interface Penilaian {
 // Form data types for creating/updating penilaian
 export interface CreatePenilaianData {
     proyek_id: number;
-    bintang: number; // Use stars instead of score
+    bintang: number;
     catatan?: string;
 }
 

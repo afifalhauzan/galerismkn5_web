@@ -16,10 +16,8 @@ export default function LandingPage({ user, logout, isLoading }: LandingPageProp
     return (
         <div className="flex min-h-screen w-full flex-col items-center">
             <div className="w-full max-w-6xl px-0 md:px-8 md:py-8 md:py-20">
-                {/* Hero Section */}
                 <Hero />
 
-                {/* Karya Carousel */}
                 <KaryaCarousel className="mb-12" />
 
                 {/* Login prompt for non-users */}

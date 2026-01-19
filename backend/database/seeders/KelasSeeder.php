@@ -15,7 +15,6 @@ class KelasSeeder extends Seeder
     {
         $jurusans = Jurusan::all();
         
-        // Technology departments that have 3 classes
         $technologyDepartments = ['RPL', 'TKJT', 'DKV'];
         
         foreach ($jurusans as $jurusan) {
@@ -25,7 +24,6 @@ class KelasSeeder extends Seeder
             
             // Create classes for each grade level (10, 11, 12)
             foreach (['X', 'XI', 'XII'] as $tingkat) {
-                // Create classes with Roman numerals
                 $romanNumerals = ['I', 'II', 'III'];
                 
                 for ($i = 0; $i < $classCount; $i++) {

@@ -44,8 +44,8 @@ class SiswaController extends Controller
             $kelasId = $request->get('kelas_id');
 
             $students = User::siswa()
-                ->unregistered() // email is null
-                ->where('is_active', false) // is_active is false
+                ->unregistered()
+                ->where('is_active', false)
                 ->where('kelas_id', $kelasId)
                 ->select('id', 'name', 'nis')
                 ->orderBy('name')

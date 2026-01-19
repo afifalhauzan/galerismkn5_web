@@ -54,9 +54,6 @@ export default function StudentProjectTrigger({ name, nis, projects, totalKarya 
                     <div className="text-xs text-emerald-600">NIS: {nis}</div>
                 </div>
                 <div className="flex items-center space-x-1 flex-shrink-0">
-                    {/* <span className="text-xs bg-emerald-200 text-emerald-800 px-2 py-1 rounded-full">
-                        1 Karya
-                    </span> */}
                     <ExternalLink className="w-3 h-3 text-emerald-600 group-hover:text-emerald-700" />
                 </div>
             </Link>

@@ -36,7 +36,6 @@ class AuthController extends Controller
             'kelas_id' => $request->role === 'siswa' ? $request->kelas_id : null,
         ]);
 
-        // Load relationships
         $user->load(['jurusan', 'kelas']);
 
         // Add jurusan_name to user data

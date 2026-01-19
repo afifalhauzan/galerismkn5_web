@@ -5,7 +5,6 @@ export function middleware(request: NextRequest) {
     const token = request.cookies.get('token')?.value;
     const { pathname } = request.nextUrl;
 
-    // Define protected routes
     const protectedRoutes = ['/dashboard', '/profile', '/admin'];
     const authRoutes = ['/login', '/register'];
 
@@ -30,9 +29,6 @@ export function middleware(request: NextRequest) {
     if (token && isAuthRoute) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
-
-    // Allow public access to root route for landing page
-    // No redirects for root route - let it be publicly accessible
 
     return NextResponse.next();
 }

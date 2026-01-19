@@ -30,7 +30,7 @@ class AkunController extends Controller
         $this->checkAdminAccess();
         $query = User::with(['jurusan', 'kelas']);
 
-        // Filter by role (guru or siswa only)
+        // Filter by role
         if ($request->has('role') && in_array($request->role, ['guru', 'siswa'])) {
             $query->where('role', $request->role);
         } else {
@@ -38,17 +38,14 @@ class AkunController extends Controller
             $query->whereIn('role', ['guru', 'siswa']);
         }
 
-        // Filter by jurusan
         if ($request->has('jurusan_id') && $request->jurusan_id) {
             $query->where('jurusan_id', $request->jurusan_id);
         }
 
-        // Filter by kelas (for siswa)
         if ($request->has('kelas_id') && $request->kelas_id) {
             $query->where('kelas_id', $request->kelas_id);
         }
 
-        // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -177,7 +174,6 @@ class AkunController extends Controller
 
         $updateData = $request->only(['name', 'email', 'role', 'nis_nip', 'jurusan_id', 'kelas_id']);
 
-        // Hash password if provided
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
         }
