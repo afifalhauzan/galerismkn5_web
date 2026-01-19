@@ -2,10 +2,10 @@
 
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import Hero from "@/components/ui/Hero";
 import KaryaCarousel from "@/components/ui/KaryaCarousel";
 import KaryaCarouselServer from "@/components/ui/KaryaCarouselServer";
 import Image from "next/image";
+import HeroCarousel from "@/components/ui/HeroCarousel";
 
 interface LandingPageProps {
     user?: any;
@@ -28,7 +28,7 @@ export default function LandingPage({ user, logout, isLoading }: LandingPageProp
             </div>
 
             <div className="w-full max-w-6xl px-0 md:px-8 md:py-8 md:py-20">
-                <Hero />
+                <HeroCarousel />
 
                 <KaryaCarousel className="mb-12" />
 
