@@ -56,18 +56,18 @@ export default function HeroCarousel() {
                                     target.src = '/fotosmkn5landing.png';
                                 }}
                             />
-                            <div className="absolute inset-0 bg-bluealt-200/30"></div>
-                            <div className="absolute inset-0 bg-black/40"></div>
+                            {/* <div className="absolute inset-0 bg-bluealt-200/30"></div>
+                            <div className="absolute inset-0 bg-black/40"></div> */}
                         </div>
 
-                        <div className="relative z-10 flex flex-col justify-center items-center h-full text-white text-center px-4">
+                        {/* <div className="relative z-10 flex flex-col justify-center items-center h-full text-white text-center px-4">
                             <h1 className="text-4xl md:text-5xl font-bold mb-4">
                                 {slide.title}
                             </h1>
                             <p className="text-lg md:text-xl max-w-4xl leading-relaxed">
                                 {slide.subtitle}
                             </p>
-                        </div>
+                        </div> */}
                     </div>
                 ))}
             </Slider>
