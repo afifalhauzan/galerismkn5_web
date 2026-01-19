@@ -77,12 +77,13 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
                         Karya Unggulan
                     </h2>
                 </div>
-                <div className="flex justify-center items-center py-16">
-                    <div className="text-center">
-                        <Spinner className="mx-auto mb-4" />
-                        <p className="text-gray-600">Loading karya unggulan...</p>
-                    </div>
+                <div className="relative w-full h-70 md:h-96 mb-8 rounded-2xl overflow-hidden shadow-lg bg-gray-200 flex items-center justify-center">
+                <div className="flex space-x-2">
+                    <div className="w-3 h-3 bg-sky-600 rounded-full animate-bounce"></div>
+                    <div className="w-3 h-3 bg-sky-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-3 h-3 bg-sky-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
+            </div>
             </div>
         );
     }
@@ -97,7 +98,7 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
                 </div>
                 <div className="flex justify-center items-center py-16">
                     <div className="text-center">
-                        <p className="text-gray-500">Failed to load featured projects</p>
+                        <p className="text-gray-500">Ada kesalahan saat memuat karya unggulan. Harap coba lagi atau hubungi administrator.</p>
                     </div>
                 </div>
             </div>
@@ -124,13 +125,13 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
     return (
         <div className={`py-8 ${className}`}>
             <style>{customStyles}</style>
-            
+
             <div className="mb-6">
-                    <h2 className="inline-block w-full text-center bg-gradient-to-r from-sky-600 to-bluealt-200 text-white px-6 py-3 rounded-full text-lg font-semibold">
-                        Karya Unggulan
+                <h2 className="inline-block w-full text-center bg-gradient-to-r from-sky-600 to-bluealt-200 text-white px-6 py-3 rounded-full text-lg font-semibold">
+                    Karya Unggulan
                 </h2>
             </div>
-            
+
             <div className="relative">
                 <Carousel
                     responsive={responsive}
