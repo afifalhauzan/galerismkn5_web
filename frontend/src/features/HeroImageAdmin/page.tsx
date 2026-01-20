@@ -402,7 +402,7 @@ export default function HeroImageAdminPage() {
                                                             className="w-full h-full object-cover"
                                                             onError={(e) => {
                                                                 console.error('🖼️ Image failed to load:', heroImage.image_url);
-                                                                e.currentTarget.src = '/placeholder-image.png';
+                                                                // e.currentTarget.src = '/placeholder-image.png';
                                                             }}
                                                         />
                                                     </div>
