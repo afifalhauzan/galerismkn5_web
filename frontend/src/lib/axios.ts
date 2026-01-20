@@ -52,9 +52,22 @@ axiosInstance.interceptors.response.use(
     }
 );
 
-// SWR-compatible fetcher function
+// SWR-compatible fetcher function (with auth)
 export const fetcher = async (url: string) => {
     const response = await axiosInstance.get(url);
+    return response.data;
+};
+
+// Public fetcher function (without auth token)
+export const publicFetcher = async (url: string) => {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}${url}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        timeout: 60000,
+    });
     return response.data;
 };
 

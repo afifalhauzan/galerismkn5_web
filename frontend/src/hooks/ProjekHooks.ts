@@ -1,6 +1,6 @@
 import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { fetcher, poster, putter, deleter } from '@/lib/axios';
+import { fetcher, publicFetcher, poster, putter, deleter } from '@/lib/axios';
 import {
     Proyek,
     CreateProjekData,

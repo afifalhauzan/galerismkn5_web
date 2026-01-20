@@ -31,10 +31,13 @@ Route::get('/carousel-slides', [HeroCarouselController::class, 'carousel'])->nam
 /**
  * Public Proyek Routes
  * These routes can be accessed without authentication for public viewing
+ * but can detect authenticated users for role-based filtering
  */
-Route::get('/proyeks', [ProjekController::class, 'index'])->name('proyeks.index');
-Route::get('/proyeks/latest', [ProjekController::class, 'latest'])->name('proyeks.latest');
-Route::get('/proyeks/best', [ProjekController::class, 'best'])->name('proyeks.best');
+Route::middleware([\App\Http\Middleware\OptionalAuth::class])->group(function () {
+    Route::get('/proyeks', [ProjekController::class, 'index'])->name('proyeks.index');
+    Route::get('/proyeks/latest', [ProjekController::class, 'latest'])->name('proyeks.latest');
+    Route::get('/proyeks/best', [ProjekController::class, 'best'])->name('proyeks.best');
+});
 Route::get('/proyeks/ungraded', [ProjekController::class, 'ungraded'])->name('proyeks.ungraded')->middleware('auth:sanctum');
 Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyeks.show');
 

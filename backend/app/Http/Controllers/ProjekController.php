@@ -25,10 +25,8 @@ class ProjekController extends Controller
             // For public access (no authentication), only show published projects
             if (!$user) {
                 $query->published();
-            }
-
-            // Teacher-specific logic: include terkirim projects from their department
-            if ($user && $user->role === 'guru' && $user->jurusan_id) {
+            } elseif ($user->role === 'guru' && $user->jurusan_id) {
+                // Teacher-specific logic: include terkirim projects from their department
                 if ($request->has('status')) {
                     if ($request->status === 'terkirim') {
                         // Only show terkirim projects from teacher's department
@@ -48,7 +46,8 @@ class ProjekController extends Controller
                     });
                 }
             } else {
-                // Non-teachers: existing logic
+                // Admin and other authenticated users: can see all projects
+                // Apply status filter if provided
                 if ($request->has('status')) {
                     $query->byStatus($request->status);
                 }
@@ -87,10 +86,18 @@ class ProjekController extends Controller
             // Pagination
             $page = $request->get('page', 1);
             $requestedLimit = $request->get('limit', 10);
-            $limit = min($requestedLimit, 5); // Enforce maximum of 5
+            $limit = min($requestedLimit, 50); // Enforce maximum of 50 for admin, more reasonable limit
 
             $proyeks = $query->latest()
                 ->paginate($limit, ['*'], 'page', $page);
+
+            // Debug info for troubleshooting
+            $debug = [
+                'user_role' => $user ? $user->role : 'unauthenticated',
+                'total_projects_in_db' => Proyek::count(),
+                'query_conditions_applied' => $request->only(['status', 'jurusan_id', 'year', 'kelas', 'search']),
+                'pagination_limit' => $limit,
+            ];
 
             return response()->json([
                 'success' => true,
@@ -102,7 +109,8 @@ class ProjekController extends Controller
                     'total' => $proyeks->total(),
                     'from' => $proyeks->firstItem(),
                     'to' => $proyeks->lastItem(),
-                ]
+                ],
+                'debug' => config('app.debug') ? $debug : null
             ]);
         } catch (\Exception $e) {
             return response()->json([
