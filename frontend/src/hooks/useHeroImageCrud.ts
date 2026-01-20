@@ -181,7 +181,7 @@ export function useHeroImageCrud() {
       ...image,
       image_url: image.image_url.startsWith('http') 
         ? image.image_url 
-        : `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}${image.image_url}`
+        : `${process.env.NEXT_PUBLIC_BACKEND_URL || ''} ${image.image_url}`
     })) || [],
     isLoading,
     isError: error,
