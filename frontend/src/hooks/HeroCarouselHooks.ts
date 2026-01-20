@@ -65,7 +65,7 @@ export function useHeroCarousel() {
 
   // Helper function to get full image URL
   const getImageUrl = (imageUrl: string): string => {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
     
     // If it's already a full URL, return as is
     if (imageUrl.startsWith('http')) {
