@@ -13,35 +13,35 @@ function getJurusanColors(jurusan: string) {
         // Rekayasa Perangkat Lunak - Blue theme (tech)
         'Rekayasa Perangkat Lunak': { bg: 'bg-blue-500', text: 'text-blue-100' },
         'RPL': { bg: 'bg-blue-500', text: 'text-blue-100' },
-        
+
         // Teknik Komputer Jaringan - Green theme (network)
         'Teknik Komputer Jaringan': { bg: 'bg-green-500', text: 'text-green-100' },
         'TKJ': { bg: 'bg-green-500', text: 'text-green-100' },
-        
+
         // Desain Komunikasi Visual - Purple theme (creative)
         'Desain Komunikasi Visual': { bg: 'bg-purple-500', text: 'text-purple-100' },
         'DKV': { bg: 'bg-purple-500', text: 'text-purple-100' },
-        
+
         // Animasi - Pink theme (creative/motion)
         'Animasi': { bg: 'bg-pink-500', text: 'text-pink-100' },
-        
+
         // Kriya Kayu - Amber theme (wood/craft)
         'Kriya Kayu': { bg: 'bg-amber-600', text: 'text-amber-100' },
         'KK': { bg: 'bg-amber-600', text: 'text-amber-100' },
-        
+
         // Kriya Tekstil - Indigo theme (textile)
         'Kriya Tekstil': { bg: 'bg-indigo-500', text: 'text-indigo-100' },
         'KT': { bg: 'bg-indigo-500', text: 'text-indigo-100' },
-        
+
         // Kriya Keramik - Orange theme (clay/ceramic)
         'Kriya Keramik': { bg: 'bg-orange-500', text: 'text-orange-100' },
         'KKR': { bg: 'bg-orange-500', text: 'text-orange-100' },
-        
+
         // Tata Busana - Rose theme (fashion)
         'Tata Busana': { bg: 'bg-rose-500', text: 'text-rose-100' },
         'TB': { bg: 'bg-rose-500', text: 'text-rose-100' },
     };
-    
+
     return colorMap[jurusan] || { bg: 'bg-gray-500', text: 'text-gray-100' };
 }
 
@@ -61,8 +61,8 @@ export default function KaryaCard({ karya }: KaryaCardProps) {
                     />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                        <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+                        <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
                 )}
