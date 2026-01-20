@@ -19,10 +19,10 @@ function GaleriContent() {
     const { jurusans, isLoading: isLoadingJurusans } = useJurusans();
 
     // Get URL parameters
-    const urlJurusanId = searchParams.get('jurusan_id');
-    const urlKelas = searchParams.get('kelas');
-    const urlYear = searchParams.get('year');
-    const urlSearch = searchParams.get('search');
+    const urlJurusanId = searchParams?.get('jurusan_id');
+    const urlKelas = searchParams?.get('kelas');
+    const urlYear = searchParams?.get('year');
+    const urlSearch = searchParams?.get('search');
 
     // Filter states - initialize from URL params if available
     const [selectedJurusan, setSelectedJurusan] = useState(urlJurusanId || "");

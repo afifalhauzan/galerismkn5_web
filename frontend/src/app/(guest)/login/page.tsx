@@ -12,7 +12,7 @@ function LoginForm() {
   
   const { login, isLoading, error, clearError } = useAuth();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const redirectTo = searchParams?.get('redirect') || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

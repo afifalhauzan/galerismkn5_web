@@ -17,7 +17,7 @@ import {
 export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: () => void }) {
     const params = useParams();
     const router = useRouter();
-    const proyekId = params.id as string;
+    const proyekId = params?.id as string;
     const { proyek, isLoading, isError, mutate } = useProyek(proyekId);
     const { deleteProyek, isDeleting } = useDeleteProyek();
     const [showReview, setShowReview] = useState(false);

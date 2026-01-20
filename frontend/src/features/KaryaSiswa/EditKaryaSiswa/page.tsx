@@ -30,7 +30,7 @@ interface FormErrors {
 export default function EditKaryaSiswa({ user, logout }: { user: any; logout: () => void }) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const proyekId = searchParams.get('id');
+    const proyekId = searchParams?.get('id');
     const { user: authUser } = useAuth();
     const { proyek, isLoading: isLoadingProyek } = useProyek(proyekId || '');
     const { updateProyek, isUpdating, error } = useUpdateProyek(proyekId || '');
