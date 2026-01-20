@@ -22,6 +22,11 @@ class ProjekController extends Controller
             $query = Proyek::with(['user.kelas', 'jurusan', 'penilaian.guru']);
             $user = Auth::user();
 
+            // For public access (no authentication), only show published projects
+            if (!$user) {
+                $query->published();
+            }
+
             // Teacher-specific logic: include terkirim projects from their department
             if ($user && $user->role === 'guru' && $user->jurusan_id) {
                 if ($request->has('status')) {
@@ -122,6 +127,7 @@ class ProjekController extends Controller
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'jurusan_id' => 'required|exists:jurusans,id',
                 'status' => 'in:terkirim,dinilai',
+                'is_published' => 'boolean',
             ]);
 
             if ($validator->fails()) {
@@ -207,6 +213,7 @@ class ProjekController extends Controller
                 'tautan_proyek' => $request->tautan_proyek,
                 'image_url' => $data['image_url'] ?? $request->image_url,
                 'status' => $request->status ?? 'terkirim',
+                'is_published' => $request->is_published ?? false,
             ]);
 
             $proyek->load(['user', 'jurusan', 'penilaian.guru']);
@@ -321,6 +328,7 @@ class ProjekController extends Controller
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'jurusan_id' => 'sometimes|required|exists:jurusans,id',
                 'status' => 'sometimes|in:terkirim,dinilai',
+                'is_published' => 'boolean',
             ]);
 
             if ($validator->fails()) {
@@ -395,6 +403,73 @@ class ProjekController extends Controller
                 'message' => 'Failed to update project',
                 'error' => $e->getMessage(),
                 'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the publication status of a specific project
+     */
+    public function updatePublishStatus(Request $request, string $id): JsonResponse
+    {
+        try {
+            $proyek = Proyek::findOrFail($id);
+
+            // Check if user owns this project or is admin/guru
+            $currentUser = Auth::user();
+            
+            // Only admin, guru (teacher), or project owner can update publication status
+            if ($currentUser->role === 'siswa' && $proyek->user_id !== $currentUser->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized to update publication status of this project'
+                ], 403);
+            }
+
+            // For guru, they can only update projects from their department
+            if ($currentUser->role === 'guru' && $currentUser->jurusan_id !== $proyek->jurusan_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized to update projects from other departments'
+                ], 403);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'is_published' => 'required|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $proyek->update([
+                'is_published' => $request->is_published
+            ]);
+
+            $proyek->load(['user.kelas', 'jurusan', 'penilaian.guru']);
+
+            return response()->json([
+                'success' => true,
+                'message' => $request->is_published 
+                    ? 'Project published successfully' 
+                    : 'Project unpublished successfully',
+                'data' => $proyek
+            ]);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Project not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update publication status',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -567,6 +642,7 @@ class ProjekController extends Controller
                     $query->where('bintang', 5);
                 })
                 ->where('status', 'dinilai')
+                ->published()
                 ->latest()
                 ->limit(10)
                 ->get();
@@ -592,6 +668,7 @@ class ProjekController extends Controller
         try {
             $proyeks = Proyek::with(['user.kelas', 'jurusan', 'penilaian.guru'])
                 ->where('status', 'dinilai') // Only show graded projects
+                ->published()
                 ->latest()
                 ->take(5)
                 ->get();

@@ -17,10 +17,12 @@ class Proyek extends Model
         'tautan_proyek',
         'image_url',
         'status',
+        'is_published',
     ];
 
     protected $casts = [
         'status' => 'string',
+        'is_published' => 'boolean',
     ];
 
     /**
@@ -69,5 +71,13 @@ class Proyek extends Model
     public function scopeDinilai($query)
     {
         return $query->where('status', 'dinilai');
+    }
+
+    /**
+     * Scope to get published projects
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true);
     }
 }
