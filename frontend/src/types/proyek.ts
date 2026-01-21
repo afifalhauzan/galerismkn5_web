@@ -83,6 +83,7 @@ export interface Proyek {
     user?: User;
     jurusan?: Jurusan;
     penilaian?: Penilaian;
+    is_published?: boolean;
 }
 
 export interface PaginationMeta {

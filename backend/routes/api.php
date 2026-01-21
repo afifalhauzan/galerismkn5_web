@@ -113,6 +113,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/proyeks/{proyek}', [ProjekController::class, 'update'])->name('proyeks.update');
     Route::patch('/proyeks/{proyek}', [ProjekController::class, 'update'])->name('proyeks.update.patch');
     Route::patch('/proyeks/{proyek}/publish', [ProjekController::class, 'updatePublishStatus'])->name('proyeks.publish');
+    Route::put('/proyeks/{proyek}/publication-status', [ProjekController::class, 'updatePublishStatus'])->name('proyeks.publication.update');
     Route::delete('/proyeks/{proyek}', [ProjekController::class, 'destroy'])->name('proyeks.destroy');
     Route::get('/my-proyeks', [ProjekController::class, 'myProjects'])->name('proyeks.my');
 

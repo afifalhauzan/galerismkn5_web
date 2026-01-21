@@ -13,6 +13,7 @@ import {
   RatingCard,
   GradingSection 
 } from "./components";
+import PublishSection from "./components/PublishSection";
 
 export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: () => void }) {
     const params = useParams();
@@ -128,6 +129,8 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                             onDelete={handleDelete}
                             isDeleting={isDeleting}
                         />
+
+                        <PublishSection proyek={proyek} user={user} onPublicationStatusChanged={() => mutate()} />
                         {/* <ReviewSection 
                             proyek={proyek} 
                             showReview={showReview} 

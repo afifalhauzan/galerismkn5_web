@@ -393,6 +393,39 @@ export function useGradeProyek(id: number | string) {
 }
 
 /**
+ * Hook to update publication status of a project
+ */
+export function useUpdatePublicationStatus(id: number | string) {
+    const { trigger, isMutating, error } = useSWRMutation(
+        `/proyeks/${id}/publication-status`,
+        (url: string, { arg }: { arg: { is_published: boolean } }) => {
+            return putter(url, arg);
+        }
+    );
+
+    const updatePublicationStatus = async (isPublished: boolean) => {
+        try {
+            const result = await trigger({ is_published: isPublished });
+            console.log("Publication status updated successfully:", result);
+            
+            // Revalidate specific project and lists
+            mutate(`/proyeks/${id}`);
+            mutate((key) => typeof key === 'string' && (key.startsWith('/proyeks') || key.startsWith('/my-proyeks')));
+            
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    return {
+        updatePublicationStatus,
+        isUpdating: isMutating,
+        error,
+    };
+}
+
+/**
  * Hook to get project statistics for dashboards
  */
 export function useProjekStats() {
