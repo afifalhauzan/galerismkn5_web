@@ -607,12 +607,26 @@ class ProjekController extends Controller
                 $query->whereYear('created_at', $year);
             }
 
-            // Filter by kelas tingkat if provided (X, XI, XII)
+            // Filter by kelas tingkat if provided
             if ($request->has('kelas')) {
                 $kelasFilter = $request->kelas;
-                if (in_array($kelasFilter, ['X', 'XI', 'XII'])) {
-                    $query->whereHas('user.kelas', function ($q) use ($kelasFilter) {
-                        $q->where('tingkat', $kelasFilter);
+                
+                // Map various input formats to database values
+                $tingkatMap = [
+                    '10' => ['X', '10', 'x'],
+                    '11' => ['XI', '11', 'xi'],
+                    '12' => ['XII', '12', 'xii'],
+                    'X' => ['X', '10', 'x'],
+                    'XI' => ['XI', '11', 'xi'], 
+                    'XII' => ['XII', '12', 'xii'],
+                    'x' => ['X', '10', 'x'],
+                    'xi' => ['XI', '11', 'xi'],
+                    'xii' => ['XII', '12', 'xii']
+                ];
+                
+                if (isset($tingkatMap[$kelasFilter])) {
+                    $query->whereHas('user.kelas', function ($q) use ($tingkatMap, $kelasFilter) {
+                        $q->whereIn('tingkat', $tingkatMap[$kelasFilter]);
                     });
                 }
             }

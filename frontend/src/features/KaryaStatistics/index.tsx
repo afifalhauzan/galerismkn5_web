@@ -136,11 +136,11 @@ export default function KaryaStatisticsPage() {
                                     </div>
                                 </div>
                                 
-                                <div className="flex flex-row justify-between mt-4 md:mt-0 space-x-4 print:hidden">
+                                <div className="flex flex-row justify-between mt-4 text-slate-700 md:mt-0 space-x-4 print:hidden">
                                     <button
                                         onClick={fetchStats}
                                         disabled={isLoading}
-                                        className="flex items-center w-full px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                                        className="flex items-center w-full px-3 py-2 border border-slate-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                                     >
                                         <HiRefresh className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                                         Refresh
@@ -183,10 +183,27 @@ export default function KaryaStatisticsPage() {
                             {/* Search Bar */}
                             <SearchBar onSearch={setSearchTerm} />
 
-                            {/* Jurusan Accordion */}
-                            {filteredStats && (
-                                <div className="space-y-4">
-                                    {filteredStats.data.map((jurusan) => (
+                            {/* No Results Found */}
+                            {filteredStats && filteredStats.data.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <div className="text-gray-600 mb-4">
+                                        <HiUsers className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                                        <p className="font-medium">Tidak ada hasil ditemukan</p>
+                                        <p className="text-sm">Tidak ada jurusan yang cocok dengan pencarian "{searchTerm}"</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setSearchTerm('')}
+                                        className="text-emerald-600 hover:text-emerald-700 text-sm"
+                                    >
+                                        Hapus pencarian
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Jurusan Accordion */}
+                                    {filteredStats && (
+                                        <div className="space-y-4">
+                                            {filteredStats.data.map((jurusan) => (
                                         <div key={jurusan.jurusan_nama} className="bg-white rounded-lg shadow-sm">
                                             <div 
                                                 className="p-4 cursor-pointer hover:bg-gray-50"
@@ -322,8 +339,10 @@ export default function KaryaStatisticsPage() {
                             )}
                         </>
                     )}
-                </div>
-            </main>
+                </>
+            )}
         </div>
+    </main>
+</div>
     );
 }
