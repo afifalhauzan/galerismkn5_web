@@ -36,14 +36,17 @@ class DashboardStatsController extends Controller
         
         // Filter by jurusan_id for guru role
         if ($user->role === 'guru') {
-            if (!$user->jurusan_id) {
+            $guruJurusanIds = $user->getJurusanIds();
+            
+            if (empty($guruJurusanIds)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Guru belum memiliki jurusan yang ditetapkan',
                     'data' => []
                 ], 400);
             }
-            $query->where('id', $user->jurusan_id);
+            
+            $query->whereIn('id', $guruJurusanIds);
         }
         
         $jurusans = $query->get();
@@ -138,13 +141,26 @@ class DashboardStatsController extends Controller
                 : 0
         ];
         
+        // Get filtered jurusan names for guru
+        $filteredByJurusan = null;
+        if ($user->role === 'guru') {
+            $guruJurusans = $user->jurusans;
+            if ($guruJurusans->count() > 1) {
+                $filteredByJurusan = $guruJurusans->pluck('nama')->join(', ');
+            } elseif ($guruJurusans->count() === 1) {
+                $filteredByJurusan = $guruJurusans->first()->nama;
+            } else {
+                $filteredByJurusan = 'Unknown';
+            }
+        }
+        
         return response()->json([
             'success' => true,
             'message' => 'Dashboard statistics retrieved successfully',
             'data' => $data,
             'summary' => $summary,
             'user_role' => $user->role,
-            'filtered_by_jurusan' => $user->role === 'guru' ? $user->jurusan->nama ?? 'Unknown' : null
+            'filtered_by_jurusan' => $filteredByJurusan
         ]);
     }
     
@@ -159,8 +175,11 @@ class DashboardStatsController extends Controller
             abort(403, 'Access denied');
         }
         
-        if ($user->role === 'guru' && $user->jurusan_id !== (int)$jurusanId) {
-            abort(403, 'You can only view statistics for your assigned jurusan');
+        if ($user->role === 'guru') {
+            $guruJurusanIds = $user->getJurusanIds();
+            if (!in_array((int)$jurusanId, $guruJurusanIds)) {
+                abort(403, 'You can only view statistics for your assigned jurusans');
+            }
         }
         
         $jurusan = Jurusan::with([
