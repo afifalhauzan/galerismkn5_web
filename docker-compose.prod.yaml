@@ -15,14 +15,16 @@ services:
       - APP_DEBUG=false
       - APP_KEY=${APP_KEY} # Ensure this is in your .env
       - DB_CONNECTION=mysql
-      - DB_HOST=mysql
+      - DB_HOST=172.18.0.1
+# USE HOST NETWORK NOW, NOT DB_HOST=mysql
+#      - DB_HOST=mysql
       - DB_PORT=3306       # Internal port is still 3306
       - DB_DATABASE=${DB_DATABASE:-galerismkn5}
       - DB_USERNAME=${DB_USERNAME:-root}
       - DB_PASSWORD=${DB_PASSWORD}
-      - CACHE_STORE=redis
-      - SESSION_DRIVER=redis
-      - QUEUE_CONNECTION=redis
+      - CACHE_STORE=file
+      - SESSION_DRIVER=file
+      - QUEUE_CONNECTION=sync
       - REDIS_HOST=redis
       - REDIS_PORT=6379    # Internal port is still 6379
       - APP_URL=${APP_URL:-https://api.yourdomain.com}
@@ -33,11 +35,11 @@ services:
       - mysql
 #      - redis
     # Add Healthcheck to ensure Nginx/PHP are actually running
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
     networks:
       - galeri_network
 
@@ -73,10 +75,11 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
-    ports:
-      - "3307:3306" # <--- CHANGED: Host 3307 maps to Container 3306
-    networks:
-      - galeri_network
+#    ports:
+#      - "3307:3306" # <--- CHANGED: Host 3307 maps to Container 3306
+#    networks:
+#      - galeri_network
+    network_mode: host
     command: --default-authentication-plugin=mysql_native_password
 
   # --- Redis Cache ---
