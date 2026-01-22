@@ -81,6 +81,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if guru can teach in a specific jurusan
+     */
+    public function canTeachInJurusan(int $jurusanId): bool
+    {
+        if (!$this->isGuru()) {
+            return false;
+        }
+        
+        return $this->jurusans()->where('jurusan_id', $jurusanId)->exists();
+    }
+
+    /**
+     * Get all jurusan IDs that this guru can teach
+     */
+    public function getJurusanIds(): array
+    {
+        if (!$this->isGuru()) {
+            return [];
+        }
+        
+        return $this->jurusans()->pluck('jurusan_id')->toArray();
+    }
+
+    /**
      * Check if user is active (has email and password)
      */
     public function isActive(): bool
@@ -97,11 +121,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the jurusan that the student belongs to
+     * Get the jurusan that the student belongs to (for siswa)
      */
     public function jurusan()
     {
         return $this->belongsTo(Jurusan::class);
+    }
+
+    /**
+     * Get the jurusans that the guru can teach (for guru - many-to-many)
+     */
+    public function jurusans()
+    {
+        return $this->belongsToMany(Jurusan::class, 'guru_jurusan');
     }
 
     /**

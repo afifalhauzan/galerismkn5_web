@@ -45,4 +45,12 @@ class Jurusan extends Model
     {
         return $this->hasMany(User::class)->where('role', 'siswa');
     }
+
+    /**
+     * Get the gurus (teachers) that can teach this jurusan (many-to-many)
+     */
+    public function gurus()
+    {
+        return $this->belongsToMany(User::class, 'guru_jurusan')->where('role', 'guru');
+    }
 }

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { User, CreateUserData, UpdateUserData, Jurusan } from "@/types/proyek";
 import { useKelasByJurusan } from "@/hooks/KelasHooks";
 
@@ -12,32 +13,52 @@ interface UserModalProps {
   error?: any;
 }
 
-const KELAS_OPTIONS = ["10", "11", "12"];
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  role: 'guru' | 'siswa';
+  nis_nip: string;
+  jurusan_id: number;
+  kelas_id?: number;
+}
 
-export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, isLoading, error }: UserModalProps) {
-  const [formData, setFormData] = useState<CreateUserData>({
-    name: '',
-    email: '',
-    password: '',
-    role: 'siswa',
-    nis_nip: '',
-    jurusan_id: 0,
-    kelas_id: 0
+export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, error }: UserModalProps) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    reset,
+    formState: { errors: formErrors }
+  } = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      role: 'siswa',
+      nis_nip: '',
+      jurusan_id: 0,
+      kelas_id: 0
+    }
   });
 
+  const watchedRole = watch('role');
+  const watchedJurusanId = watch('jurusan_id');
+
   // Fetch kelas based on selected jurusan
-  const { kelas, isLoading: kelasLoading, isError: kelasError } = useKelasByJurusan(formData.jurusan_id > 0 ? formData.jurusan_id : null);
+  const { kelas, isLoading: kelasLoading } = useKelasByJurusan(watchedJurusanId > 0 ? watchedJurusanId : null);
 
-  // Use error prop for backend errors and local state for frontend validation
-  const [frontendErrors, setFrontendErrors] = useState<Record<string, string>>({});
+  // Combine frontend (RHF) errors with backend errors
   const backendErrors = error?.errors || {};
-  const errors = { ...frontendErrors, ...backendErrors };
+  const allErrors = { ...formErrors, ...backendErrors };
 
+  // Reset form when modal opens/closes or user changes
   useEffect(() => {
     if (isOpen) {
-      setFrontendErrors({}); // Clear frontend validation errors
       if (user) {
-        setFormData({
+        reset({
           name: user.name || '',
           email: user.email || '',
           password: '',
@@ -47,7 +68,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
           kelas_id: user.kelas_id || 0
         });
       } else {
-        setFormData({
+        reset({
           name: '',
           email: '',
           password: '',
@@ -58,47 +79,16 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
         });
       }
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFrontendErrors({}); // Clear previous validation errors
+  // Reset kelas_id when jurusan changes
+  useEffect(() => {
+    setValue('kelas_id', 0);
+  }, [watchedJurusanId, setValue]);
 
-    // Frontend validation
-    const validationErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) {
-      validationErrors.name = 'Nama lengkap harus diisi';
-    }
-    
-    if (!formData.email.trim()) {
-      validationErrors.email = 'Email harus diisi';
-    }
-    
-    if (!user && !formData.password.trim()) {
-      validationErrors.password = 'Password harus diisi';
-    }
-    
-    if (!formData.nis_nip.trim()) {
-      validationErrors.nis_nip = `${formData.role === 'guru' ? 'NIP' : 'NIS'} harus diisi`;
-    }
-    
-    if (!formData.jurusan_id || formData.jurusan_id === 0) {
-      validationErrors.jurusan_id = 'Jurusan harus dipilih';
-    }
-    
-    if (formData.role === 'siswa' && (!formData.kelas_id || formData.kelas_id === 0)) {
-      validationErrors.kelas_id = 'Kelas harus dipilih';
-    }
-
-    // If there are validation errors, set them and don't submit
-    if (Object.keys(validationErrors).length > 0) {
-      setFrontendErrors(validationErrors);
-      return; // Don't submit
-    }
-
+  const onFormSubmit = async (data: FormData) => {
     try {
-      const submitData = { ...formData };
+      const submitData: CreateUserData | UpdateUserData = { ...data };
       
       // Remove password if empty for update
       if (user && !submitData.password) {
@@ -113,9 +103,13 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
       await onSubmit(submitData);
       onClose();
     } catch (error: any) {
-      // Error handling is done in paFrent component
       console.error('Form submission error:', error);
     }
+  };
+
+  const handleClose = () => {
+    reset();
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -129,7 +123,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
               {user ? 'Edit Akun' : 'Tambah Akun Baru'}
             </h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,9 +133,9 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+        <form onSubmit={handleSubmit(onFormSubmit)} className="px-6 py-4 space-y-4">
           {/* Error Message */}
-          {Object.keys(errors).length > 0 && (
+          {Object.keys(allErrors).length > 0 && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <div className="flex">
                 <div className="flex-shrink-0">
@@ -155,9 +149,12 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
                   </h3>
                   <div className="mt-2 text-sm text-red-700">
                     <ul className="list-disc pl-5 space-y-1">
-                      {Object.entries(errors).map(([field, message]) => (
-                        <li key={field}>{Array.isArray(message) ? message.join(', ') : String(message)}</li>
-                      ))}
+                      {Object.entries(allErrors).map(([field, error]) => {
+                        const message = error?.message || error;
+                        return (
+                          <li key={field}>{Array.isArray(message) ? message.join(', ') : String(message)}</li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>
@@ -173,20 +170,23 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
             <input
               type="text"
               id="name"
-              value={formData.name}
-              onChange={(e) => {
-                setFormData({ ...formData, name: e.target.value });
-                if (frontendErrors.name) {
-                  setFrontendErrors({ ...frontendErrors, name: '' });
+              {...register('name', {
+                required: 'Nama lengkap harus diisi',
+                minLength: {
+                  value: 2,
+                  message: 'Nama minimal 2 karakter'
                 }
-              }}
+              })}
               className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
+                allErrors.name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Masukkan nama lengkap"
-              required
             />
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+            {allErrors.name && (
+              <p className="mt-1 text-sm text-red-600">
+                {allErrors.name.message || allErrors.name}
+              </p>
+            )}
           </div>
 
           {/* Email */}
@@ -197,15 +197,23 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
             <input
               type="email"
               id="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              {...register('email', {
+                required: 'Email harus diisi',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Format email tidak valid'
+                }
+              })}
               className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+                allErrors.email ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Masukkan email"
-              required
             />
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+            {allErrors.email && (
+              <p className="mt-1 text-sm text-red-600">
+                {allErrors.email.message || allErrors.email}
+              </p>
+            )}
           </div>
 
           {/* Password */}
@@ -217,15 +225,23 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
             <input
               type="password"
               id="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              {...register('password', {
+                required: !user ? 'Password harus diisi' : false,
+                minLength: {
+                  value: 6,
+                  message: 'Password minimal 6 karakter'
+                }
+              })}
               className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.password ? 'border-red-500' : 'border-gray-300'
+                allErrors.password ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Masukkan password"
-              required={!user}
             />
-            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+            {allErrors.password && (
+              <p className="mt-1 text-sm text-red-600">
+                {allErrors.password.message || allErrors.password}
+              </p>
+            )}
           </div>
 
           {/* Role */}
@@ -235,36 +251,48 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
             </label>
             <select
               id="role"
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value as 'guru' | 'siswa' })}
+              {...register('role', {
+                required: 'Peran harus dipilih'
+              })}
               className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.role ? 'border-red-500' : 'border-gray-300'
+                allErrors.role ? 'border-red-500' : 'border-gray-300'
               }`}
-              required
             >
               <option value="siswa">Siswa</option>
               <option value="guru">Guru</option>
             </select>
-            {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
+            {allErrors.role && (
+              <p className="mt-1 text-sm text-red-600">
+                {allErrors.role.message || allErrors.role}
+              </p>
+            )}
           </div>
 
           {/* NIS/NIP */}
           <div>
             <label htmlFor="nis_nip" className="block text-sm font-medium text-gray-700 mb-1">
-              {formData.role === 'guru' ? 'NIP' : 'NIS'} *
+              {watchedRole === 'guru' ? 'NIP' : 'NIS'} *
             </label>
             <input
               type="text"
               id="nis_nip"
-              value={formData.nis_nip}
-              onChange={(e) => setFormData({ ...formData, nis_nip: e.target.value })}
+              {...register('nis_nip', {
+                required: `${watchedRole === 'guru' ? 'NIP' : 'NIS'} harus diisi`,
+                minLength: {
+                  value: 3,
+                  message: `${watchedRole === 'guru' ? 'NIP' : 'NIS'} minimal 3 karakter`
+                }
+              })}
               className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.nis_nip ? 'border-red-500' : 'border-gray-300'
+                allErrors.nis_nip ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder={`Masukkan ${formData.role === 'guru' ? 'NIP' : 'NIS'}`}
-              required
+              placeholder={`Masukkan ${watchedRole === 'guru' ? 'NIP' : 'NIS'}`}
             />
-            {errors.nis_nip && <p className="mt-1 text-sm text-red-600">{errors.nis_nip}</p>}
+            {allErrors.nis_nip && (
+              <p className="mt-1 text-sm text-red-600">
+                {allErrors.nis_nip.message || allErrors.nis_nip}
+              </p>
+            )}
           </div>
 
           {/* Jurusan */}
@@ -272,72 +300,81 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
             <label htmlFor="jurusan_id" className="block text-sm font-medium text-gray-700 mb-1">
               Jurusan *
             </label>
-            <select
-              id="jurusan_id"
-              value={formData.jurusan_id}
-              onChange={(e) => {
-                const newJurusanId = parseInt(e.target.value);
-                setFormData({ 
-                  ...formData, 
-                  jurusan_id: newJurusanId,
-                  kelas_id: 0 // Reset kelas when jurusan changes
-                });
-                if (frontendErrors.jurusan_id) {
-                  setFrontendErrors({ ...frontendErrors, jurusan_id: '' });
-                }
+            <Controller
+              name="jurusan_id"
+              control={control}
+              rules={{
+                required: 'Jurusan harus dipilih',
+                validate: (value) => value > 0 || 'Jurusan harus dipilih'
               }}
-              className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.jurusan_id ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            >
-              <option value={0}>Pilih Jurusan</option>
-              {jurusans.map((jurusan) => (
-                <option key={jurusan.id} value={jurusan.id}>
-                  {jurusan.nama}
-                </option>
-              ))}
-            </select>
-            {errors.jurusan_id && <p className="mt-1 text-sm text-red-600">{errors.jurusan_id}</p>}
+              render={({ field }) => (
+                <select
+                  {...field}
+                  id="jurusan_id"
+                  className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    allErrors.jurusan_id ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                >
+                  <option value={0}>Pilih Jurusan</option>
+                  {jurusans.map((jurusan) => (
+                    <option key={jurusan.id} value={jurusan.id}>
+                      {jurusan.nama}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+            {allErrors.jurusan_id && (
+              <p className="mt-1 text-sm text-red-600">
+                {allErrors.jurusan_id.message || allErrors.jurusan_id}
+              </p>
+            )}
           </div>
 
           {/* Kelas (only for siswa) */}
-          {formData.role === 'siswa' && (
+          {watchedRole === 'siswa' && (
             <div>
               <label htmlFor="kelas_id" className="block text-sm font-medium text-gray-700 mb-1">
                 Kelas *
               </label>
-              <select
-                id="kelas_id"
-                value={formData.kelas_id || 0}
-                onChange={(e) => {
-                  setFormData({ ...formData, kelas_id: parseInt(e.target.value) });
-                  if (frontendErrors.kelas_id) {
-                    setFrontendErrors({ ...frontendErrors, kelas_id: '' });
-                  }
+              <Controller
+                name="kelas_id"
+                control={control}
+                rules={{
+                  required: watchedRole === 'siswa' ? 'Kelas harus dipilih' : false,
+                  validate: (value) => watchedRole === 'siswa' ? (value && value > 0) || 'Kelas harus dipilih' : true
                 }}
-                className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.kelas_id ? 'border-red-500' : 'border-gray-300'
-                }`}
-                required
-                disabled={kelasLoading || formData.jurusan_id === 0}
-              >
-                <option value={0}>
-                  {formData.jurusan_id === 0 
-                    ? 'Pilih jurusan terlebih dahulu' 
-                    : kelasLoading 
-                      ? 'Memuat kelas...' 
-                      : 'Pilih Kelas'
-                  }
-                </option>
-                {kelas.map((kelasItem) => (
-                  <option key={kelasItem.id} value={kelasItem.id}>
-                    {kelasItem.nama_kelas}
-                  </option>
-                ))}
-              </select>
-              {errors.kelas_id && <p className="mt-1 text-sm text-red-600">{errors.kelas_id}</p>}
-              {formData.jurusan_id > 0 && kelas.length === 0 && !kelasLoading && (
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    id="kelas_id"
+                    className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      allErrors.kelas_id ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    disabled={kelasLoading || watchedJurusanId === 0}
+                  >
+                    <option value={0}>
+                      {watchedJurusanId === 0 
+                        ? 'Pilih jurusan terlebih dahulu' 
+                        : kelasLoading 
+                          ? 'Memuat kelas...' 
+                          : 'Pilih Kelas'
+                      }
+                    </option>
+                    {kelas.map((kelasItem) => (
+                      <option key={kelasItem.id} value={kelasItem.id}>
+                        {kelasItem.nama_kelas}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
+              {allErrors.kelas_id && (
+                <p className="mt-1 text-sm text-red-600">
+                  {allErrors.kelas_id.message || allErrors.kelas_id}
+                </p>
+              )}
+              {watchedJurusanId > 0 && kelas.length === 0 && !kelasLoading && (
                 <p className="mt-1 text-sm text-yellow-600">Belum ada kelas untuk jurusan ini</p>
               )}
             </div>
@@ -347,7 +384,7 @@ export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, i
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
               disabled={isLoading}
             >
