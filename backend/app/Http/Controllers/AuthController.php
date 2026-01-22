@@ -68,11 +68,16 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = User::where('email', $request->email)->with(['jurusan', 'kelas'])->firstOrFail();
+        $user = User::where('email', $request->email)->with(['jurusan', 'kelas', 'jurusans'])->firstOrFail();
 
         // Add jurusan_name to user data
         $userData = $user->toArray();
         $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
+        
+        // Add jurusan_ids for guru users (multiple jurusans)
+        if ($user->role === 'guru') {
+            $userData['jurusan_ids'] = $user->jurusans->pluck('id')->toArray();
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

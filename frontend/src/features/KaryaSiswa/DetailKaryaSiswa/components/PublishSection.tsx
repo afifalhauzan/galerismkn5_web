@@ -19,7 +19,13 @@ export default function PublishSection({ proyek, user, onPublicationStatusChange
     const isGuru = user?.role === 'guru';
     const isSiswa = user?.role === 'siswa';
     const isProjectOwner = proyek.user_id === user?.id;
-    const isProjectFromSameJurusan = user?.jurusan_id === proyek.jurusan_id;
+    
+    // Check if guru can manage this project's jurusan
+    const isProjectFromSameJurusan = isGuru 
+        ? (user?.jurusan_ids && user.jurusan_ids.includes(proyek.jurusan_id)) ||
+          (user?.jurusan_id === proyek.jurusan_id)
+        : false;
+    
     const isProjectGraded = proyek.status === 'dinilai';
     const isCurrentlyPublished = proyek.is_published;
 
@@ -116,12 +122,18 @@ export default function PublishSection({ proyek, user, onPublicationStatusChange
                             <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                             <div>
                                 <h4 className="text-sm font-medium text-amber-800 mb-1">
-                                    Tidak dapat mengelola publikasi karya dari jurusan lain
+                                    Tidak dapat mengelola publikasi karya dari jurusan yang tidak diampu
                                 </h4>
                                 <p className="text-sm text-amber-700">
-                                    Anda hanya dapat mengelola publikasi karya dari siswa di jurusan yang sama.
-                                    Karya ini dari jurusan <strong>{proyek.jurusan?.nama}</strong>,
-                                    sedangkan Anda dari jurusan <strong>{user.jurusan?.nama}</strong>.
+                                    Anda hanya dapat mengelola publikasi karya dari siswa di jurusan yang Anda ampu.
+                                    Karya ini dari jurusan <strong>{proyek.jurusan?.nama}</strong>.
+                                    {user?.jurusans && user.jurusans.length > 0 && (
+                                        <span>
+                                            {' '}Anda mengampu jurusan: <strong>
+                                                {user.jurusans.map(j => j.nama).join(', ')}
+                                            </strong>
+                                        </span>
+                                    )}
                                 </p>
                             </div>
                         </div>
