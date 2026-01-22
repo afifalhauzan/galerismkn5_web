@@ -89,11 +89,16 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->load(['jurusan', 'kelas']);
+        $user = $request->user()->load(['jurusan', 'kelas', 'jurusans']);
 
         // Add jurusan_name to user data
         $userData = $user->toArray();
         $userData['jurusan_name'] = $user->jurusan ? $user->jurusan->nama : null;
+        
+        // Add jurusan_ids for guru users (multiple jurusans)
+        if ($user->role === 'guru') {
+            $userData['jurusan_ids'] = $user->jurusans->pluck('id')->toArray();
+        }
 
         return response()->json([
             'user' => $userData

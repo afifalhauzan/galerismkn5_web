@@ -28,7 +28,7 @@ class AkunController extends Controller
     public function index(Request $request): JsonResponse
     {
         $this->checkAdminAccess();
-        $query = User::with(['jurusan', 'kelas']);
+        $query = User::with(['jurusan', 'kelas', 'jurusans']);
 
         // Filter by role
         if ($request->has('role') && in_array($request->role, ['guru', 'siswa'])) {
@@ -58,6 +58,14 @@ class AkunController extends Controller
         // Pagination
         $limit = min($request->get('limit', 10), 50); // Max 50 items per page
         $users = $query->orderBy('created_at', 'desc')->paginate($limit);
+        
+        // Add jurusan_ids to guru users
+        $users->getCollection()->transform(function ($user) {
+            if ($user->role === 'guru') {
+                $user->jurusan_ids = $user->jurusans->pluck('id')->toArray();
+            }
+            return $user;
+        });
 
         return response()->json([
             'success' => true,
@@ -79,7 +87,8 @@ class AkunController extends Controller
     public function store(Request $request): JsonResponse
     {
         $this->checkAdminAccess();
-        $validator = Validator::make($request->all(), [
+        
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
@@ -87,7 +96,15 @@ class AkunController extends Controller
             'nis_nip' => 'required|string|max:20|unique:users',
             'jurusan_id' => 'required|exists:jurusans,id',
             'kelas_id' => 'required_if:role,siswa|nullable|exists:kelas,id',
-        ]);
+        ];
+        
+        // Add validation for guru's additional jurusans
+        if ($request->role === 'guru' && $request->has('jurusan_ids')) {
+            $rules['jurusan_ids'] = 'array';
+            $rules['jurusan_ids.*'] = 'exists:jurusans,id';
+        }
+        
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
@@ -106,8 +123,18 @@ class AkunController extends Controller
             'jurusan_id' => $request->jurusan_id,
             'kelas_id' => $request->role === 'siswa' ? $request->kelas_id : null,
         ]);
+        
+        // Handle multiple jurusans for guru
+        if ($request->role === 'guru' && $request->has('jurusan_ids') && is_array($request->jurusan_ids)) {
+            $user->jurusans()->sync($request->jurusan_ids);
+        }
 
-        $user->load(['jurusan', 'kelas']);
+        $user->load(['jurusan', 'kelas', 'jurusans']);
+        
+        // Add jurusan_ids to response for guru
+        if ($user->role === 'guru') {
+            $user->jurusan_ids = $user->jurusans->pluck('id')->toArray();
+        }
 
         return response()->json([
             'success' => true,
@@ -122,13 +149,18 @@ class AkunController extends Controller
     public function show($id): JsonResponse
     {
         $this->checkAdminAccess();
-        $user = User::with(['jurusan', 'kelas'])->find($id);
+        $user = User::with(['jurusan', 'kelas', 'jurusans'])->find($id);
 
         if (!$user || $user->role === 'admin') {
             return response()->json([
                 'success' => false,
                 'message' => 'User not found'
             ], 404);
+        }
+        
+        // Add jurusan_ids to response for guru
+        if ($user->role === 'guru') {
+            $user->jurusan_ids = $user->jurusans->pluck('id')->toArray();
         }
 
         return response()->json([
@@ -161,6 +193,12 @@ class AkunController extends Controller
             'jurusan_id' => 'sometimes|required|exists:jurusans,id',
             'kelas_id' => 'sometimes|nullable|exists:kelas,id',
         ];
+        
+        // Add validation for guru's additional jurusans
+        if ($request->role === 'guru' && $request->has('jurusan_ids')) {
+            $rules['jurusan_ids'] = 'array';
+            $rules['jurusan_ids.*'] = 'exists:jurusans,id';
+        }
 
         $validator = Validator::make($request->all(), $rules);
 
@@ -184,7 +222,18 @@ class AkunController extends Controller
         }
 
         $user->update($updateData);
-        $user->load(['jurusan', 'kelas']);
+        
+        // Handle multiple jurusans for guru
+        if ($request->role === 'guru' && $request->has('jurusan_ids') && is_array($request->jurusan_ids)) {
+            $user->jurusans()->sync($request->jurusan_ids);
+        }
+        
+        $user->load(['jurusan', 'kelas', 'jurusans']);
+        
+        // Add jurusan_ids to response for guru
+        if ($user->role === 'guru') {
+            $user->jurusan_ids = $user->jurusans->pluck('id')->toArray();
+        }
 
         return response()->json([
             'success' => true,

@@ -17,6 +17,7 @@ export interface User {
     jurusan_id?: number;
     jurusan_name?: string;
     jurusan?: Jurusan;
+    jurusans?: Jurusan[];
     kelas_id?: number;
     kelas?: Kelas;
     created_at: string;

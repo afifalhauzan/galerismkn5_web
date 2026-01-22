@@ -102,7 +102,12 @@ export default function NilaiKaryaPage() {
                                         Nilai Karya Siswa
                                     </h1>
                                     <p className="text-gray-600">
-                                        Menilai karya siswa dari jurusan {user?.jurusan?.nama || 'Anda'}
+                                        {user?.jurusans && user.jurusans.length > 1 
+                                            ? `Menilai karya siswa dari ${user.jurusans.length} jurusan yang Anda ampu`
+                                            : user?.jurusans && user.jurusans.length === 1
+                                            ? `Menilai karya siswa dari jurusan ${user.jurusans[0].nama}`
+                                            : `Menilai karya siswa dari jurusan ${user?.jurusan?.nama || 'Anda'}`
+                                        }
                                     </p>
                                 </div>
                             </div>

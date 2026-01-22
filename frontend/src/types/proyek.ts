@@ -7,8 +7,10 @@ export interface User {
     nis_nip?: string;
     nis?: string;
     jurusan_id?: number;
-    jurusan_name?: string;
-    jurusan?: Jurusan;
+    jurusan_ids?: number[]; // For guru with multiple jurusans
+    jurusan_names?: string[];
+    jurusan?: Jurusan; // Single jurusan (primary)
+    jurusans?: Jurusan[]; // Multiple jurusans for guru
     kelas_id?: number;
     kelas?: Kelas;
     is_active?: boolean;
@@ -163,7 +165,8 @@ export interface CreateUserData {
     password: string;
     role: 'guru' | 'siswa';
     nis_nip: string;
-    jurusan_id: number;
+    jurusan_id: number; // Always required (primary jurusan)
+    jurusan_ids?: number[]; // Additional jurusans for guru
     kelas_id?: number;
 }
 

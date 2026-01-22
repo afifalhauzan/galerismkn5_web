@@ -20,10 +20,11 @@ interface FormData {
   role: 'guru' | 'siswa';
   nis_nip: string;
   jurusan_id: number;
+  jurusan_ids: number[];
   kelas_id?: number;
 }
 
-export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, error }: UserModalProps) {
+export default function UserModal({ isOpen, onClose, onSubmit, user, jurusans, isLoading, error }: UserModalProps) {
   const {
     register,
     handleSubmit,
@@ -40,6 +41,7 @@ export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, 
       role: 'siswa',
       nis_nip: '',
       jurusan_id: 0,
+      jurusan_ids: [],
       kelas_id: 0
     }
   });
@@ -65,6 +67,7 @@ export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, 
           role: user.role as 'guru' | 'siswa',
           nis_nip: user.nis_nip || '',
           jurusan_id: user.jurusan_id || 0,
+          jurusan_ids: user.jurusan_ids || [],
           kelas_id: user.kelas_id || 0
         });
       } else {
@@ -75,6 +78,7 @@ export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, 
           role: 'siswa',
           nis_nip: '',
           jurusan_id: 0,
+          jurusan_ids: [],
           kelas_id: 0
         });
       }
@@ -86,6 +90,23 @@ export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, 
     setValue('kelas_id', 0);
   }, [watchedJurusanId, setValue]);
 
+  // Reset jurusan selections when role changes
+  useEffect(() => {
+    if (watchedRole === 'siswa') {
+      setValue('jurusan_ids', []);
+    } else if (watchedRole === 'guru') {
+      setValue('jurusan_id', 0);
+    }
+  }, [watchedRole, setValue]);
+
+  // Auto-set jurusan_id when guru selects jurusan_ids (for backend compatibility)
+  const watchedJurusanIds = watch('jurusan_ids');
+  useEffect(() => {
+    if (watchedRole === 'guru' && watchedJurusanIds && watchedJurusanIds.length > 0) {
+      setValue('jurusan_id', watchedJurusanIds[0]);
+    }
+  }, [watchedJurusanIds, watchedRole, setValue]);
+
   const onFormSubmit = async (data: FormData) => {
     try {
       const submitData: CreateUserData | UpdateUserData = { ...data };
@@ -95,9 +116,16 @@ export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, 
         delete (submitData as any).password;
       }
       
-      // Set kelas_id to undefined if role is guru
+      // Handle different data structure for guru vs siswa
       if (submitData.role === 'guru') {
         submitData.kelas_id = undefined;
+        // For guru, if jurusan_ids is provided but not jurusan_id, use first selected jurusan as primary
+        if (submitData.jurusan_ids && submitData.jurusan_ids.length > 0 && !submitData.jurusan_id) {
+          submitData.jurusan_id = submitData.jurusan_ids[0];
+        }
+      } else {
+        // For siswa, use single jurusan_id and remove jurusan_ids
+        delete (submitData as any).jurusan_ids;
       }
 
       await onSubmit(submitData);
@@ -150,9 +178,8 @@ export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, 
                   <div className="mt-2 text-sm text-red-700">
                     <ul className="list-disc pl-5 space-y-1">
                       {Object.entries(allErrors).map(([field, error]) => {
-                        const message = error?.message || error;
                         return (
-                          <li key={field}>{Array.isArray(message) ? message.join(', ') : String(message)}</li>
+                          <li key={field}>{Array.isArray(error) ? error.join(', ') : String(error)}</li>
                         );
                       })}
                     </ul>
@@ -297,36 +324,78 @@ export default function UserModal({ isOpen, onClose, user, jurusans, isLoading, 
 
           {/* Jurusan */}
           <div>
-            <label htmlFor="jurusan_id" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Jurusan *
             </label>
-            <Controller
-              name="jurusan_id"
-              control={control}
-              rules={{
-                required: 'Jurusan harus dipilih',
-                validate: (value) => value > 0 || 'Jurusan harus dipilih'
-              }}
-              render={({ field }) => (
-                <select
-                  {...field}
-                  id="jurusan_id"
-                  className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    allErrors.jurusan_id ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                >
-                  <option value={0}>Pilih Jurusan</option>
-                  {jurusans.map((jurusan) => (
-                    <option key={jurusan.id} value={jurusan.id}>
-                      {jurusan.nama}
-                    </option>
-                  ))}
-                </select>
-              )}
-            />
-            {allErrors.jurusan_id && (
+            
+            {/* For Siswa - Single Select */}
+            {watchedRole === 'siswa' && (
+              <Controller
+                name="jurusan_id"
+                control={control}
+                rules={{
+                  required: 'Jurusan harus dipilih',
+                  validate: (value) => value > 0 || 'Jurusan harus dipilih'
+                }}
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    id="jurusan_id"
+                    className={`w-full px-3 py-2 text-gray-600 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      allErrors.jurusan_id ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value={0}>Pilih Jurusan</option>
+                    {jurusans.map((jurusan) => (
+                      <option key={jurusan.id} value={jurusan.id}>
+                        {jurusan.nama}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
+            )}
+
+            {/* For Guru - Multiple Checkboxes */}
+            {watchedRole === 'guru' && (
+              <Controller
+                name="jurusan_ids"
+                control={control}
+                rules={{
+                  required: 'Minimal satu jurusan harus dipilih',
+                  validate: (value) => (value && value.length > 0) || 'Minimal satu jurusan harus dipilih'
+                }}
+                render={({ field }) => (
+                  <div className={`border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto ${
+                    allErrors.jurusan_ids ? 'border-red-500' : 'border-gray-300'
+                  }`}>
+                    {jurusans.map((jurusan) => (
+                      <label key={jurusan.id} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          value={jurusan.id}
+                          checked={field.value?.includes(jurusan.id) || false}
+                          onChange={(e) => {
+                            const currentValues = field.value || [];
+                            if (e.target.checked) {
+                              field.onChange([...currentValues, jurusan.id]);
+                            } else {
+                              field.onChange(currentValues.filter(id => id !== jurusan.id));
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <span className="text-sm text-gray-700">{jurusan.nama}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              />
+            )}
+
+            {(allErrors.jurusan_id || allErrors.jurusan_ids) && (
               <p className="mt-1 text-sm text-red-600">
-                {allErrors.jurusan_id.message || allErrors.jurusan_id}
+                {allErrors.jurusan_id?.message || allErrors.jurusan_id || allErrors.jurusan_ids?.message || allErrors.jurusan_ids}
               </p>
             )}
           </div>

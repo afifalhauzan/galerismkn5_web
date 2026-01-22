@@ -570,16 +570,26 @@ class ProjekController extends Controller
             $user = Auth::user();
 
             // Only teachers can access this endpoint
-            if (!$user || $user->role !== 'guru' || !$user->jurusan_id) {
+            if (!$user || $user->role !== 'guru') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. Only teachers can access ungraded projects.'
                 ], 403);
             }
 
+            // Get guru's assigned jurusan IDs
+            $guruJurusanIds = $user->getJurusanIds();
+            
+            if (empty($guruJurusanIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No assigned departments found. Please contact administrator.'
+                ], 403);
+            }
+
             $query = Proyek::with(['user.kelas', 'jurusan'])
                 ->where('status', 'terkirim')
-                ->where('jurusan_id', $user->jurusan_id)
+                ->whereIn('jurusan_id', $guruJurusanIds)
                 ->whereDoesntHave('penilaian'); // Projects without any assessment
 
             // Search by title or description
@@ -627,8 +637,8 @@ class ProjekController extends Controller
                     'to' => $proyeks->lastItem(),
                 ],
                 'message' => $proyeks->total() > 0 
-                    ? "Found {$proyeks->total()} ungraded projects from your department" 
-                    : "No ungraded projects found from your department"
+                    ? "Found {$proyeks->total()} ungraded projects from your assigned departments" 
+                    : "No ungraded projects found from your assigned departments"
             ]);
         } catch (\Exception $e) {
             return response()->json([
