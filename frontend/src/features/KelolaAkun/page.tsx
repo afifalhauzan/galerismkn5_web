@@ -11,6 +11,7 @@ import UserTable from "./components/UserTable";
 import UserTablePagination from "./components/UserTablePagination";
 import UserModal from "./components/UserModal";
 import StudentExcelImportSection from "./components/StudentExcelImportSection";
+import TeacherExcelImportSection from "./components/TeacherExcelImportSection";
 import { MdAccountCircle } from "react-icons/md";
 
 export default function KelolaAkun({ user, logout }: { user: any, logout: () => void }) {
@@ -18,11 +19,17 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
     const { createUser, updateUser, deleteUser } = useUserMutations();
     const {
         importStudents,
+        importTeachers,
         downloadTemplate,
+        downloadTeacherTemplate,
         isImporting,
+        isImportingTeachers,
         isDownloading,
+        isDownloadingTeacher,
         importError,
+        importTeacherError,
         downloadError,
+        downloadTeacherError,
     } = useExcelAdmin();
 
     // Filter states
@@ -41,6 +48,13 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
     // Excel import states
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [importStatus, setImportStatus] = useState<{
+        type: 'success' | 'error' | null;
+        message: string;
+    }>({ type: null, message: '' });
+
+    // Teacher Excel import states
+    const [selectedTeacherFile, setSelectedTeacherFile] = useState<File | null>(null);
+    const [teacherImportStatus, setTeacherImportStatus] = useState<{
         type: 'success' | 'error' | null;
         message: string;
     }>({ type: null, message: '' });
@@ -203,6 +217,66 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
         }
     };
 
+    // Teacher import handlers
+    const handleTeacherFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedTeacherFile(file);
+            setTeacherImportStatus({ type: null, message: '' });
+        }
+    };
+
+    const handleImportTeacherExcel = async () => {
+        if (!selectedTeacherFile) {
+            setTeacherImportStatus({
+                type: 'error',
+                message: 'Silakan pilih file Excel terlebih dahulu'
+            });
+            return;
+        }
+
+        setTeacherImportStatus({ type: null, message: '' });
+        
+        try {
+            const result = await importTeachers(selectedTeacherFile);
+            
+            setTeacherImportStatus({
+                type: 'success',
+                message: `Import berhasil! ${result.imported_rows} guru berhasil diimpor dari ${result.total_rows} baris.`
+            });
+            
+            await mutate(); // Refresh the data
+            setSelectedTeacherFile(null);
+            
+            // Reset file input
+            const fileInput = document.getElementById('teacher-excel-upload') as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
+        } catch (error: any) {
+            console.error('Error importing teacher Excel:', error);
+            setTeacherImportStatus({
+                type: 'error',
+                message: error.message || 'Terjadi kesalahan saat mengimpor file guru'
+            });
+        }
+    };
+
+    const handleDownloadTeacherTemplate = async () => {
+        setTeacherImportStatus({ type: null, message: '' });
+        try {
+            await downloadTeacherTemplate();
+            setTeacherImportStatus({
+                type: 'success',
+                message: 'Template guru berhasil diunduh!'
+            });
+        } catch (error: any) {
+            console.error('Error downloading teacher template:', error);
+            setTeacherImportStatus({
+                type: 'error',
+                message: error.message || 'Terjadi kesalahan saat mengunduh template guru'
+            });
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:mt-20">
@@ -302,6 +376,17 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
                     onFileUpload={handleFileUpload}
                     onImportExcel={handleImportExcel}
                     onDownloadTemplate={handleDownloadTemplate}
+                />
+
+                {/* Teacher Excel Import Section */}
+                <TeacherExcelImportSection
+                    selectedFile={selectedTeacherFile}
+                    importStatus={teacherImportStatus}
+                    isImporting={isImportingTeachers}
+                    isDownloading={isDownloadingTeacher}
+                    onFileUpload={handleTeacherFileUpload}
+                    onImportExcel={handleImportTeacherExcel}
+                    onDownloadTemplate={handleDownloadTeacherTemplate}
                 />
                 {/* Filters */}
                 <UserFilters
