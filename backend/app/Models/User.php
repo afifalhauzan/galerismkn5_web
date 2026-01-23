@@ -24,7 +24,7 @@ class User extends Authenticatable
         'password',
         'nis_nip',
         'role',
-        'jurusan_id',
+        'jurusan_id', // For siswa only, can be null for guru
         'kelas_id',
         'nis',
         'gender',
@@ -121,7 +121,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the jurusan that the student belongs to (for siswa)
+     * Get the jurusan that the student belongs to (for siswa only)
+     * For guru, this will be null since they use many-to-many jurusans() relationship
      */
     public function jurusan()
     {
@@ -130,6 +131,7 @@ class User extends Authenticatable
 
     /**
      * Get the jurusans that the guru can teach (for guru - many-to-many)
+     * Siswa don't use this relationship
      */
     public function jurusans()
     {

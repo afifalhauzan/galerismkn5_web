@@ -8,6 +8,7 @@ use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\StudentImportController;
+use App\Http\Controllers\TeacherImportController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\Auth\ClaimAccountController;
 use App\Http\Controllers\DashboardStatsController;
@@ -40,6 +41,13 @@ Route::middleware([\App\Http\Middleware\OptionalAuth::class])->group(function ()
 });
 Route::get('/proyeks/ungraded', [ProjekController::class, 'ungraded'])->name('proyeks.ungraded')->middleware('auth:sanctum');
 Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyeks.show');
+
+/**
+ * Public Template Download Routes
+ * These routes allow downloading Excel templates for import
+ */
+Route::get('/admin/templates/students', [StudentImportController::class, 'downloadTemplate'])->name('students.template');
+Route::get('/admin/templates/teachers', [TeacherImportController::class, 'downloadTemplate'])->name('teachers.template');
 
 /**
  * Public Jurusan Routes
@@ -135,6 +143,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
      */
     Route::post('/admin/import-students', [StudentImportController::class, 'import'])->name('students.import');
     Route::get('/admin/students/import/status', [StudentImportController::class, 'getImportStatus'])->name('students.import.status');
+
+    /**
+     * Teacher Excel Import Routes
+     * Admin-only routes for importing teachers from Excel files
+     */
+    Route::post('/admin/import-teachers', [TeacherImportController::class, 'import'])->name('teachers.import');
+    Route::get('/admin/teachers/import/status', [TeacherImportController::class, 'getImportStatus'])->name('teachers.import.status');
 
     /**
      * Penilaian (Grading) Routes
