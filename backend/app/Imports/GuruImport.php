@@ -68,6 +68,7 @@ class GuruImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErro
                 'gender' => null,
                 'is_active' => true, // Teachers are active by default
                 'is_alumni' => false,
+                'is_changed_password' => false, // Flag that password needs to be changed
                 'email_verified_at' => now(), // Auto-verify imported teachers
             ]);
 

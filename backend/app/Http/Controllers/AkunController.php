@@ -122,6 +122,7 @@ class AkunController extends Controller
             'nis_nip' => $request->nis_nip,
             'jurusan_id' => $request->jurusan_id,
             'kelas_id' => $request->role === 'siswa' ? $request->kelas_id : null,
+            'is_changed_password' => true, // Manually created accounts have custom passwords
         ]);
         
         // Handle multiple jurusans for guru

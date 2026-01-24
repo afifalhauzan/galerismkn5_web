@@ -11,6 +11,7 @@ use App\Http\Controllers\StudentImportController;
 use App\Http\Controllers\TeacherImportController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\Auth\ClaimAccountController;
+use App\Http\Controllers\Auth\PasswordCheckController;
 use App\Http\Controllers\DashboardStatsController;
 use App\Http\Controllers\HeroCarouselController;
 
@@ -41,6 +42,12 @@ Route::middleware([\App\Http\Middleware\OptionalAuth::class])->group(function ()
 });
 Route::get('/proyeks/ungraded', [ProjekController::class, 'ungraded'])->name('proyeks.ungraded')->middleware('auth:sanctum');
 Route::get('/proyeks/{proyek}', [ProjekController::class, 'show'])->name('proyeks.show');
+
+/**
+ * Public Password Requirements Route
+ * Public route for getting password requirements
+ */
+Route::get('/auth/password-requirements', [PasswordCheckController::class, 'getPasswordRequirements'])->name('auth.password.requirements.public');
 
 /**
  * Public Template Download Routes
@@ -87,6 +94,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('auth.logout.all');
 
     Route::get('/user-stats', [AuthController::class, 'userStats'])->name('user.stats');
+    
+    /**
+     * Password Management Routes
+     * For checking and updating teacher passwords after import
+     */
+    Route::get('/auth/password-check', [PasswordCheckController::class, 'checkPasswordStatus'])->name('auth.password.check');
+    Route::post('/auth/change-password', [PasswordCheckController::class, 'changePassword'])->name('auth.password.change');
     
     /**
      * Dashboard Statistics Routes

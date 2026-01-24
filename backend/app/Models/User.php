@@ -31,6 +31,7 @@ class User extends Authenticatable
         'is_active',
         'is_alumni',
         'email_verified_at',
+        'is_changed_password',
     ];
 
     /**
@@ -118,6 +119,22 @@ class User extends Authenticatable
     public function isRegistered(): bool
     {
         return !is_null($this->email);
+    }
+
+    /**
+     * Check if user needs to change password (for imported accounts)
+     */
+    public function needsPasswordChange(): bool
+    {
+        return $this->isGuru() && !$this->is_changed_password;
+    }
+
+    /**
+     * Mark password as changed
+     */
+    public function markPasswordAsChanged(): void
+    {
+        $this->update(['is_changed_password' => true]);
     }
 
     /**

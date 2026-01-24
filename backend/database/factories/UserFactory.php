@@ -39,6 +39,7 @@ class UserFactory extends Factory
             'gender' => $this->faker ? $this->faker->randomElement(['L', 'P']) : 'L',
             'is_active' => true, // Active by default (with email)
             'is_alumni' => false,
+            'is_changed_password' => true, // Default to true for factory-created users
         ];
     }
 
