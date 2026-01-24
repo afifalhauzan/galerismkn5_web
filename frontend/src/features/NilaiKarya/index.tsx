@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useUngradedProjeks } from "@/hooks/ProjekHooks";
 import Navbar from "@/components/ui/Navbar";
 import { Spinner } from "@/components/ui/spinner";
+import Modal, { ModalBody, ModalFooter } from "@/components/ui/Modal";
 import {
     HiSearch,
     HiFilter,
@@ -18,6 +19,7 @@ import {
 } from "react-icons/hi";
 import { ProjectCard } from "./components/ProjectCard";
 import { Proyek } from "@/types/proyek";
+import { MdNoAccounts } from "react-icons/md";
 
 export default function NilaiKaryaPage() {
     const { user, isLoading: authLoading } = useAuth();
@@ -28,6 +30,9 @@ export default function NilaiKaryaPage() {
     const [selectedYear, setSelectedYear] = useState<string>("");
     const [selectedKelas, setSelectedKelas] = useState<string>("");
     const [currentPage, setCurrentPage] = useState(1);
+    
+    // Modal state for error handling
+    const [showErrorModal, setShowErrorModal] = useState(false);
 
     // Fetch ungraded projects
     const {
@@ -36,6 +41,7 @@ export default function NilaiKaryaPage() {
         message,
         isLoading,
         isError,
+        error,
         mutate
     } = useUngradedProjeks({
         page: currentPage,
@@ -45,12 +51,41 @@ export default function NilaiKaryaPage() {
         kelas: selectedKelas || undefined,
     });
 
+    // Helper function to translate backend error messages
+    const getErrorMessage = (error: any) => {
+        if (!error) return "Gagal memuat data karya. Silahkan coba lagi.";
+        
+        const errorMessage = error?.message || error?.response?.data?.message || error?.toString() || "";
+        
+        if (errorMessage.includes("No assigned departments found. Please contact administrator.")) {
+            return "Akun Guru anda belum memiliki jurusan";
+        }
+        
+        return "Gagal memuat data karya. Silahkan coba lagi.";
+    };
+
     // Redirect if not authenticated or not a teacher
     useEffect(() => {
         if (!authLoading && (!user || user.role !== 'guru')) {
             router.push('/login');
         }
     }, [user, authLoading, router]);
+
+    // Show error modal when there's an error
+    useEffect(() => {
+        if (isError && error) {
+            setShowErrorModal(true);
+        }
+    }, [isError, error]);
+
+    const handleCloseErrorModal = () => {
+        setShowErrorModal(false);
+    };
+
+    const handleRetry = () => {
+        setShowErrorModal(false);
+        mutate();
+    };
 
     // Handle search
     const handleSearch = (value: string) => {
@@ -169,25 +204,20 @@ export default function NilaiKaryaPage() {
                         </div>
                     </div>
 
+                    {isError && 
+                    <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">
+                        <p className="text-center">
+                            {getErrorMessage(error)}. Hubungi admin IT sekolah untuk mengatur jurusan pada akun Anda.
+                        </p>
+                    </div>
+                    }
+
                     {/* Projects Grid */}
                     {isLoading ? (
                         <div className="flex justify-center items-center py-12">
                             <Spinner />
                         </div>
-                    ) : isError ? (
-                        <div className="text-center py-12">
-                            <div className="text-red-600 mb-4">
-                                <HiClock className="w-12 h-12 mx-auto mb-2" />
-                                <p>Gagal memuat data karya</p>
-                            </div>
-                            <button
-                                onClick={() => mutate()}
-                                className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700"
-                            >
-                                Coba Lagi
-                            </button>
-                        </div>
-                    ) : proyeks.length === 0 ? (
+                    ) : !isError && proyeks.length === 0 ? (
                         <div className="text-center py-12">
                             <HiStar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -238,6 +268,51 @@ export default function NilaiKaryaPage() {
                     )}
                 </div>
             </main>
+
+            {/* Error Modal */}
+            <Modal
+                isOpen={showErrorModal}
+                onClose={handleCloseErrorModal}
+                title="Terjadi Kesalahan"
+                size="md"
+                closeOnBackdrop={true}
+                closeOnEscape={true}
+            >
+                <ModalBody className="text-center py-2">
+                    <div className="text-orange-500 mb-6">
+                        <MdNoAccounts className="w-20 h-20 mx-auto mb-4 opacity-80" />
+                        <p className="text-xl font-medium mb-3 text-gray-800">
+                            {getErrorMessage(error)}
+                        </p>
+                        {error?.message?.includes("No assigned departments found. Please contact administrator.") ? (
+                            <p className="text-base text-gray-600 leading-relaxed max-w-md mx-auto">
+                                Hubungi admin IT sekolah untuk mengatur jurusan pada akun Anda.
+                            </p>
+                        ) : (
+                            <p className="text-base text-gray-600 leading-relaxed">
+                                Terjadi kesalahan saat memuat data. Silakan coba lagi.
+                            </p>
+                        )}
+                    </div>
+                </ModalBody>
+                
+                <ModalFooter className="flex justify-center space-x-3">
+                    <button
+                        onClick={handleCloseErrorModal}
+                        className="px-6 py-2 w-full border-1 border-gray-500 hover:bg-sky-00 bg-sky-600 text-white rounded-lg transition-colors duration-200"
+                    >
+                        Tutup
+                    </button>
+                    {!error?.message?.includes("No assigned departments") && (
+                        <button
+                            onClick={handleRetry}
+                            className="px-6 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg transition-colors duration-200"
+                        >
+                            Coba Lagi
+                        </button>
+                    )}
+                </ModalFooter>
+            </Modal>
         </div>
     );
 }

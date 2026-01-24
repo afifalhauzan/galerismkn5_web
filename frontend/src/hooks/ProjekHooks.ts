@@ -167,6 +167,7 @@ export function useUngradedProjeks(params: Omit<ProjekQueryParams, 'jurusan_id' 
         message: (data as PaginatedResponse<Proyek>)?.message || '',
         isLoading,
         isError: error,
+        error,
         mutate,
     };
 }
