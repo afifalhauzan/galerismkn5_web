@@ -24,6 +24,8 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
     const [showReview, setShowReview] = useState(false);
     const imageUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
+    console.log('PROJEK DATA:', proyek);
+
     const handleDelete = async () => {
         const confirmed = await showDeleteConfirmation({
             title: "Apakah Anda yakin?",

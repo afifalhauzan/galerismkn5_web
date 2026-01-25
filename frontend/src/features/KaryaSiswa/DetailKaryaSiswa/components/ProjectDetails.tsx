@@ -1,3 +1,5 @@
+import MediaPreview from './MediaPreview';
+
 interface ProjectDetailsProps {
   proyek: any;
   imageUrl: string;
@@ -38,7 +40,7 @@ export default function ProjectDetails({ proyek, imageUrl }: ProjectDetailsProps
                 rel="noopener noreferrer"
                 className="inline-flex items-center text-blue-600 hover:text-blue-800"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="hidden md:block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
                 {proyek.tautan_proyek}
@@ -48,27 +50,8 @@ export default function ProjectDetails({ proyek, imageUrl }: ProjectDetailsProps
         </div>
       </div>
 
-      {/* Project Image */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        {proyek.image_url ? (
-          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-            <img
-              src={`${imageUrl}${proyek.image_url}`}
-              alt={proyek.judul}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p className="mt-2 text-sm text-gray-500">Tidak ada gambar</p>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Dynamic Media Preview */}
+      <MediaPreview proyek={proyek} imageUrl={imageUrl} />
     </div>
   );
 }
