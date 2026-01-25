@@ -302,64 +302,136 @@ export default function KelolaAkun({ user, logout }: { user: any, logout: () => 
 
                     {/* Stats */}
                     {pagination && (
-                        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
-                            <div className="bg-white overflow-hidden shadow rounded-lg">
-                                <div className="p-5">
-                                    <div className="flex items-center">
-                                        <MdAccountCircle className="h-10 w-10 text-sky-600"/>
-                                        <div className="ml-5 w-0 flex-1">
-                                            <dl>
-                                                <dt className="text-sm font-medium text-gray-500 truncate">
-                                                    Total Akun {selectedRole ? `(${selectedRole})` : ''}
-                                                </dt>
-                                                <dd className="text-lg font-medium text-gray-900">
-                                                    {pagination.total}
-                                                </dd>
-                                            </dl>
+                        <div className="mt-6">
+                            {/* Mobile Layout */}
+                            <div className="block sm:hidden">
+                                {/* First two stats in 2-column grid */}
+                                <div className="grid grid-cols-2 gap-5 mb-5">
+                                    <div className="bg-white overflow-hidden shadow rounded-lg">
+                                        <div className="p-5">
+                                            <div className="flex items-center">
+                                                <MdAccountCircle className="h-10 w-10 text-sky-600"/>
+                                                <div className="ml-5 w-0 flex-1">
+                                                    <dl>
+                                                        <dt className="text-sm font-medium text-gray-500 truncate">
+                                                            Total Akun {selectedRole ? `(${selectedRole})` : ''}
+                                                        </dt>
+                                                        <dd className="text-lg font-medium text-gray-900">
+                                                            {pagination.total}
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white overflow-hidden shadow rounded-lg">
+                                        <div className="p-5">
+                                            <div className="flex items-center">
+                                                <div className="flex-shrink-0">
+                                                    <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    </svg>
+                                                </div>
+                                                <div className="ml-5 w-0 flex-1">
+                                                    <dl>
+                                                        <dt className="text-sm font-medium text-gray-500 truncate">
+                                                            Halaman Saat Ini
+                                                        </dt>
+                                                        <dd className="text-lg font-medium text-gray-900">
+                                                            {pagination.current_page} dari {pagination.last_page}
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Third stat full width */}
+                                <div className="bg-white overflow-hidden shadow rounded-lg">
+                                    <div className="p-5">
+                                        <div className="flex items-center">
+                                            <div className="flex-shrink-0">
+                                                <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h9.586a1 1 0 00.707-.293l2.414-2.414a1 1 0 00.293-.707V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                </svg>
+                                            </div>
+                                            <div className="ml-5 w-0 flex-1">
+                                                <dl>
+                                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                                        Per Halaman
+                                                    </dt>
+                                                    <dd className="text-lg font-medium text-gray-900">
+                                                        {pagination.per_page} akun
+                                                    </dd>
+                                                </dl>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-white overflow-hidden shadow rounded-lg">
-                                <div className="p-5">
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0">
-                                            <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                        </div>
-                                        <div className="ml-5 w-0 flex-1">
-                                            <dl>
-                                                <dt className="text-sm font-medium text-gray-500 truncate">
-                                                    Halaman Saat Ini
-                                                </dt>
-                                                <dd className="text-lg font-medium text-gray-900">
-                                                    {pagination.current_page} dari {pagination.last_page}
-                                                </dd>
-                                            </dl>
+                            {/* Desktop Layout */}
+                            <div className="hidden sm:grid sm:grid-cols-3 gap-5">
+                                <div className="bg-white overflow-hidden shadow rounded-lg">
+                                    <div className="p-5">
+                                        <div className="flex items-center">
+                                            <MdAccountCircle className="h-10 w-10 text-sky-600"/>
+                                            <div className="ml-5 w-0 flex-1">
+                                                <dl>
+                                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                                        Total Akun {selectedRole ? `(${selectedRole})` : ''}
+                                                    </dt>
+                                                    <dd className="text-lg font-medium text-gray-900">
+                                                        {pagination.total}
+                                                    </dd>
+                                                </dl>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="bg-white overflow-hidden shadow rounded-lg">
-                                <div className="p-5">
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0">
-                                            <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h9.586a1 1 0 00.707-.293l2.414-2.414a1 1 0 00.293-.707V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                            </svg>
+                                <div className="bg-white overflow-hidden shadow rounded-lg">
+                                    <div className="p-5">
+                                        <div className="flex items-center">
+                                            <div className="flex-shrink-0">
+                                                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            </div>
+                                            <div className="ml-5 w-0 flex-1">
+                                                <dl>
+                                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                                        Halaman Saat Ini
+                                                    </dt>
+                                                    <dd className="text-lg font-medium text-gray-900">
+                                                        {pagination.current_page} dari {pagination.last_page}
+                                                    </dd>
+                                                </dl>
+                                            </div>
                                         </div>
-                                        <div className="ml-5 w-0 flex-1">
-                                            <dl>
-                                                <dt className="text-sm font-medium text-gray-500 truncate">
-                                                    Per Halaman
-                                                </dt>
-                                                <dd className="text-lg font-medium text-gray-900">
-                                                    {pagination.per_page} akun
-                                                </dd>
-                                            </dl>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white overflow-hidden shadow rounded-lg">
+                                    <div className="p-5">
+                                        <div className="flex items-center">
+                                            <div className="flex-shrink-0">
+                                                <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h9.586a1 1 0 00.707-.293l2.414-2.414a1 1 0 00.293-.707V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                </svg>
+                                            </div>
+                                            <div className="ml-5 w-0 flex-1">
+                                                <dl>
+                                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                                        Per Halaman
+                                                    </dt>
+                                                    <dd className="text-lg font-medium text-gray-900">
+                                                        {pagination.per_page} akun
+                                                    </dd>
+                                                </dl>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

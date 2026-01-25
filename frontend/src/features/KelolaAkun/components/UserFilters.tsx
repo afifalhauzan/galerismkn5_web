@@ -90,7 +90,7 @@ export default function UserFilters({
                     <select
                         value={selectedJurusan}
                         onChange={(e) => onJurusanChange(e.target.value)}
-                        className="appearance-none bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg border-0 cursor-pointer transition-colors min-w-[150px] text-sm font-medium pr-10"
+                        className="appearance-none bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg border-0 cursor-pointer transition-colors text-sm font-medium pr-5 md:pr-10"
                     >
                         <option value="">Semua Jurusan</option>
                         {jurusanOptions.map((option) => (

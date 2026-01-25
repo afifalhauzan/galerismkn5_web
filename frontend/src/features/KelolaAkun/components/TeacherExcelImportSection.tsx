@@ -30,7 +30,7 @@ export default function TeacherExcelImportSection({
                 className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200 cursor-pointer hover:from-green-100 hover:to-emerald-100 transition-colors"
                 onClick={() => setIsExpanded(!isExpanded)}
             >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-row sm:items-center sm:justify-between">
                     <div className="flex-1">
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
                             <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,9 +38,6 @@ export default function TeacherExcelImportSection({
                             </svg>
                             Import Data Guru
                         </h2>
-                        <p className="text-sm text-gray-600 mt-1">
-                            Upload file Excel untuk mengimpor data guru secara massal
-                        </p>
                     </div>
                     <div className="flex items-center mt-3 sm:mt-0 sm:ml-4">
                         {isExpanded && (
