@@ -30,11 +30,11 @@ export function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
               </div>
             </div>
             
-            {index < steps.length - 1 && (
+            {/* {index < steps.length - 1 && (
               <div className={`w-10 mr-2 h-0.5 ${
                 currentStep > step.id ? 'bg-emerald-600' : 'bg-gray-200'
               }`} />
-            )}
+            )} */}
           </div>
         ))}
       </div>
