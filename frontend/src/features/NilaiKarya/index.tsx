@@ -58,7 +58,7 @@ export default function NilaiKaryaPage() {
         const errorMessage = error?.message || error?.response?.data?.message || error?.toString() || "";
         
         if (errorMessage.includes("No assigned departments found. Please contact administrator.")) {
-            return "Akun Guru anda belum memiliki jurusan";
+            return "Halo Bapak/Ibu Guru,";
         }
         
         return "Gagal memuat data karya. Silahkan coba lagi.";
@@ -273,20 +273,20 @@ export default function NilaiKaryaPage() {
             <Modal
                 isOpen={showErrorModal}
                 onClose={handleCloseErrorModal}
-                title="Terjadi Kesalahan"
+                title="Akses Dashboard Penilai"
                 size="md"
                 closeOnBackdrop={true}
                 closeOnEscape={true}
             >
                 <ModalBody className="text-center py-2">
-                    <div className="text-orange-500 mb-6">
+                    <div className="text-sky-600">
                         <MdNoAccounts className="w-20 h-20 mx-auto mb-4 opacity-80" />
                         <p className="text-xl font-medium mb-3 text-gray-800">
                             {getErrorMessage(error)}
                         </p>
                         {error?.message?.includes("No assigned departments found. Please contact administrator.") ? (
                             <p className="text-base text-gray-600 leading-relaxed max-w-md mx-auto">
-                                Hubungi admin IT sekolah untuk mengatur jurusan pada akun Anda.
+                                Akun Anda telah aktif, namun saat ini belum terhubung dengan jurusan tertentu. Mohon hubungi Admin IT Sekolah untuk menetapkan jurusan agar Bapak/Ibu dapat mulai melakukan penilaian karya siswa.
                             </p>
                         ) : (
                             <p className="text-base text-gray-600 leading-relaxed">
@@ -301,7 +301,7 @@ export default function NilaiKaryaPage() {
                         onClick={handleCloseErrorModal}
                         className="px-6 py-2 w-full border-1 border-gray-500 hover:bg-sky-00 bg-sky-600 text-white rounded-lg transition-colors duration-200"
                     >
-                        Tutup
+                        Mengerti
                     </button>
                     {!error?.message?.includes("No assigned departments") && (
                         <button
