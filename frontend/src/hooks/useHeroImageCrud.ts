@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/axios';
 import api from '@/lib/axios';
+import { env } from 'next-runtime-env/build/script/env';
 
 export interface HeroImage {
   id: number;
@@ -179,9 +180,8 @@ export function useHeroImageCrud() {
     // Data
     heroImages: data?.data?.map(image => ({
       ...image,
-      image_url: image.image_url.startsWith('http') 
-        ? image.image_url 
-        : `${process.env.NEXT_PUBLIC_BACKEND_URL || ''} ${image.image_url}`
+      image_url: image.image_url.startsWith('http')? image.image_url : `${(env('NEXT_PUBLIC_BACKEND_URL') || '').trim()}${image.image_url}` 
+        // No space above, and .trim() just to be safe.
     })) || [],
     isLoading,
     isError: error,
