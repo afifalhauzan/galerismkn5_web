@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { fetcher } from '@/lib/axios';
+import { env } from 'next-runtime-env/build/script/env';
 
 export interface CarouselSlide {
   id: number;
@@ -65,7 +66,7 @@ export function useHeroCarousel() {
 
   // Helper function to get full image URL
   const getImageUrl = (imageUrl: string): string => {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    const backendUrl = env('NEXT_PUBLIC_BACKEND_URL') || '';
     
     // If it's already a full URL, return as is
     if (imageUrl.startsWith('http')) {
