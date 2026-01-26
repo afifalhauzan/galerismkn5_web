@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { env } from "next-runtime-env";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
@@ -10,29 +9,27 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'picsum.photos' },
+      // Use wildcards for your domains to handle staging AND production in one build
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
+        hostname: '**.duckdns.org', // Matches galeri-staging.duckdns.org AND galerismkn5.duckdns.org
       },
       {
         protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
+        hostname: 'karya.smkn5malang.sch.id',
       },
+      // Keep localhost for your local testing
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '8000',
-        pathname: '/storage/**',
       },
     ],
   },
-  env: {
-    NEXT_PUBLIC_API_URL: env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000',
-  }
+  // REMOVED: env block. 
+  // We handle this via next-runtime-env in the layout/components instead.
 };
 
 export default nextConfig;
