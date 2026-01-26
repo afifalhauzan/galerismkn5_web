@@ -1,8 +1,9 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { env } from 'next-runtime-env';
 
 const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+    baseURL: env('NEXT_PUBLIC_API_URL') || '/api',
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Accept': 'application/json',
@@ -60,7 +61,7 @@ export const fetcher = async (url: string) => {
 
 // Public fetcher function (without auth token)
 export const publicFetcher = async (url: string) => {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}${url}`, {
+    const response = await axios.get(`${env('NEXT_PUBLIC_API_URL') || '/api'}${url}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Accept': 'application/json',

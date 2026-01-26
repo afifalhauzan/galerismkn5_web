@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { fetcher, publicFetcher } from '@/lib/axios';
+import { env } from 'next-runtime-env';
 
 interface PasswordCheckResponse {
   success: boolean;
@@ -86,7 +87,7 @@ export async function changePassword(data: ChangePasswordData): Promise<ChangePa
   console.log('🔑 Token from localStorage:', localStorage.getItem('token') ? 'Present' : 'Missing');
   console.log('🔑 Using token:', token ? 'Present' : 'Missing');
   
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`, {
+  const response = await fetch(`${env('NEXT_PUBLIC_API_URL')}/auth/change-password`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

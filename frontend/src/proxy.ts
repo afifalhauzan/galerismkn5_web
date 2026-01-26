@@ -1,3 +1,4 @@
+import { env } from 'next-runtime-env';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Define protected routes that require authentication
@@ -80,7 +81,7 @@ export async function proxy(request: NextRequest) {
     // For authenticated users accessing protected routes, check password change status
     console.log('🔍 Checking password status for authenticated user on protected route');
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000';
       console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
       
       const response = await fetch(`${apiUrl}/auth/password-check`, {

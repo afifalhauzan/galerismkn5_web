@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from 'next-runtime-env';
 import { useState } from "react";
 
 export default function Test() {
@@ -12,7 +13,7 @@ export default function Test() {
   const [message, setMessage] = useState("");
   const [isLogin, setIsLogin] = useState(true);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+  const API_URL = env('NEXT_PUBLIC_API_URL') || "/api";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();

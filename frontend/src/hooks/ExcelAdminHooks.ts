@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { fetcher, poster } from '@/lib/axios';
 import { ApiResponse } from '@/types/proyek';
+import { env } from 'next-runtime-env';
 
 // Types for Excel import operations
 export interface ImportStats {
@@ -110,7 +111,7 @@ export function useExcelMutations() {
         '/admin/templates/students',
         async (url: string) => {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${url}`,
+                `${env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000/api'}${url}`,
                 {
                     method: 'GET',
                     headers: {
@@ -139,7 +140,7 @@ export function useExcelMutations() {
         '/admin/templates/teachers',
         async (url: string) => {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}${url}`,
+                `${env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000/api'}${url}`,
                 {
                     method: 'GET',
                     headers: {

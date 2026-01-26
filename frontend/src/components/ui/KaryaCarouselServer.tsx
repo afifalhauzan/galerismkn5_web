@@ -1,10 +1,11 @@
 import { Proyek, proyekToKaryaItem, KaryaItem } from '@/types/proyek';
 import KaryaCarouselClient from '@/components/ui/KaryaCarouselClient';
+import { env } from 'next-runtime-env';
 
 // Server-side data fetching function
 async function getFeaturedProjects(): Promise<KaryaItem[]> {
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const apiUrl = env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000';
         
         // Fetch featured projects from API
         const response = await fetch(`${apiUrl}/api/proyeks?status=dinilai&limit=6&page=1`, {

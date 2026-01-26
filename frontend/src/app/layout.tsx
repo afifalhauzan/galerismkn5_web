@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import SWRProvider from "@/providers/SWRProvider";
 import ProgressProviders from '@/app/bprogress';
+import { PublicEnvScript } from 'next-runtime-env';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <PublicEnvScript />
         <ProgressProviders>
           <SWRProvider>
             <AuthProvider>

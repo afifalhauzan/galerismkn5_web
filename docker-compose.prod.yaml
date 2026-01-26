@@ -3,6 +3,7 @@ version: '3.8'
 services:
   # --- Laravel API Backend ---
   backend:
+    image: afifalhauzan123/galerismkn5_backend:latest # Use pre-built image from Docker Hub
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
@@ -45,6 +46,7 @@ services:
 
   # --- Next.js Frontend ---
   frontend:
+    image: afifalhauzan123/galerismkn5_frontend:latest # Use pre-built image from Docker Hub
     build:
       context: ./frontend
       dockerfile: Dockerfile
