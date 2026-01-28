@@ -71,9 +71,19 @@ export default function ChangePasswordPage() {
             <p className="text-gray-600 text-sm mb-4">
               Kata sandi Anda telah berhasil diubah.
             </p>
-            <p className="text-blue-600 font-semibold text-sm">
+            <p className="text-blue-600 font-semibold text-sm mb-6">
               Selamat datang di Dashboard Penilaian!
             </p>
+            <button
+              onClick={() => {
+                router.push('/dashboard');
+                router.refresh();
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2"
+            >
+              Lanjutkan ke Dashboard
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}

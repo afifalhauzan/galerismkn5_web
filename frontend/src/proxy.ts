@@ -9,6 +9,7 @@ const PROTECTED_ROUTES = [
   '/admin',
   '/projects',
   '/penilaian',
+  '/nilaikarya',
   '/users',
   '/settings',
   '/profile',
@@ -31,11 +32,15 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('token')?.value;
   
+  // Prevent redirect loops by checking if we're coming from a redirect
+  const isRedirect = request.headers.get('referer')?.includes(request.nextUrl.origin);
+  
   // Debug logging - will appear in your terminal
   console.log('🔄 Proxy executing for path:', pathname);
   console.log('🌐 Request URL:', request.url);
   console.log('🌐 Request nextUrl origin:', request.nextUrl.origin);
   console.log('🔑 Token present:', !!token);
+  console.log('🔄 Is redirect:', isRedirect);
   
   // Get frontend URL explicitly
   const frontendUrl = request.nextUrl.origin; // This should be http://localhost:3000
@@ -146,6 +151,37 @@ export async function proxy(request: NextRequest) {
       console.log('🔗 Change-password login redirect URL:', loginUrl.toString());
       return NextResponse.redirect(loginUrl);
     }
+    
+    // Check if password has been changed (to handle post-change redirect)
+    try {
+      const apiUrl = env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000';
+      console.log('📡 Checking password status on change-password page:', `${apiUrl}/auth/password-check`);
+      
+      const response = await fetch(`${apiUrl}/auth/password-check`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        const data = responseData.data || responseData;
+        
+        // If password has been changed, redirect to dashboard
+        if (!data.needs_password_change) {
+          console.log('✅ Password changed successfully, redirecting to dashboard');
+          const dashboardUrl = new URL('/dashboard', frontendUrl);
+          console.log('🔗 Post-change dashboard redirect URL:', dashboardUrl.toString());
+          return NextResponse.redirect(dashboardUrl);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error checking password status on change-password page:', error);
+    }
+    
     console.log('✅ Allowing access to change-password page');
     // If authenticated, allow access to change-password page
     return NextResponse.next();
