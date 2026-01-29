@@ -9,11 +9,12 @@ use App\Http\Controllers\AkunController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\StudentImportController;
 use App\Http\Controllers\TeacherImportController;
-use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\SiswaController2;
 use App\Http\Controllers\Auth\ClaimAccountController;
 use App\Http\Controllers\Auth\PasswordCheckController;
 use App\Http\Controllers\DashboardStatsController;
 use App\Http\Controllers\HeroCarouselController;
+use App\Http\Controllers\Admin\MaintenanceController;
 
 /**
  * Authentication Routes
@@ -182,4 +183,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
      * CRUD operations for managing homepage carousel images
      */
     Route::apiResource('hero-images', HeroCarouselController::class);
+
+    /**
+     * Nuclear Maintenance Routes (Admin only)
+     * Dangerous system reset operations - requires admin authentication
+     */
+    Route::prefix('admin/maintenance')->name('admin.maintenance.')->group(function () {
+        Route::get('/stats', [MaintenanceController::class, 'getSystemStats'])->name('stats');
+        Route::post('/reset-projects-only', [MaintenanceController::class, 'resetProjectsOnly'])->name('reset.projects');
+        Route::post('/reset-academic-year', [MaintenanceController::class, 'resetAcademicYear'])->name('reset.academic');
+        Route::post('/total-system-reset', [MaintenanceController::class, 'totalSystemReset'])->name('reset.total');
+    });
 });
