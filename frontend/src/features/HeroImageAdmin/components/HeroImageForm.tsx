@@ -189,7 +189,7 @@ export function HeroImageForm({
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto m-4">
         <form onSubmit={handleSubmit} className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-black">
               {heroImage ? 'Edit Hero Image' : 'Tambah Hero Image'}
             </h2>
             <button
@@ -207,7 +207,7 @@ export function HeroImageForm({
           <div className="space-y-6">
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="title" className="block text-sm font-medium text-black mb-1">
                 Judul *
               </label>
               <input
@@ -216,7 +216,7 @@ export function HeroImageForm({
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black ${
                   errors.title ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Masukkan judul hero image"
@@ -226,7 +226,7 @@ export function HeroImageForm({
 
             {/* Subtitle */}
             <div>
-              <label htmlFor="subtitle" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="subtitle" className="block text-sm font-medium text-black mb-1">
                 Subtitle *
               </label>
               <textarea
@@ -235,7 +235,7 @@ export function HeroImageForm({
                 rows={3}
                 value={formData.subtitle}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black ${
                   errors.subtitle ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Masukkan subtitle hero image"
@@ -245,7 +245,7 @@ export function HeroImageForm({
 
             {/* Image Upload */}
             <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="image" className="block text-sm font-medium text-black mb-1">
                 Gambar {!heroImage && '*'}
               </label>
               
@@ -289,7 +289,7 @@ export function HeroImageForm({
 
             {/* Sort Order */}
             <div>
-              <label htmlFor="sort_order" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="sort_order" className="block text-sm font-medium text-black mb-1">
                 Urutan Tampilan *
               </label>
               <input
@@ -299,7 +299,7 @@ export function HeroImageForm({
                 min="0"
                 value={formData.sort_order}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black ${
                   errors.sort_order ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -319,7 +319,7 @@ export function HeroImageForm({
                   onChange={handleInputChange}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-black">
                   Aktif (tampilkan di carousel)
                 </span>
               </label>
