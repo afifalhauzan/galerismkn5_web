@@ -126,7 +126,7 @@ export default function NilaiKaryaPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                     {/* Header Section */}
-                    <div className="mb-8">
+                    <div className="mb-4">
                         <div className="bg-white rounded-lg shadow-sm  p-6">
                             <div className="flex items-center space-x-3 mb-4">
                                 <div className="bg-sky-100 p-2 rounded-lg">
@@ -160,7 +160,7 @@ export default function NilaiKaryaPage() {
                     </div>
 
                     {/* Search and Filter Section */}
-                    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
 
                             {/* Search Bar */}
@@ -232,7 +232,7 @@ export default function NilaiKaryaPage() {
                     ) : (
                         <>
                             {/* Projects Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-8">
                                 {proyeks.map((proyek: Proyek) => (
                                     <ProjectCard key={proyek.id} proyek={proyek} onGraded={mutate} />
                                 ))}
