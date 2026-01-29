@@ -33,13 +33,14 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check for various possible Laravel session cookies
-  const laravelSession = request.cookies.get('laravel-session')?.value; // Note: hyphen, not underscore
-  const sessionCookie = request.cookies.get('galerismkn5-web-session')?.value; // App-specific session
+  const laravelSession = request.cookies.get('laravel-session')?.value; // Standard Laravel session
+  const sessionCookie = request.cookies.get('galerismkn5-web-session')?.value; // App-specific session  
+  const galeriSession = request.cookies.get('galeri-smkn-5-session')?.value; // Production session name
   const phpSession = request.cookies.get('PHPSESSID')?.value;
   const xsrfCookie = request.cookies.get('XSRF-TOKEN')?.value;
 
   // Check if any authentication indicators are present
-  const hasAuthCookie = !!(laravelSession || sessionCookie || phpSession);
+  const hasAuthCookie = !!(laravelSession || sessionCookie || galeriSession || phpSession);
 
   // Debug logging - show all cookies for troubleshooting
   console.log('🔄 Proxy executing for path:', pathname);
@@ -47,6 +48,7 @@ export async function proxy(request: NextRequest) {
   console.log('🍪 All cookies:', request.cookies.getAll().map(c => `${c.name}=${c.value?.substring(0, 20)}...`));
   console.log('🔑 Laravel session present:', !!laravelSession);
   console.log('🔑 App session present:', !!sessionCookie);
+  console.log('🔑 Galeri session present:', !!galeriSession);
   console.log('🔑 PHP session present:', !!phpSession);
   console.log('🔐 XSRF cookie present:', !!xsrfCookie);
   console.log('🔒 Has auth cookie:', hasAuthCookie);
