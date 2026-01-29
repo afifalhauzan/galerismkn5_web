@@ -32,29 +32,26 @@ const EXCLUDED_ROUTES = [
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check for various possible Laravel session cookies
-  const laravelSession = request.cookies.get('laravel-session')?.value; // Standard Laravel session
-  const sessionCookie = request.cookies.get('galerismkn5-web-session')?.value; // App-specific session  
+  // Get the REAL domain from Caddy headers
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
+  const protocol = request.headers.get('x-forwarded-proto') || 'https';
+  const frontendUrl = `${protocol}://${host}`;
+
+  // Check for your specific production cookie names
+  const laravelSession = request.cookies.get('laravel-session')?.value; // Development session name
   const galeriSession = request.cookies.get('galeri-smkn-5-session')?.value; // Production session name
-  const phpSession = request.cookies.get('PHPSESSID')?.value;
   const xsrfCookie = request.cookies.get('XSRF-TOKEN')?.value;
 
-  // Check if any authentication indicators are present
-  const hasAuthCookie = !!(laravelSession || sessionCookie || galeriSession || phpSession);
+  // Auth check either in production or development
+  const hasAuthCookie = !!galeriSession || !!laravelSession;
 
-  // Debug logging - show all cookies for troubleshooting
+  // Debug logging - refined for production
   console.log('🔄 Proxy executing for path:', pathname);
-  console.log('🌐 Request URL:', request.url);
-  console.log('🍪 All cookies:', request.cookies.getAll().map(c => `${c.name}=${c.value?.substring(0, 20)}...`));
-  console.log('🔑 Laravel session present:', !!laravelSession);
-  console.log('🔑 App session present:', !!sessionCookie);
-  console.log('🔑 Galeri session present:', !!galeriSession);
-  console.log('🔑 PHP session present:', !!phpSession);
+  console.log('🌐 Real Request URL:', `${frontendUrl}${pathname}`);
+  console.log('🍪 Laravel (LOCALHOST) Session:', !!laravelSession ? '✅ Found' : '❌ Missing');
+  console.log('🍪 Galeri (PROD) Session:', !!galeriSession ? '✅ Found' : '❌ Missing');
   console.log('🔐 XSRF cookie present:', !!xsrfCookie);
-  console.log('🔒 Has auth cookie:', hasAuthCookie);
-
-  // Get frontend URL explicitly
-  const frontendUrl = request.nextUrl.origin;
+  console.log('🔒 Auth Status:', hasAuthCookie ? 'Authenticated' : 'Guest');
   console.log('🏠 Frontend URL:', frontendUrl);
 
   // Skip proxy for excluded routes - use exact match for root route to avoid conflicts
