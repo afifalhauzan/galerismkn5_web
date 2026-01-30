@@ -89,7 +89,7 @@ export async function proxy(request: NextRequest) {
     // Basic session check - if no session cookies, definitely not authenticated
     if (!hasAuthCookie) {
       console.log('🚫 No session cookie found, redirecting to login from:', pathname);
-      const loginUrl = new URL('/login', request.nextUrl.origin);
+      const loginUrl = new URL('/login', frontendUrl);
       console.log('🔗 Login redirect URL:', loginUrl.toString());
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
@@ -99,15 +99,17 @@ export async function proxy(request: NextRequest) {
     
     // Check password status for authenticated user on protected route
     try {
-      const apiUrl = env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000';
-      console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
+      // Use internal backend URL for middleware API calls (Docker container network)
+      const internalApiUrl = process.env.NODE_ENV === 'production' ? 'http://backend:8000/api' : 'http://localhost:8000/api';
+      console.log('📡 Making API call to:', `${internalApiUrl}/auth/password-check`);
 
-      const response = await fetch(`${apiUrl}/auth/password-check`, {
+      const response = await fetch(`${internalApiUrl}/auth/password-check`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+          'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
         },
       });
 
@@ -129,7 +131,7 @@ export async function proxy(request: NextRequest) {
         }
       } else if (response.status === 401) {
         console.log('🚫 Authentication invalid, redirecting to login');
-        const loginUrl = new URL('/login', request.nextUrl.origin);
+        const loginUrl = new URL('/login', frontendUrl);
         console.log('🔗 401 Login redirect URL:', loginUrl.toString());
         loginUrl.searchParams.set('redirect', pathname);
         return NextResponse.redirect(loginUrl);
@@ -150,22 +152,24 @@ export async function proxy(request: NextRequest) {
     // Basic session check
     if (!hasAuthCookie) {
       console.log('🚫 No session for change-password page, redirecting to login');
-      const loginUrl = new URL('/login', request.nextUrl.origin);
+      const loginUrl = new URL('/login', frontendUrl);
       console.log('🔗 Change-password login redirect URL:', loginUrl.toString());
       return NextResponse.redirect(loginUrl);
     }
 
     // Check if user still needs password change
     try {
-      const apiUrl = env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000';
-      console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
+      // Use internal backend URL for middleware API calls (Docker container network)
+      const internalApiUrl = process.env.NODE_ENV === 'production' ? 'http://backend:8000/api' : 'http://localhost:8000/api';
+      console.log('📡 Making API call to:', `${internalApiUrl}/auth/password-check`);
 
-      const response = await fetch(`${apiUrl}/auth/password-check`, {
+      const response = await fetch(`${internalApiUrl}/auth/password-check`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+          'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
         },
       });
 
