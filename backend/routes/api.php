@@ -9,7 +9,7 @@ use App\Http\Controllers\AkunController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\StudentImportController;
 use App\Http\Controllers\TeacherImportController;
-use App\Http\Controllers\SiswaController2;
+use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\Auth\ClaimAccountController;
 use App\Http\Controllers\Auth\PasswordCheckController;
 use App\Http\Controllers\DashboardStatsController;
