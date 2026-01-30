@@ -72,15 +72,17 @@ export async function proxy(request: NextRequest) {
   console.log('🛡️ Is protected route:', isProtectedRoute);
   console.log('🔐 Is auth route:', isAuthRoute);
 
-  // Handle authentication routes - allow access but check for valid sessions
+  // Handle authentication routes - redirect authenticated users to dashboard
   if (isAuthRoute) {
-    // If user has both session and XSRF tokens, they might already be logged in
-    // But let the client-side handle the redirect to avoid blocking access
+    // If user has valid session and XSRF tokens, redirect to dashboard immediately
     if (hasAuthCookie && xsrfCookie) {
-      console.log('⚠️ User has session cookies on auth route, letting client handle redirect');
+      console.log('🔄 Authenticated user on auth route, redirecting to dashboard');
+      const dashboardUrl = new URL('/dashboard', frontendUrl);
+      console.log('🔗 Dashboard redirect URL:', dashboardUrl.toString());
+      return NextResponse.redirect(dashboardUrl);
     }
 
-    console.log('✅ Allowing access to auth route');
+    console.log('✅ Guest user accessing auth route, allowing access');
     return NextResponse.next();
   }
 
@@ -101,19 +103,42 @@ export async function proxy(request: NextRequest) {
     try {
       // Use internal backend URL for middleware API calls (Docker container network)
       const internalApiUrl = process.env.NODE_ENV === 'production' ? 'http://backend:8000/api' : 'http://localhost:8000/api';
-      console.log('📡 Making API call to:', `${internalApiUrl}/auth/password-check`);
+      // Fallback to external URL if internal DNS fails
+      const externalApiUrl = `${frontendUrl}/api`;
+      
+      let apiUrl = internalApiUrl;
+      let useFallback = false;
+      
+      console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
 
-      const response = await fetch(`${internalApiUrl}/auth/password-check`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
-          'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
-        },
-      });
+      let response;
+      try {
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+            'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
+          },
+        });
+      } catch (dnsError) {
+        console.log('⚠️ DNS resolution failed for internal backend, trying external URL');
+        console.error('DNS Error:', dnsError.message);
+        apiUrl = externalApiUrl;
+        useFallback = true;
+        
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+          },
+        });
+      }
 
-      console.log('📡 API response status:', response.status);
+      console.log('📡 API response status:', response.status, useFallback ? '(using fallback URL)' : '(using internal URL)');
 
       if (response.ok) {
         const responseData = await response.json();
@@ -161,19 +186,42 @@ export async function proxy(request: NextRequest) {
     try {
       // Use internal backend URL for middleware API calls (Docker container network)
       const internalApiUrl = process.env.NODE_ENV === 'production' ? 'http://backend:8000/api' : 'http://localhost:8000/api';
-      console.log('📡 Making API call to:', `${internalApiUrl}/auth/password-check`);
+      // Fallback to external URL if internal DNS fails
+      const externalApiUrl = `${frontendUrl}/api`;
+      
+      let apiUrl = internalApiUrl;
+      let useFallback = false;
+      
+      console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
 
-      const response = await fetch(`${internalApiUrl}/auth/password-check`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
-          'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
-        },
-      });
+      let response;
+      try {
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+            'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
+          },
+        });
+      } catch (dnsError) {
+        console.log('⚠️ DNS resolution failed for internal backend, trying external URL');
+        console.error('DNS Error:', dnsError.message);
+        apiUrl = externalApiUrl;
+        useFallback = true;
+        
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+          },
+        });
+      }
 
-      console.log('📡 API response status:', response.status);
+      console.log('📡 API response status:', response.status, useFallback ? '(using fallback URL)' : '(using internal URL)');
 
       if (response.ok) {
         const responseData = await response.json();
