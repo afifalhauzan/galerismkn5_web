@@ -28,7 +28,7 @@ const wizardSteps: WizardStep[] = [
 
 export function ClaimWizardPage() {
   const router = useRouter();
-  const { setUser, setToken } = useAuth();
+  const { setUser } = useAuth();
   
   const {
     currentStep,
@@ -48,15 +48,18 @@ export function ClaimWizardPage() {
     const result = await submitClaim();
     
     if (result && result.success) {
-      // Store token and user data
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', result.token);
-        localStorage.setItem('user', JSON.stringify(result.user));
-      }
-      
-      // Update auth context
-      setToken(result.token);
-      setUser(result.user);
+      // Extract user data from response (same as AuthProvider)
+      const userData = result.user || result;
+
+      // Add helper methods to user object (same as AuthProvider)
+      const userWithMethods = {
+        ...userData,
+        isGuru: () => userData.role === 'guru',
+        isSiswa: () => userData.role === 'siswa'
+      };
+
+      // Update auth context (stateful authentication, no token storage)
+      setUser(userWithMethods);
       
       // Redirect to dashboard
       router.push('/dashboard');

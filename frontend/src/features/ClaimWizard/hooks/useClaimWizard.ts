@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ClaimFormData, ValidationErrors } from "../types";
 import axios from "@/lib/axios";
 import { ClaimResponse } from "../types";
+import { env } from 'next-runtime-env';
 
 const initialFormData: ClaimFormData = {
   selectedJurusan: null,
@@ -110,6 +111,16 @@ export const useClaimWizard = () => {
     setGeneralError(null);
 
     try {
+      // Get backend URL for CSRF cookie (same as AuthProvider)
+      const backendUrl = env('NEXT_PUBLIC_BACKEND_URL') || 'http://localhost:8000';
+
+      // First, get the CSRF cookie from Laravel Sanctum (same as AuthProvider)
+      await axios.get("/sanctum/csrf-cookie", {
+        baseURL: backendUrl,
+        withCredentials: true
+      });
+
+      // Then attempt claim with stateful authentication
       const response = await axios.post<ClaimResponse>('/auth/claim', {
         nis: formData.selectedNis,
         email: formData.email,
@@ -119,6 +130,9 @@ export const useClaimWizard = () => {
 
       return response.data;
     } catch (error: any) {
+      console.error('Claim error:', error);
+      
+      // Handle errors (same pattern as AuthProvider)
       if (error.response?.status === 403) {
         setGeneralError("Akun sudah diklaim. Silahkan hubungi administrator jika membutuhkan bantuan.");
       } else if (error.response?.status === 422) {
@@ -128,7 +142,7 @@ export const useClaimWizard = () => {
       } else if (error.response?.status === 404) {
         setGeneralError("NIS tidak ditemukan. Silahkan periksa kembali data Anda.");
       } else {
-        setGeneralError("Terjadi kesalahan. Silahkan coba lagi.");
+        setGeneralError(error.response?.data?.message || "Claim failed");
       }
       return null;
     } finally {

@@ -132,7 +132,10 @@ export default function DetailKaryaSiswa({ user, logout }: { user: any; logout: 
                             isDeleting={isDeleting}
                         />
 
-                        <PublishSection proyek={proyek} user={user} onPublicationStatusChanged={() => mutate()} />
+                        {(user?.role === 'guru' || user?.role === 'admin') && (
+                            <PublishSection proyek={proyek} user={user} onPublicationStatusChanged={() => mutate()} />
+                        )}
+
                         {/* <ReviewSection 
                             proyek={proyek} 
                             showReview={showReview} 

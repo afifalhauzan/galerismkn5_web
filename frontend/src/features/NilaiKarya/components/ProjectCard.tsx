@@ -19,33 +19,12 @@ export function ProjectCard({ proyek, onGraded }: ProjectCardProps) {
 
     return (
         <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-            {/* Project Image */}
-            <div className="relative h-48 bg-gray-100 rounded-t-lg overflow-hidden">
-                {proyek.image_url ? (
-                    <Image
-                        src={proyek.image_url}
-                        alt={proyek.judul}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    />
-                ) : (
-                    <div className="flex items-center justify-center h-full">
-                        <HiPhotograph className="w-12 h-12 text-gray-400" />
-                    </div>
-                )}
-
-                {/* Status Badge */}
-                <div className="absolute top-2 left-2">
-                    <span className="bg-orange-100 text-orange-800 px-2 py-1 text-xs font-medium rounded-full">
-                        Menunggu Penilaian
-                    </span>
-                </div>
-            </div>
-
             {/* Project Content */}
             <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                <div className="w-full bg-orange-100 text-orange-800 px-2 py-1 text-xs mb-2 font-medium rounded-full">
+                    Menunggu Penilaian
+                </div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
                     {proyek.judul}
                 </h3>
 

@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => explode(',', env('FRONTEND_URL', 'http://127.0.0.1:3000')),
+    'allowed_origins' => explode(',', env('FRONTEND_URL', 'https://galerismkn5.duckdns.org')),
 
     'allowed_origins_patterns' => [],
 

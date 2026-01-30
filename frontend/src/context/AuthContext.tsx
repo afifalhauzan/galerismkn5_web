@@ -1,11 +1,11 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import Cookies from 'js-cookie';
 import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { Jurusan } from "@/types/proyek";
 import { Kelas } from "@/types/proyek";
+import { env } from 'next-runtime-env';
 
 export interface User {
     id: number;
@@ -26,7 +26,6 @@ export interface User {
 
 interface AuthContextType {
     user: User | null;
-    token: string | null;
     login: (email: string, password: string) => Promise<void>;
     register: (name: string, email: string, nis: string, password: string, role: string, jurusan_id: number, kelas?: string) => Promise<void>;
     logout: () => Promise<void>;
@@ -34,14 +33,12 @@ interface AuthContextType {
     error: string | null;
     clearError: () => void;
     setUser: (user: User | null) => void;
-    setToken: (token: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -49,60 +46,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Helper to clear error
     const clearError = () => setError(null);
 
-    // Check for existing token on app load
+    // Check for existing session on app load
     useEffect(() => {
-        const storedToken = Cookies.get("token");
-        const storedUser = Cookies.get("user");
-
-        if (storedToken && storedUser) {
+        const checkSession = async () => {
             try {
-                setToken(storedToken);
-                const userData = JSON.parse(storedUser);
-                
-                // Check if user data is nested under 'user' property
-                const actualUserData = userData.user || userData;
+                // Try to get current user - this will work if session is valid
+                const response = await axios.get("/user");
+                const userData = response.data.user || response.data;
                 
                 // Add helper methods to user object
                 const userWithMethods = {
-                    ...actualUserData,
-                    isGuru: () => actualUserData.role === 'guru',
-                    isSiswa: () => actualUserData.role === 'siswa'
+                    ...userData,
+                    isGuru: () => userData.role === 'guru',
+                    isSiswa: () => userData.role === 'siswa'
                 };
                 
                 setUser(userWithMethods);
-                
-                // Verify token is still valid by fetching fresh user data
-                axios.get("/user")
-                    .then((res) => {
-                        // Extract user data - handle both nested and direct formats
-                        const freshUserData = res.data.user || res.data;
-                        const freshUser = {
-                            ...freshUserData,
-                            isGuru: () => freshUserData.role === 'guru',
-                            isSiswa: () => freshUserData.role === 'siswa'
-                        };
-                        setUser(freshUser);
-                        Cookies.set("user", JSON.stringify(freshUserData), { expires: 7 });
-                    })
-                    .catch(() => {
-                        // Token is invalid, clear everything
-                        Cookies.remove("token");
-                        Cookies.remove("user");
-                        setToken(null);
-                        setUser(null);
-                    })
-                    .finally(() => setIsLoading(false));
             } catch (error) {
-                // Invalid stored user data, clear everything
-                Cookies.remove("token");
-                Cookies.remove("user");
-                setToken(null);
+                // No valid session, user is not authenticated
                 setUser(null);
+            } finally {
                 setIsLoading(false);
             }
-        } else {
-            setIsLoading(false);
-        }
+        };
+
+        checkSession();
     }, []);
 
     const login = async (email: string, password: string) => {
@@ -110,9 +78,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsLoading(true);
             setError(null);
 
+            // Get backend URL for CSRF cookie
+            const backendUrl = env('NEXT_PUBLIC_BACKEND_URL') || 'http://localhost:8000';
+
+            // First, get the CSRF cookie from Laravel Sanctum
+            await axios.get("/sanctum/csrf-cookie", {
+                baseURL: backendUrl,
+                withCredentials: true
+            });
+
+            // Then attempt login
             const response = await axios.post("/login", { email, password });
             
-            const { access_token, user: userData } = response.data;
+            // Extract user data from response
+            const userData = response.data.user || response.data;
 
             // Add helper methods to user object
             const userWithMethods = {
@@ -121,15 +100,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 isSiswa: () => userData.role === 'siswa'
             };
 
-            // Save to Cookie (Expires in 7 days)
-            Cookies.set("token", access_token, { expires: 7 });
-            Cookies.set("user", JSON.stringify(userData), { expires: 7 });
-            
-            setToken(access_token);
             setUser(userWithMethods);
             
             router.push("/dashboard"); // Redirect after login
         } catch (err: any) {
+            console.error('Login error:', err);
             setError(err.response?.data?.message || "Login failed");
             throw err;
         } finally {
@@ -141,6 +116,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             setIsLoading(true);
             setError(null);
+
+            // Get backend URL for CSRF cookie
+            const backendUrl = env('NEXT_PUBLIC_BACKEND_URL') || 'http://localhost:8000';
+
+            // First, get the CSRF cookie from Laravel Sanctum
+            await axios.get("/sanctum/csrf-cookie", {
+                baseURL: backendUrl,
+                withCredentials: true
+            });
 
             const requestData: any = {
                 name,
@@ -159,7 +143,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             const response = await axios.post("/register", requestData);
 
-            const { access_token, user: userData } = response.data;
+            // Extract user data from response
+            const userData = response.data.user || response.data;
 
             // Add helper methods to user object
             const userWithMethods = {
@@ -168,15 +153,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 isSiswa: () => userData.role === 'siswa'
             };
 
-            // Save to Cookie (Expires in 7 days)
-            Cookies.set("token", access_token, { expires: 7 });
-            Cookies.set("user", JSON.stringify(userData), { expires: 7 });
-            
-            setToken(access_token);
             setUser(userWithMethods);
             
             router.push("/dashboard"); // Redirect after registration
         } catch (err: any) {
+            console.error('Registration error:', err);
             setError(err.response?.data?.message || "Registration failed");
             throw err;
         } finally {
@@ -189,18 +170,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsLoading(true);
             
             // Attempt to logout on server (best effort)
-            if (token) {
-                try {
-                    await axios.post("/logout");
-                } catch {
-                    // Continue logout even if server request fails
-                }
+            try {
+                await axios.post("/logout");
+            } catch {
+                // Continue logout even if server request fails
             }
         } finally {
             // Clear local state regardless of server response
-            Cookies.remove("token");
-            Cookies.remove("user");
-            setToken(null);
             setUser(null);
             setIsLoading(false);
             router.push("/login");
@@ -210,15 +186,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return (
         <AuthContext.Provider value={{ 
             user, 
-            token, 
             login, 
             register, 
             logout, 
             isLoading, 
             error, 
             clearError,
-            setUser,
-            setToken 
+            setUser
         }}>
             {children}
         </AuthContext.Provider>
