@@ -77,7 +77,7 @@ export default function KaryaCarousel({ className = "" }: KaryaCarouselProps) {
                         Karya Unggulan
                     </h2>
                 </div>
-                <div className="relative w-full h-70 md:h-96 mb-8 rounded-2xl overflow-hidden shadow-lg bg-gray-200 flex items-center justify-center">
+                <div className="relative w-full h-70 md:h-96 mb-8 rounded-2xl overflow-hidden shadow-lg bg-gray-50 flex items-center justify-center">
                 <div className="flex space-x-2">
                     <div className="w-3 h-3 bg-sky-600 rounded-full animate-bounce"></div>
                     <div className="w-3 h-3 bg-sky-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

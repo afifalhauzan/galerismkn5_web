@@ -30,3 +30,6 @@
 
 .DS_Store
 Thumbs.db
+frontend/src/components/ui/Footer.tsx
+frontend/src/app/(guest)/credits/page.tsx
+frontend/src/components/ui/Footer.tsx

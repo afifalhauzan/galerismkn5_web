@@ -40,7 +40,7 @@ export default function LandingPage({ user, logout, isLoading }: LandingPageProp
                                 Siap untuk bergabung dan berbagi karyamu?
                             </h2>
                             <p className="text-gray-600 mb-6">
-                                Masuk untuk mengakses dashboard pribadi, unggah karya kamu sendiri, dan terhubung dengan komunitas SMKN 5.
+                                Masuk untuk mengakses dashboard pribadi dan unggah karya kamu sendiri!
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Link
@@ -53,7 +53,7 @@ export default function LandingPage({ user, logout, isLoading }: LandingPageProp
                                     href="/register"
                                     className="border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 rounded-lg font-semibold transition-colors"
                                 >
-                                    Buat Akun
+                                    Klaim Akun Siswa
                                 </Link>
                             </div>
                         </div>
