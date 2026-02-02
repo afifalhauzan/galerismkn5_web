@@ -26,6 +26,30 @@ class Proyek extends Model
     ];
 
     /**
+     * Append youtube_url attribute to JSON serialization
+     */
+    protected $appends = ['youtube_url'];
+
+    /**
+     * Get the YouTube URL if tautan_proyek is a YouTube link
+     */
+    public function getYoutubeUrlAttribute()
+    {
+        if ($this->tautan_proyek && $this->isYouTubeUrl($this->tautan_proyek)) {
+            return $this->tautan_proyek;
+        }
+        return null;
+    }
+
+    /**
+     * Check if a URL is a YouTube URL
+     */
+    private function isYouTubeUrl($url)
+    {
+        return str_contains($url, 'youtube.com') || str_contains($url, 'youtu.be');
+    }
+
+    /**
      * Get the user (siswa) that owns the proyek
      */
     public function user()

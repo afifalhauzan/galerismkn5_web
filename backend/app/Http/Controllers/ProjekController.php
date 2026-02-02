@@ -131,6 +131,8 @@ class ProjekController extends Controller
                 'judul' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
                 'tautan_proyek' => 'nullable|url|max:500',
+                'youtube_url' => 'nullable|url|max:500',
+                'media_type' => 'nullable|in:image,youtube,link',
                 'image_url' => 'nullable|url|max:500',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'jurusan_id' => 'required|exists:jurusans,id',
@@ -148,6 +150,14 @@ class ProjekController extends Controller
 
             $data = $request->except('image');
             $uploadInfo = null;
+
+            // Handle YouTube URL - store it in tautan_proyek field
+            $projectUrl = null;
+            if ($request->youtube_url) {
+                $projectUrl = $request->youtube_url;
+            } elseif ($request->tautan_proyek) {
+                $projectUrl = $request->tautan_proyek;
+            }
 
             // Handle image upload with detailed feedback
             if ($request->hasFile('image')) {
@@ -218,7 +228,7 @@ class ProjekController extends Controller
                 'jurusan_id' => $request->jurusan_id,
                 'judul' => $request->judul,
                 'deskripsi' => $request->deskripsi,
-                'tautan_proyek' => $request->tautan_proyek,
+                'tautan_proyek' => $projectUrl,
                 'image_url' => $data['image_url'] ?? $request->image_url,
                 'status' => $request->status ?? 'terkirim',
                 'is_published' => $request->is_published ?? false,
@@ -332,6 +342,8 @@ class ProjekController extends Controller
                 'judul' => 'sometimes|required|string|max:255',
                 'deskripsi' => 'sometimes|required|string',
                 'tautan_proyek' => 'nullable|url|max:500',
+                'youtube_url' => 'nullable|url|max:500',
+                'media_type' => 'nullable|in:image,youtube,link',
                 'image_url' => 'nullable|url|max:500',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'jurusan_id' => 'sometimes|required|exists:jurusans,id',
@@ -349,6 +361,13 @@ class ProjekController extends Controller
 
             $data = $request->except('image');
             $uploadInfo = null;
+
+            // Handle YouTube URL - store it in tautan_proyek field
+            if ($request->has('youtube_url')) {
+                $data['tautan_proyek'] = $request->youtube_url;
+                // Remove youtube_url from data since it's not a database field
+                unset($data['youtube_url']);
+            }
 
             // Handle image upload if provided
             if ($request->hasFile('image')) {
