@@ -39,7 +39,21 @@ class AkunController extends Controller
         }
 
         if ($request->has('jurusan_id') && $request->jurusan_id) {
-            $query->where('jurusan_id', $request->jurusan_id);
+            $jurusanId = $request->jurusan_id;
+            $query->where(function($q) use ($jurusanId) {
+                // For siswa: check direct jurusan_id column
+                $q->where(function($subQ) use ($jurusanId) {
+                    $subQ->where('role', 'siswa')
+                         ->where('jurusan_id', $jurusanId);
+                })
+                // For guru: check many-to-many relationship
+                ->orWhere(function($subQ) use ($jurusanId) {
+                    $subQ->where('role', 'guru')
+                         ->whereHas('jurusans', function($jurusanQ) use ($jurusanId) {
+                             $jurusanQ->where('jurusan_id', $jurusanId);
+                         });
+                });
+            });
         }
 
         if ($request->has('kelas_id') && $request->kelas_id) {
