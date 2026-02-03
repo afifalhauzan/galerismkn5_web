@@ -92,7 +92,7 @@ export default function Footer() {
 
             <div className="text-sm border-t bg-sky-900 border-gray-700 mt-8 py-3 text-center">
                 <p className="text-gray-300">
-                    Made with 🤍 by <Link href="/credits" className="text-white underline hover:text-blue-200">AYIDA Team</Link> 2025
+                    Made with 🤍 by <Link href="/" className="text-white underline hover:text-blue-200">AYIDA Team</Link> 2025
                 </p>
             </div>
         </footer>
