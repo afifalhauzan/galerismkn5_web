@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import axios from '@/lib/axios';
 import { fetcher, publicFetcher } from '@/lib/axios';
 import { env } from 'next-runtime-env';
 
@@ -66,56 +67,32 @@ export function usePasswordRequirements() {
   };
 }
 
-// Helper function to get token from cookies
-function getTokenFromCookie(): string | null {
-  if (typeof document === 'undefined') return null;
-  
-  const cookies = document.cookie.split(';');
-  const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
-  
-  if (tokenCookie) {
-    return tokenCookie.split('=')[1];
-  }
-  
-  return null;
-}
-
 export async function changePassword(data: ChangePasswordData): Promise<ChangePasswordResponse> {
-  // Try to get token from cookies first, then localStorage
-  const token = getTokenFromCookie() || localStorage.getItem('token');
-  console.log('🔑 Token from cookies:', getTokenFromCookie() ? 'Present' : 'Missing');
-  console.log('🔑 Token from localStorage:', localStorage.getItem('token') ? 'Present' : 'Missing');
-  console.log('🔑 Using token:', token ? 'Present' : 'Missing');
-  
-  const response = await fetch(`${env('NEXT_PUBLIC_API_URL')}/auth/change-password`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json', // This is important for Laravel to return JSON instead of redirect
-    },
-    body: JSON.stringify(data),
-  });
+  try {
+    // Get backend URL for CSRF cookie (same as AuthContext)
+    const backendUrl = env('NEXT_PUBLIC_BACKEND_URL') || 'http://localhost:8000';
 
-  console.log('📡 Change password response status:', response.status);
+    // First, get the CSRF cookie from Laravel Sanctum (same as AuthContext)
+    await axios.get("/sanctum/csrf-cookie", {
+      baseURL: backendUrl,
+      withCredentials: true
+    });
 
-  if (!response.ok) {
-    // Handle different error cases
-    if (response.status === 401) {
+    // Then make the change password request using axios (same pattern as AuthContext)
+    const response = await axios.post("/auth/change-password", data);
+    
+    console.log('✅ Change password success:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Change password error:', error);
+    
+    // Handle different error cases (same pattern as AuthContext)
+    if (error.response?.status === 401) {
       throw new Error('Authentication failed. Please log in again.');
     }
     
-    try {
-      const errorData = await response.json();
-      console.log('❌ Error response:', errorData);
-      throw new Error(errorData.message || 'Failed to change password');
-    } catch (parseError) {
-      // If we can't parse the response, throw a generic error
-      throw new Error(`Server error: ${response.status} ${response.statusText}`);
-    }
+    const errorMessage = error.response?.data?.message || "Failed to change password";
+    console.log('❌ Error response:', error.response?.data);
+    throw new Error(errorMessage);
   }
-
-  const result = await response.json();
-  console.log('✅ Change password success:', result);
-  return result;
 }

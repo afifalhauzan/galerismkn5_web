@@ -53,7 +53,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Login user
+     * Login user with stateful authentication
      */
     public function login(Request $request)
     {
@@ -68,7 +68,13 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Regenerate session to prevent session fixation attacks
+        $request->session()->regenerate();
+
         $user = User::where('email', $request->email)->with(['jurusan', 'kelas', 'jurusans'])->firstOrFail();
+
+        // Manually set the authenticated user in the session
+        Auth::login($user);
 
         // Add jurusan_name to user data
         $userData = $user->toArray();
@@ -79,13 +85,9 @@ class AuthController extends Controller
             $userData['jurusan_ids'] = $user->jurusans->pluck('id')->toArray();
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'message' => 'Login successful',
             'user' => $userData,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
         ], 200);
     }
 
@@ -111,12 +113,17 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout user
+     * Logout user with stateful authentication
      */
     public function logout(Request $request)
     {
-        // Revoke the current token
-        $request->user()->currentAccessToken()->delete();
+        // Logout using Auth facade with web guard for stateful authentication
+        // Auth::logout();
+        Auth::guard('web')->logout();
+
+        // Invalidate the session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Logged out successfully'

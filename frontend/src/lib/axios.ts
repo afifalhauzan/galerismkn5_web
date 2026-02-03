@@ -1,24 +1,21 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { env } from 'next-runtime-env';
 
 const axiosInstance = axios.create({
     baseURL: env('NEXT_PUBLIC_API_URL') || '/api',
+    withCredentials: true, // Enable cookies for stateful authentication
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Accept': 'application/json',
         'Content-Type': 'application/json',
     },
-    timeout: 60000, // 60    seconds timeout
+    timeout: 60000, // 60 seconds timeout
 });
 
-// Request Interceptor: Auto-attach the token
+// Request Interceptor: No need to manually attach tokens - cookies handle this
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = Cookies.get('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
+        // Cookies are automatically sent with withCredentials: true
         return config;
     },
     (error) => {
@@ -26,18 +23,24 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-// Response Interceptor: Handle errors and token expiration
+// Response Interceptor: Handle errors and session expiration
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Token expired or invalid - clear auth data
-            Cookies.remove('token');
-            Cookies.remove('user');
-            
-            // Only redirect if we're in the browser and not already on login page
-            if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-                window.location.href = '/login';
+            // Session expired or invalid - clear any stored user data
+            if (typeof window !== 'undefined') {
+                // Clear any stored user data from localStorage/cookies if any
+                localStorage.removeItem('user');
+                
+                // Only redirect if we're in the browser and not already on login/auth pages or homepage
+                const currentPath = window.location.pathname;
+                const isOnPublicPage = ['/login', '/register', '/'].includes(currentPath);
+                
+                if (!isOnPublicPage) {
+                    console.log('🔄 401 detected, redirecting to login from:', currentPath);
+                    window.location.href = '/login';
+                }
             }
         }
         

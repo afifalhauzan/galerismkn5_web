@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const PROTECTED_ROUTES = [
   '/dashboard',
   '/siswa',
-  '/guru', 
+  '/guru',
   '/admin',
   '/projects',
   '/penilaian',
@@ -20,6 +20,7 @@ const AUTH_ROUTES = ['/login', '/register'];
 
 // Routes that should be accessible without any checks
 const EXCLUDED_ROUTES = [
+  '/', // Homepage should be accessible to everyone
   '/api',
   '/forgot-password',
   '/_next',
@@ -30,24 +31,36 @@ const EXCLUDED_ROUTES = [
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get('token')?.value;
-  
-  // Prevent redirect loops by checking if we're coming from a redirect
-  const isRedirect = request.headers.get('referer')?.includes(request.nextUrl.origin);
-  
-  // Debug logging - will appear in your terminal
+
+  // Get the REAL domain from Caddy headers
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
+  const protocol = request.headers.get('x-forwarded-proto') || 'https';
+  const frontendUrl = `${protocol}://${host}`;
+
+  // Check for your specific production cookie names
+  const laravelSession = request.cookies.get('laravel-session')?.value; // Development session name
+  const galeriSession = request.cookies.get('galeri-smkn-5-session')?.value; // Production session name
+  const xsrfCookie = request.cookies.get('XSRF-TOKEN')?.value;
+
+  // Auth check either in production or development
+  const hasAuthCookie = !!galeriSession || !!laravelSession;
+
+  // Debug logging - refined for production
   console.log('🔄 Proxy executing for path:', pathname);
-  console.log('🌐 Request URL:', request.url);
-  console.log('🌐 Request nextUrl origin:', request.nextUrl.origin);
-  console.log('🔑 Token present:', !!token);
-  console.log('🔄 Is redirect:', isRedirect);
-  
-  // Get frontend URL explicitly
-  const frontendUrl = request.nextUrl.origin; // This should be http://localhost:3000
+  console.log('🌐 Real Request URL:', `${frontendUrl}${pathname}`);
+  console.log('🍪 Laravel (LOCALHOST) Session:', !!laravelSession ? '✅ Found' : '❌ Missing');
+  console.log('🍪 Galeri (PROD) Session:', !!galeriSession ? '✅ Found' : '❌ Missing');
+  console.log('🔐 XSRF cookie present:', !!xsrfCookie);
+  console.log('🔒 Auth Status:', hasAuthCookie ? 'Authenticated' : 'Guest');
   console.log('🏠 Frontend URL:', frontendUrl);
-  
-  // Skip proxy for excluded routes
-  if (EXCLUDED_ROUTES.some(route => pathname.startsWith(route))) {
+
+  // Skip proxy for excluded routes - use exact match for root route to avoid conflicts
+  if (EXCLUDED_ROUTES.some(route => {
+    if (route === '/') {
+      return pathname === '/'; // Exact match for homepage
+    }
+    return pathname.startsWith(route);
+  })) {
     console.log('⏭️ Skipping proxy for excluded route:', pathname);
     return NextResponse.next();
   }
@@ -59,54 +72,81 @@ export async function proxy(request: NextRequest) {
   console.log('🛡️ Is protected route:', isProtectedRoute);
   console.log('🔐 Is auth route:', isAuthRoute);
 
-  // Handle authentication routes
+  // Handle authentication routes - redirect authenticated users to dashboard
   if (isAuthRoute) {
-    // If user is authenticated and trying to access auth routes, redirect to dashboard
-    if (token) {
-      console.log('🔀 Redirecting authenticated user from auth route to dashboard');
+    // If user has valid session and XSRF tokens, redirect to dashboard immediately
+    if (hasAuthCookie && xsrfCookie) {
+      console.log('🔄 Authenticated user on auth route, redirecting to dashboard');
       const dashboardUrl = new URL('/dashboard', frontendUrl);
       console.log('🔗 Dashboard redirect URL:', dashboardUrl.toString());
       return NextResponse.redirect(dashboardUrl);
     }
-    console.log('✅ Allowing access to auth route for unauthenticated user');
+
+    console.log('✅ Guest user accessing auth route, allowing access');
     return NextResponse.next();
   }
 
-  // Handle protected routes
+  // Handle protected routes - session check and password validation
   if (isProtectedRoute) {
-    // If user is not authenticated and trying to access protected routes
-    if (!token) {
-      console.log('🚫 Redirecting unauthenticated user to login from:', pathname);
-      const loginUrl = new URL('/login', request.nextUrl.origin);
+    // Basic session check - if no session cookies, definitely not authenticated
+    if (!hasAuthCookie) {
+      console.log('🚫 No session cookie found, redirecting to login from:', pathname);
+      const loginUrl = new URL('/login', frontendUrl);
       console.log('🔗 Login redirect URL:', loginUrl.toString());
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // For authenticated users accessing protected routes, check password change status
-    console.log('🔍 Checking password status for authenticated user on protected route');
+    console.log('✅ Session cookie present, checking password status for protected route');
+    
+    // Check password status for authenticated user on protected route
     try {
-      const apiUrl = env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000';
-      console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
+      // Use internal backend URL for middleware API calls (Docker container network)
+      const internalApiUrl = process.env.NODE_ENV === 'production' ? 'http://backend:8000/api' : 'http://localhost:8000/api';
+      // Fallback to external URL if internal DNS fails
+      const externalApiUrl = `${frontendUrl}/api`;
       
-      const response = await fetch(`${apiUrl}/auth/password-check`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
+      let apiUrl = internalApiUrl;
+      let useFallback = false;
+      
+      console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
 
-      console.log('📡 API response status:', response.status);
+      let response;
+      try {
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+            'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
+          },
+        });
+      } catch (dnsError) {
+        console.log('⚠️ DNS resolution failed for internal backend, trying external URL');
+        console.error('DNS Error:', dnsError.message);
+        apiUrl = externalApiUrl;
+        useFallback = true;
+        
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+          },
+        });
+      }
+
+      console.log('📡 API response status:', response.status, useFallback ? '(using fallback URL)' : '(using internal URL)');
 
       if (response.ok) {
         const responseData = await response.json();
         console.log('📋 Password check data:', responseData);
-        
+
         // Extract the actual data from the response
         const data = responseData.data || responseData;
-        
+
         // If user needs to change password and not already on change-password page
         if (data.needs_password_change && pathname !== '/change-password') {
           console.log('🔄 User needs password change, redirecting to change-password page');
@@ -114,76 +154,95 @@ export async function proxy(request: NextRequest) {
           console.log('🔗 Change password redirect URL:', changePasswordUrl.toString());
           return NextResponse.redirect(changePasswordUrl);
         }
+      } else if (response.status === 401) {
+        console.log('🚫 Authentication invalid, redirecting to login');
+        const loginUrl = new URL('/login', frontendUrl);
+        console.log('🔗 401 Login redirect URL:', loginUrl.toString());
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+    } catch (error) {
+      console.error('❌ Proxy password check error:', error);
+      // On error, allow request to continue to avoid breaking the app
+    }
+
+    console.log('✅ Password check passed, allowing access to protected route');
+    return NextResponse.next();
+  }
+
+  // Handle change-password route
+  if (pathname === '/change-password') {
+    console.log('🔑 Handling change-password route');
+
+    // Basic session check
+    if (!hasAuthCookie) {
+      console.log('🚫 No session for change-password page, redirecting to login');
+      const loginUrl = new URL('/login', frontendUrl);
+      console.log('🔗 Change-password login redirect URL:', loginUrl.toString());
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Check if user still needs password change
+    try {
+      // Use internal backend URL for middleware API calls (Docker container network)
+      const internalApiUrl = process.env.NODE_ENV === 'production' ? 'http://backend:8000/api' : 'http://localhost:8000/api';
+      // Fallback to external URL if internal DNS fails
+      const externalApiUrl = `${frontendUrl}/api`;
+      
+      let apiUrl = internalApiUrl;
+      let useFallback = false;
+      
+      console.log('📡 Making API call to:', `${apiUrl}/auth/password-check`);
+
+      let response;
+      try {
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+            'Host': 'galerismkn5.duckdns.org', // Tell Laravel which domain you are
+          },
+        });
+      } catch (dnsError) {
+        console.log('⚠️ DNS resolution failed for internal backend, trying external URL');
+        console.error('DNS Error:', dnsError.message);
+        apiUrl = externalApiUrl;
+        useFallback = true;
         
+        response = await fetch(`${apiUrl}/auth/password-check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': request.headers.get('cookie') || '', // Forward cookies for authentication
+          },
+        });
+      }
+
+      console.log('📡 API response status:', response.status, useFallback ? '(using fallback URL)' : '(using internal URL)');
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('📋 Password check data:', responseData);
+
+        // Extract the actual data from the response
+        const data = responseData.data || responseData;
+
         // If user doesn't need password change but is on change-password page, redirect to dashboard
-        if (!data.needs_password_change && pathname === '/change-password') {
+        if (!data.needs_password_change) {
           console.log('✅ Password already changed, redirecting to dashboard');
           const dashboardUrl = new URL('/dashboard', frontendUrl);
           console.log('🔗 Dashboard redirect URL:', dashboardUrl.toString());
           return NextResponse.redirect(dashboardUrl);
         }
-        
-        console.log('✅ Password check passed, allowing access');
-      } else if (response.status === 401) {
-        console.log('🚫 Token invalid/expired, redirecting to login');
-        // Token invalid or expired, redirect to login
-        const loginUrl = new URL('/login', request.nextUrl.origin);
-        console.log('🔗 401 Login redirect URL:', loginUrl.toString());
-        loginUrl.searchParams.set('redirect', pathname);
-        const redirectResponse = NextResponse.redirect(loginUrl);
-        redirectResponse.cookies.delete('token');
-        return redirectResponse;
       }
     } catch (error) {
-      console.error('❌ Proxy password check error:', error);
-      // On error, allow request to continue to avoid breaking the app
-      // The client-side components will handle the error appropriately
+      console.error('❌ Change-password route error:', error);
     }
-  }
 
-  // Handle change-password route separately
-  if (pathname === '/change-password') {
-    console.log('🔑 Handling change-password route');
-    // Must be authenticated to access change-password page
-    if (!token) {
-      console.log('🚫 No token for change-password page, redirecting to login');
-      const loginUrl = new URL('/login', request.nextUrl.origin);
-      console.log('🔗 Change-password login redirect URL:', loginUrl.toString());
-      return NextResponse.redirect(loginUrl);
-    }
-    
-    // Check if password has been changed (to handle post-change redirect)
-    try {
-      const apiUrl = env('NEXT_PUBLIC_API_URL') || 'http://localhost:8000';
-      console.log('📡 Checking password status on change-password page:', `${apiUrl}/auth/password-check`);
-      
-      const response = await fetch(`${apiUrl}/auth/password-check`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        const data = responseData.data || responseData;
-        
-        // If password has been changed, redirect to dashboard
-        if (!data.needs_password_change) {
-          console.log('✅ Password changed successfully, redirecting to dashboard');
-          const dashboardUrl = new URL('/dashboard', frontendUrl);
-          console.log('🔗 Post-change dashboard redirect URL:', dashboardUrl.toString());
-          return NextResponse.redirect(dashboardUrl);
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error checking password status on change-password page:', error);
-    }
-    
     console.log('✅ Allowing access to change-password page');
-    // If authenticated, allow access to change-password page
     return NextResponse.next();
   }
 
